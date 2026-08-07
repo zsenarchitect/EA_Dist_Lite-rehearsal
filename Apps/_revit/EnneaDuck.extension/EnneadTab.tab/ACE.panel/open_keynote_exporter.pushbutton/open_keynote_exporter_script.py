@@ -1,16 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__doc__ = """Launch the Keynote Exporter app for editing the keynote spreadsheet outside Revit.
+__doc__ = """Open the Keynote Exporter -- now a standalone web service.
 
-Opens the standalone Keynote Exporter, which reads and writes the older Excel keynote
-format still used on some projects. Revit stays open and your model is untouched."""
+The Keynote Exporter has been extracted from EnneadTab-OS into its own product at
+https://enneadtab.com/keynote-exporter. This button opens it in your browser; the old
+bundled .exe was retired to shrink the repo. Revit stays open and your model is untouched."""
 __title__ = "Open Keynote Exporter"
 
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
 
-from EnneadTab import ERROR_HANDLE, LOG, EXE
+import webbrowser
+
+from EnneadTab import ERROR_HANDLE, LOG
 from EnneadTab.REVIT import REVIT_APPLICATION
 from Autodesk.Revit import DB # pyright: ignore 
 
@@ -21,8 +24,10 @@ DOC = REVIT_APPLICATION.get_doc()
 @LOG.log(__file__, __title__)
 @ERROR_HANDLE.try_catch_error()
 def open_keynote_exporter(doc):
-    
-    EXE.try_open_app("KeynoteExporter")
+    # Keynote Exporter is now the standalone service EnneadTab-KeynoteExporter
+    # (enneadtab.com/keynote-exporter). The legacy bundled .exe was cut from
+    # EnneadTab-OS to shrink the repo; this button now redirects to the web service.
+    webbrowser.open("https://enneadtab.com/keynote-exporter")
 
 
 

@@ -49,6 +49,12 @@ def get_flag_path():
     return FOLDER.get_local_dump_folder_file(FLAG_FILE_NAME)
 
 
+def get_installed_arcade_exe():
+    """Public form of _get_installed_arcade_exe, for callers that want to offer
+    the arcade themselves (SYNC_SUMMARY's card action) rather than arm a watcher."""
+    return _get_installed_arcade_exe()
+
+
 def _get_installed_arcade_exe():
     """The NSIS per-user install location, or None. Checked at WATCH time too (the
     PowerShell re-tests existence), but checking here means an uninstalled machine

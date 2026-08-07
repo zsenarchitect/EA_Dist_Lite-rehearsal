@@ -630,6 +630,19 @@ def doc_synced(doc):
         ARCADE.end_wait_watch()
     except Exception:
         pass
+
+    # End-of-wait bookkeeping for the session card: report what this sync earned
+    # to the Bank (queued locally, posted at the next startup -- never a network
+    # call here). Gated on is_sync_cancelled for the same reason update_sync_queue
+    # is: this hook ALSO fires when the user chose to wait in the queue, and no
+    # sync actually happened, so there is nothing to credit.
+    if not REVIT_EVENT.is_sync_cancelled():
+        try:
+            from EnneadTab import SYNC_SUMMARY
+            SYNC_SUMMARY.on_sync_finished(doc, doc_title)
+        except Exception:
+            pass
+
     REVIT_SYNC.update_last_sync_data_file(doc)
 
     update_sync_queue(doc)

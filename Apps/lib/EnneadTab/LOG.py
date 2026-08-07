@@ -34,6 +34,7 @@ import FOLDER
 import DATA_FILE
 import ENVIRONMENT
 import ERROR_HANDLE
+import WEB_GUARD
 
 LOG_FILE_NAME = "log_{}".format(USER.USER_NAME)
 
@@ -125,6 +126,42 @@ def log_usage(func, *args):
 whereas revit need to look at local func run"""
 
 
+def _is_button_script(script_path):
+    """True only for a real, clickable tool bundle.
+
+    This decorator is NOT only applied to buttons: `hooks/doc-syncing.py`,
+    `hooks/doc-synced.py` and `plugin_startup.py` all carry it too. Reporting
+    those to the Bank as `tool_run` would be wrong twice over -- a sync is not a
+    tool use, and those firings would burn the daily earn cap that real tool use
+    is supposed to fill. It would also put a file write on the sync path, which
+    the whole session-card design exists to keep clear.
+
+    So the test is DEFAULT-DENY: a path only qualifies if one of its folders is a
+    button bundle, i.e. ends in "button" -- `.pushbutton`, `.smartbutton`,
+    `.splitbutton` (Revit) and `.button` (Rhino). `.pulldown`, `.stack`, `.panel`
+    and `.tab` are containers whose scripts already sit inside a button folder,
+    so they need no separate case. Anything decorated in future that is not a
+    button is silently excluded, which is the correct direction to fail: a missed
+    coin is better than a fabricated one.
+
+    Args:
+        script_path (str): the decorated script's full path.
+
+    Returns:
+        bool: True if this invocation represents a user clicking a tool.
+    """
+    if not script_path:
+        return False
+    try:
+        normalized = str(script_path).replace("\\", "/")
+    except Exception:
+        return False
+    for part in normalized.split("/"):
+        if part.lower().endswith("button"):
+            return True
+    return False
+
+
 @FOLDER.backup_data(LOG_FILE_NAME, "log")
 def log(script_path, func_name_as_record):
     """Decorator for persistent function usage logging.
@@ -189,6 +226,27 @@ def log(script_path, func_name_as_record):
                     pass
                 try:
                     send_usage_to_infrawatch(environment, function_name, result)
+                except Exception:
+                    pass
+
+                # Third sink: the EnneadTab economy. Unlike the two above this one
+                # does NOT touch the network -- it appends to a local outbox that
+                # LEADER_BOARD.refresh_async() drains at the next startup. The
+                # click path stays local, and the server's 48h occurred_at window
+                # is what makes deferring legal.
+                #
+                # Its own try/except, like its neighbours, and deliberately the
+                # LAST thing before `return out`: the bare `except:` below re-runs
+                # `func`, so anything that can raise up there executes the user's
+                # tool a second time. Nothing added here may reach it.
+                try:
+                    if _is_button_script(script_path):
+                        from EnneadTab import LEADER_BOARD
+                        LEADER_BOARD.report_tool_run(
+                            function_name,
+                            duration_seconds=t_end - t_start,
+                            script_path=script_path,
+                        )
                 except Exception:
                     pass
 
@@ -280,6 +338,7 @@ def _try_infrawatch_urllib3(environment, function_name, result):
             body=body,
             headers={"Content-Type": "application/json"},
             timeout=10.0,
+            redirect=False,
         )
         if response.status == 200:
             return True
@@ -306,7 +365,7 @@ def _try_infrawatch_urllib2(environment, function_name, result):
             data=body,
             headers={"Content-Type": "application/json"},
         )
-        response = urllib2.urlopen(req, timeout=10)
+        response = WEB_GUARD.urlopen_no_redirect(req, 10)
         if response.getcode() == 200:
             return True
         ERROR_HANDLE.print_note(
@@ -331,7 +390,7 @@ def _try_infrawatch_urllib_request(environment, function_name, result):
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        response = urllib.request.urlopen(req, timeout=10)
+        response = WEB_GUARD.urlopen_no_redirect(req, 10)
         if response.getcode() == 200:
             return True
         ERROR_HANDLE.print_note(
@@ -422,7 +481,7 @@ def _try_urllib3_usage_implementation(environment, function_name, result):
         encoded_data = urllib.parse.urlencode(form_data).encode('utf-8')
         
         # Send request
-        response = http.request('POST', g_form_url, body=encoded_data, headers=headers, timeout=30.0)
+        response = http.request('POST', g_form_url, body=encoded_data, headers=headers, timeout=30.0, redirect=False)
         
         if response.status == 200:
             response_content = response.data.decode('utf-8')
@@ -481,7 +540,7 @@ def _try_urllib2_usage_implementation(environment, function_name, result):
         req.add_header('Upgrade-Insecure-Requests', '1')
         
         # Send the request
-        response = urllib2.urlopen(req, timeout=30)
+        response = WEB_GUARD.urlopen_no_redirect(req, 30)
         # Google Forms returns a 200 status even on successful submission
         if response.getcode() == 200:
             # Read response to check for success indicators
@@ -546,7 +605,7 @@ def _try_urllib_request_usage_implementation(environment, function_name, result)
         req.add_header('Upgrade-Insecure-Requests', '1')
         
         # Send the request
-        response = urllib.request.urlopen(req, timeout=30)
+        response = WEB_GUARD.urlopen_no_redirect(req, 30)
         # Google Forms returns a 200 status even on successful submission
         if response.getcode() == 200:
             # Read response to check for success indicators

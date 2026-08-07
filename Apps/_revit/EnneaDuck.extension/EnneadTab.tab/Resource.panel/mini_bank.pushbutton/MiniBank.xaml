@@ -120,17 +120,17 @@
                         <RowDefinition />
 
                     </Grid.RowDefinitions>
-                    <Button Content = "Reset My User Data" Click = "clear_data_click" Grid.Column = "0" Grid.Row="0"/>
-                    <Button Content="Check Specific Account." Click="check_account_click"  Grid.Column ="0" Grid.Row="1 "/>
-                    <Button Content="Bank Manager Access." Click="bank_manager_Click"  Grid.Column ="0" Grid.Row="2 "/>
+                    <Button Content = "Refresh From Bank" Click = "refresh_click" Grid.Column = "0" Grid.Row="0"/>
+                    <Button Content="My Transaction History" Click="check_account_click"  Grid.Column ="0" Grid.Row="1 "/>
+                    <Button Content="Office Leaderboard" Click="leaderboard_click"  Grid.Column ="0" Grid.Row="2 "/>
 
                 </Grid>
 
 
                 <Separator/>
 
-                <TextBlock x:Name="debug_textbox" Text="debug text" Foreground="#FFCBCBCB" />
-                <TextBlock Text="Manual Coin Maker(Final amount added after UI window closed)" TextWrapping="Wrap"/>
+                <TextBlock x:Name="debug_textbox" Text="debug text" Foreground="#FFCBCBCB" TextWrapping="Wrap" MaxWidth="500"/>
+                <TextBlock Text="Quacks are earned by using EnneadTab. The bank does the counting - this button just makes a nice noise." TextWrapping="Wrap"/>
                 <Button Content="Click Me! Good things will happen..." Click="manual_coin_Click" FontSize="15"/>
                 <Image x:Name="duck_img" HorizontalAlignment="Center" MaxHeight="200"/>
                 <Button Content="Close MiniBank" Click="close_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30"  Margin="0,5,0,5"/>

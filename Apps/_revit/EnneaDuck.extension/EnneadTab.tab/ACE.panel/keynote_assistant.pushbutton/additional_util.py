@@ -1,6 +1,7 @@
 import os
+import webbrowser
 
-import proDUCKtion # pyright: ignore 
+import proDUCKtion # pyright: ignore
 proDUCKtion.validify()
 # import sys
 # for i, path in enumerate(sys.path):
@@ -34,8 +35,10 @@ KEYNOTE_ID_COLUMN_NAME = "KEYNOTE ID"
 
 
 def open_new_keynote_exporter():
-
-    EXE.try_open_app("KeynoteExporter")
+    # Retired: the old bundled KeynoteExporter.exe was cut from EnneadTab-OS to shrink the
+    # repo. Keynote Exporter is now the standalone service EnneadTab-KeynoteExporter;
+    # redirect to it on the web instead of launching the legacy exe.
+    webbrowser.open("https://enneadtab.com/keynote-exporter")
 
 
 # Project data helper functions

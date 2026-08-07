@@ -15,7 +15,7 @@ Usage:
 
 import System  # pyright: ignore
 from System.Net import HttpListener  # pyright: ignore
-from System.Threading import Thread, ThreadStart  # pyright: ignore
+from System.Threading import Thread, ThreadStart, ManualResetEvent  # pyright: ignore
 from System.IO import StreamReader  # pyright: ignore
 import Rhino  # pyright: ignore
 import rhinoscriptsyntax as rs  # pyright: ignore
@@ -165,8 +165,16 @@ def _handle_request(context):
     # still reach this port; that needs a per-session token, which requires a
     # coordinated change across EnneadTab-OS + EnneadTab-RhinoAssistant. Tracked
     # separately -- do not read this guard as full authentication.
+    #
+    # DO NOT add "Sec-Fetch-Mode" to this list. Node/undici (the Electron MAIN-process
+    # fetch used by RhinoAssistant, and every Node fetch) unconditionally attaches
+    # `Sec-Fetch-Mode: cors` -- it is a non-removable default header (undici #1305), NOT
+    # a browser tell. Including it 403's the legitimate desktop client on every port, so
+    # discoverRhino() sees only 403s and the UI reports "cannot find server" while the
+    # server is actually healthy. A real browser is still caught by Origin (sent on every
+    # cross-origin POST -- the exec() attack vector) and Sec-Fetch-Site.
     browser_header = None
-    for header_name in ("Origin", "Referer", "Sec-Fetch-Site", "Sec-Fetch-Mode"):
+    for header_name in ("Origin", "Referer", "Sec-Fetch-Site"):
         try:
             if request.Headers[header_name]:
                 browser_header = header_name
@@ -198,6 +206,18 @@ def _handle_request(context):
         # Use a mutable list to pass results out of the closure
         result_holder = [None, 200]
 
+        # InvokeOnUiThread is FIRE-AND-FORGET: it queues do_on_ui on Rhino's UI thread
+        # and returns immediately. Without waiting, we read result_holder before do_on_ui
+        # has run and serialize json.dumps(None) -> "null" with the default 200. The
+        # RhinoAssistant client's discoverRhino() then sees a body with no app == "rhino"
+        # and reports "Rhino is not connected" against a perfectly healthy server (and
+        # every tool call likewise returns null). Block this listener thread on a
+        # ManualResetEvent until the UI thread finishes populating result_holder. Bounded
+        # so a modal/busy UI thread times out (504) instead of hanging the connection.
+        # If InvokeOnUiThread ever runs synchronously, done is already set and WaitOne
+        # returns immediately -- correct either way.
+        done = ManualResetEvent(False)
+
         def do_on_ui():
             try:
                 r, s = _route(path, method, body, query)
@@ -206,8 +226,13 @@ def _handle_request(context):
             except Exception:
                 result_holder[0] = {"error": traceback.format_exc()}
                 result_holder[1] = 500
+            finally:
+                done.Set()
 
         Rhino.RhinoApp.InvokeOnUiThread(System.Action(do_on_ui))
+        if not done.WaitOne(30000):
+            result_holder[0] = {"error": "Rhino UI thread did not respond within 30s"}
+            result_holder[1] = 504
 
         result = result_holder[0]
         status = result_holder[1]
@@ -283,16 +308,30 @@ def _route(path, method, body, query):
             return _handle_element_params(elem_id), 200
         if sub == "set-parameter" and method == "POST":
             return _handle_set_param(elem_id, merged), 200
+        if sub == "user-text" and method == "GET":
+            return _handle_user_text(elem_id), 200
         return {"error": "Unknown element sub-route: {}".format(sub)}, 404
 
     if route == "levels":
         return {"levels": [], "note": "Levels are not applicable in Rhino."}, 200
 
+    if route == "selected":
+        return _handle_selected(), 200
+
     if route == "views":
         return _handle_views(), 200
 
     if route == "families":
+        # /families/<name>/instances/ — instances of one block definition.
+        if len(segments) >= 4 and segments[3] == "instances":
+            return _handle_block_instances(segments[2]), 200
         return _handle_block_defs(merged), 200
+
+    if route == "groups":
+        return _handle_groups(), 200
+
+    if route == "extents":
+        return _handle_extents(), 200
 
     if route == "layers":
         return _handle_layers(), 200
@@ -584,6 +623,28 @@ def _handle_execute_code(data):
     return {"success": True, "stdout": stdout_text}
 
 
+def _allowed_function_names(mcp_tools):
+    """Extract callable function names from a module's __mcp_tools__.
+
+    Mirrors the Revit sibling (routes/enneadtab_tools.py). __mcp_tools__ entries
+    are dicts ({"function": name, ...}); older modules may list bare strings.
+    Both forms are accepted. This is the fix for the run-tool 403: the old check
+    did `function_name not in mcp_tools`, testing a string against a list of
+    DICTS, which ALWAYS failed -> every run-tool call was rejected.
+    """
+    names = []
+    if not mcp_tools or not isinstance(mcp_tools, (list, tuple)):
+        return names
+    for entry in mcp_tools:
+        if isinstance(entry, dict):
+            name = entry.get("function")
+            if name:
+                names.append(name)
+        elif isinstance(entry, str):
+            names.append(entry)
+    return names
+
+
 def _handle_list_tools():
     """GET /enneadtab/tools/ — scan EnneadTab modules for __mcp_tools__."""
     lib_path = _ensure_lib_on_path()
@@ -638,9 +699,12 @@ def _handle_run_tool(data):
     except ImportError as e:
         return {"error": "Module not found: {}. {}".format(module_name, str(e))}
 
-    # Verify function is in __mcp_tools__ whitelist
+    # Verify function is in __mcp_tools__ whitelist. Entries are dicts
+    # ({"function": name, ...}), so compare against the EXTRACTED names, not the
+    # raw dict list (the old `function_name not in mcp_tools` always 403'd).
     mcp_tools = getattr(mod, "__mcp_tools__", None)
-    if not mcp_tools or function_name not in mcp_tools:
+    allowed_functions = _allowed_function_names(mcp_tools)
+    if function_name not in allowed_functions:
         return {
             "error": "Function '{}' is not in __mcp_tools__ for module '{}'".format(
                 function_name, module_name
@@ -763,6 +827,88 @@ def _handle_export(data):
         return {"success": True, "path": export_path, "format": fmt}
     else:
         return {"error": "Export command failed. Check file path and format."}
+
+
+def _handle_selected():
+    """GET /enneadtab/selected/ — currently selected objects (id, name, layer, type)."""
+    ids = rs.SelectedObjects() or []
+    elements = []
+    for obj_id in ids:
+        elements.append({
+            "id": str(obj_id),
+            "name": rs.ObjectName(obj_id) or "",
+            "layer": rs.ObjectLayer(obj_id) or "",
+            "type": rs.ObjectType(obj_id),
+        })
+    return {"count": len(elements), "selected": elements}
+
+
+def _handle_user_text(elem_id):
+    """GET /enneadtab/element/<id>/user-text/ — all user-text key/value pairs."""
+    try:
+        guid = System.Guid(elem_id)
+    except Exception:
+        return {"error": "Invalid GUID: {}".format(elem_id)}
+
+    if not rs.IsObject(guid):
+        return {"error": "Object not found: {}".format(elem_id)}
+
+    # rs.GetUserText(guid) with no key returns the list of key names.
+    keys = rs.GetUserText(guid) or []
+    user_text = {}
+    for key in keys:
+        user_text[key] = rs.GetUserText(guid, key)
+
+    return {"id": elem_id, "count": len(user_text), "user_text": user_text}
+
+
+def _handle_groups():
+    """GET /enneadtab/groups/ — group names with member object counts."""
+    names = rs.GroupNames() or []
+    groups = []
+    for name in names:
+        members = rs.ObjectsByGroup(name) or []
+        groups.append({
+            "name": name,
+            "object_count": len(members),
+        })
+    return {"count": len(groups), "groups": groups}
+
+
+def _handle_block_instances(block_name):
+    """GET /enneadtab/families/<name>/instances/ — instances of one block, with insert points."""
+    # AbsolutePath may leave the name segment percent-escaped (spaces -> %20);
+    # unescape defensively (a no-op on an already-decoded name).
+    name = System.Uri.UnescapeDataString(block_name)
+
+    if not rs.IsBlock(name):
+        return {"error": "Block not found: {}".format(name)}
+
+    ids = rs.BlockInstances(name) or []
+    instances = []
+    for obj_id in ids:
+        pt = rs.BlockInstanceInsertPoint(obj_id)
+        insert_point = [pt.X, pt.Y, pt.Z] if pt else None
+        instances.append({
+            "id": str(obj_id),
+            "insert_point": insert_point,
+        })
+
+    return {"block": name, "count": len(instances), "instances": instances}
+
+
+def _handle_extents():
+    """GET /enneadtab/extents/ — bounding box of all objects as corner points."""
+    ids = rs.AllObjects() or []
+    if not ids:
+        return {"corners": None, "note": "no objects in document"}
+
+    box = rs.BoundingBox(ids)
+    if not box:
+        return {"corners": None, "note": "no bounding box"}
+
+    corners = [[pt.X, pt.Y, pt.Z] for pt in box]
+    return {"count": len(corners), "corners": corners}
 
 
 # ---------------------------------------------------------------------------

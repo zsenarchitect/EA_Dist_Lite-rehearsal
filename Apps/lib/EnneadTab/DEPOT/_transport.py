@@ -28,6 +28,7 @@ live Rhino 7 / Revit host. Keep the two branches structurally identical.
 import os
 
 # Fully-qualified sibling imports (repo rule: never bare "import _common").
+from EnneadTab import WEB_GUARD
 from EnneadTab.AI import _common
 
 
@@ -50,6 +51,18 @@ class Result(object):
         self.error = error               # str, for logging only
 
     def ok(self):
+        """200 means the DEPOT answered -- which is only true because this
+        transport no longer follows redirects.
+
+        Home's middleware answers a gated API path with a 302 to an SSO login
+        page. Followed, that becomes a 200 with an HTML body, and this method
+        returned True for it: STATE.write_state then reported success for a write
+        that never happened, across all 39 DATA_FILE(is_local=False) call sites,
+        with no alarm because nothing looked like a failure. Every request path
+        here now sets AllowAutoRedirect=False / uses a no-redirect opener, so a
+        redirect stays a 3xx, ok() stays False, and write_state falls through to
+        _alarm.announce_depot_unreachable. See WEB_GUARD.
+        """
         return self.status == 200
 
     def not_modified(self):
@@ -139,6 +152,7 @@ def _get_dotnet(url, headers, timeout_ms):
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
         request = WebRequest.Create(url)
         request.Method = "GET"
+        WEB_GUARD.harden_dotnet_request(request)
         request.Timeout = timeout_ms
         for k, v in headers.items():
             _dotnet_set_header(request, k, v)
@@ -192,6 +206,7 @@ def _download_dotnet(url, tmp_path, headers, timeout_ms):
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
         request = WebRequest.Create(url)
         request.Method = "GET"
+        WEB_GUARD.harden_dotnet_request(request)
         request.Timeout = timeout_ms
         for k, v in headers.items():
             request.Headers.Add(k, v)
@@ -239,7 +254,7 @@ def _get_urllib(url, headers, timeout_ms):
         req = Request(url)
         for k, v in headers.items():
             req.add_header(k, v)
-        resp = urlopen(req, timeout=timeout_ms / 1000.0)
+        resp = WEB_GUARD.urlopen_no_redirect(req, timeout_ms / 1000.0)
         try:
             etag = resp.headers.get("ETag")
             # urllib does not always RAISE for 304 (no default 304 handler); it
@@ -276,7 +291,7 @@ def _download_urllib(url, tmp_path, headers, timeout_ms):
         req = Request(url)
         for k, v in headers.items():
             req.add_header(k, v)
-        resp = urlopen(req, timeout=timeout_ms / 1000.0)
+        resp = WEB_GUARD.urlopen_no_redirect(req, timeout_ms / 1000.0)
         try:
             etag = resp.headers.get("ETag")
             f = open(tmp_path, "wb")
@@ -329,6 +344,7 @@ def _put_dotnet(url, body_str, headers, timeout_ms):
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
         request = WebRequest.Create(url)
         request.Method = "PUT"
+        WEB_GUARD.harden_dotnet_request(request)
         request.Timeout = timeout_ms
         request.ContentType = "application/json"
         for k, v in headers.items():
@@ -371,7 +387,7 @@ def _put_urllib(url, body_str, headers, timeout_ms):
         for k, v in headers.items():
             req.add_header(k, v)
         req.get_method = lambda: "PUT"   # Py2 + Py3
-        resp = urlopen(req, timeout=timeout_ms / 1000.0)
+        resp = WEB_GUARD.urlopen_no_redirect(req, timeout_ms / 1000.0)
         try:
             status = getattr(resp, "status", None)
             if status is None:

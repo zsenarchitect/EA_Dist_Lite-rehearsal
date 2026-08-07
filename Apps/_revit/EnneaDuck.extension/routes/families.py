@@ -33,20 +33,20 @@ def register_family_routes(api):
                 if fam_cat.Name != category_filter:
                     continue
 
-            # Collect type names
-            type_names = []
-            for type_id in family.GetFamilySymbolIds():
-                symbol = doc.GetElement(type_id)
-                if symbol:
-                    type_names.append(symbol.Name)
+            # Count types WITHOUT fetching each symbol. The old code did
+            # doc.GetElement(type_id) for every type of every family just to read
+            # symbol.Name -- thousands of API calls on a large model, blowing the
+            # 30s client timeout (HTTP 408). GetFamilySymbolIds() alone gives the
+            # count; per-type names are dropped from this list route (ask for a
+            # specific family's types via a targeted query if needed).
+            type_count = len(family.GetFamilySymbolIds())
 
             families.append({
                 "id": REVIT_APPLICATION.get_element_id_value(family.Id),
                 "name": family.Name,
                 "category": family.FamilyCategory.Name if family.FamilyCategory else None,
                 "is_in_place": family.IsInPlace,
-                "type_count": len(type_names),
-                "type_names": type_names,
+                "type_count": type_count,
             })
 
         return routes.make_response(data={

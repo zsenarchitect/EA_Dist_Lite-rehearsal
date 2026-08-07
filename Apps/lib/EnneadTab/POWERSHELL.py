@@ -3,7 +3,14 @@ import subprocess
 try:
     import winreg
 except ImportError:
-    import _winreg as winreg  # IronPython 2.7 compatibility
+    try:
+        import _winreg as winreg  # IronPython 2.7 compatibility
+    except ImportError:
+        # Non-Windows CPython (macOS/Linux dev or CI): neither module exists.
+        # The registry helpers below are all guarded by try/except Exception,
+        # so a None here degrades to a caught AttributeError instead of an
+        # uncaught ImportError that crashes the whole module at import time.
+        winreg = None
 import tempfile
 import uuid
 from datetime import datetime, timedelta

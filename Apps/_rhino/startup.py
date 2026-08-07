@@ -69,6 +69,23 @@ def main():
     except:
         pass
 
+    # Save-time session card. Everything expensive it needs is prepared HERE,
+    # where latency is free, so the save path itself stays a pure local read:
+    #   - stamp the session clock
+    #   - drain the Bank outbox and warm the wallet/leaderboard caches
+    #   - pick the "not tried yet" tool (this one walks the knowledge database)
+    # Mirrored in Apps/_revit/EnneaDuck.extension/plugin_startup.py -- both hosts
+    # call the same functions, which is what keeps them from drifting. The one
+    # Revit-only line there is the ViewActivated counter; Rhino samples its
+    # active viewport on save instead (see event_func_session_card_start).
+    try:
+        from EnneadTab import SESSION_STATS, SYNC_SUMMARY, LEADER_BOARD
+        SESSION_STATS.mark_session_start()
+        LEADER_BOARD.refresh_async()
+        SYNC_SUMMARY.refresh_recommendation()
+    except:
+        pass
+
     HOLIDAY.festival_greeting()
 
 
@@ -86,7 +103,19 @@ def add_hook():
 
     Rhino.RhinoDoc.BeginSaveDocument += event_func_update_dist_repo
 
-    
+    # The session card, mirroring the Revit doc-syncing / doc-synced pair. A save
+    # is the Rhino equivalent of the sync wait: begin shows the card, end does the
+    # Bank bookkeeping. Both call the same EnneadTab.SYNC_SUMMARY functions Revit
+    # does, so the two hosts cannot drift.
+    Rhino.RhinoDoc.BeginSaveDocument += event_func_session_card_start
+    Rhino.RhinoDoc.EndSaveDocument += event_func_session_card_end
+
+    # A big document open can freeze Rhino as long as a Revit open can. The arcade
+    # was Revit-only until now purely because nobody wired the Rhino side; the
+    # flag-file contract in EnneadTab/ARCADE.py is host-agnostic.
+    Rhino.RhinoDoc.BeginOpenDocument += event_func_arcade_start
+    Rhino.RhinoDoc.EndOpenDocumentInitialViewUpdate += event_func_arcade_end
+
     Rhino.RhinoApp.Closing += event_func_update_r8_rui
 
 
@@ -174,6 +203,61 @@ def event_func_update_dist_repo(sender, e):
 
 def event_func_update_r8_rui():
     EXE.try_open_app("Rhino8RuiUpdater", safe_open=True)
+
+
+@ERROR_HANDLE.try_catch_error(is_pass=True)
+def event_func_session_card_start(sender, e):
+    """Show the session card as a save begins. Rhino half of doc-syncing.
+
+    The active viewport is sampled here rather than tracked continuously: Rhino
+    has no cheap ViewActivated equivalent worth hooking for this, and sampling on
+    save still answers "which views did you work in" across a session.
+    """
+    from EnneadTab import SESSION_STATS, SYNC_SUMMARY
+    try:
+        SESSION_STATS.note_view(sender.Views.ActiveView.ActiveViewport.Name)
+    except Exception:
+        pass
+    doc_name = None
+    try:
+        doc_name = e.FileName
+    except Exception:
+        pass
+    SYNC_SUMMARY.show_session_card(doc_name)
+
+
+@ERROR_HANDLE.try_catch_error(is_pass=True)
+def event_func_session_card_end(sender, e):
+    """End-of-save bookkeeping. Rhino half of doc-synced.
+
+    No document is passed: warning counts are a Revit concept, and
+    on_sync_finished skips that metric when doc is None rather than inventing a
+    Rhino analogue that would mean something different.
+    """
+    from EnneadTab import SYNC_SUMMARY
+    doc_name = None
+    try:
+        doc_name = e.FileName
+    except Exception:
+        pass
+    SYNC_SUMMARY.on_sync_finished(None, doc_name)
+
+
+@ERROR_HANDLE.try_catch_error(is_pass=True)
+def event_func_arcade_start(sender, e):
+    from EnneadTab import ARCADE
+    doc_name = None
+    try:
+        doc_name = e.FileName
+    except Exception:
+        pass
+    ARCADE.start_wait_watch("open", doc_name)
+
+
+@ERROR_HANDLE.try_catch_error(is_pass=True)
+def event_func_arcade_end(sender, e):
+    from EnneadTab import ARCADE
+    ARCADE.end_wait_watch()
 
 
 if __name__ == "__main__":

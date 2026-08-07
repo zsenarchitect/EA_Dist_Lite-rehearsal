@@ -262,3 +262,11 @@ DarkSide/publish/publish_run_state.json
 DarkSide/publish/scheduler_heartbeat.json
 DarkSide/publish/last_tick_run.txt
 DarkSide/publish/logs/
+
+# Artifacts of importing the EnneadTab library on a non-Windows machine (CI,
+# agents, anyone running the check_*.py tests). ENVIRONMENT.py builds these
+# paths with a literal "\", which is a path separator on Windows but part of
+# the FILENAME everywhere else -- so an import creates an empty "{}" file next
+# to the real, tracked ones. Ignore the mangled twins, never the originals.
+Apps/_revit\\knowledge_revit_database.sexyDuck
+Apps/_rhino\\knowledge_rhino_database.sexyDuck

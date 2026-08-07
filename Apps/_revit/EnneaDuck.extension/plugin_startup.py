@@ -354,6 +354,34 @@ def register_selection_owner_checker():
     __revit__.SelectionChanged += EventHandler[SelectionChangedEventArgs](selection_owner_checker)
 
 
+def register_session_view_counter():
+    """Count the distinct views the user touches this session.
+
+    The sync card wants "you worked across N views", and there is no way to ask
+    Revit that after the fact -- it has to be observed as it happens. This is the
+    same `+=` EventHandler pattern toggle_warning_mode and what_happened already
+    use, and the handler is deliberately trivial: one string append into a
+    process-scoped store, no API calls, because it fires on every view switch.
+
+    The counter lives in a pyRevit env var rather than module state: pyRevit runs
+    each hook in its own engine, so a set populated here would simply not exist
+    when doc-syncing reads it.
+    """
+    from System import EventHandler
+    from Autodesk.Revit.UI.Events import ViewActivatedEventArgs # pyright: ignore
+    __revit__.ViewActivated += EventHandler[ViewActivatedEventArgs](session_view_counter) # pyright: ignore
+
+
+@ERROR_HANDLE.try_catch_error(is_pass=True)
+def session_view_counter(sender, args):
+    from EnneadTab import SESSION_STATS
+    view = args.CurrentActiveView
+    if view is None:
+        return
+    from EnneadTab.REVIT import REVIT_APPLICATION
+    SESSION_STATS.note_view(REVIT_APPLICATION.get_element_id_value(view.Id))
+
+
 def selection_owner_checker(sender, args):
     selection_ids = list(args.GetSelectedElements ())
     
@@ -739,6 +767,23 @@ def EnneadTab_startup():
     try:
         from EnneadTab import RECAP
         RECAP.show_pending_digest()
+    except:
+        pass
+
+    # Sync-time session card. Everything expensive it needs is prepared HERE,
+    # where latency is free, so the sync path itself stays a pure local read:
+    #   - stamp the session clock
+    #   - arm the view counter
+    #   - drain the Bank outbox and warm the wallet/leaderboard caches
+    #   - pick the "not tried yet" tool (this one walks the knowledge database)
+    # Mirrored in Apps/_rhino/startup.py -- both hosts call the same functions,
+    # which is what keeps Revit and Rhino from drifting.
+    try:
+        from EnneadTab import SESSION_STATS, SYNC_SUMMARY, LEADER_BOARD
+        SESSION_STATS.mark_session_start()
+        register_session_view_counter()
+        LEADER_BOARD.refresh_async()
+        SYNC_SUMMARY.refresh_recommendation()
     except:
         pass
 

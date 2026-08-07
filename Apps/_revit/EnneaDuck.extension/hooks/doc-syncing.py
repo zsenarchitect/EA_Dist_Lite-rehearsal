@@ -9,7 +9,7 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "KingDuck.lib")))
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
-from EnneadTab import VERSION_CONTROL, ERROR_HANDLE, LOG, DATA_FILE, TIME, USER, DUCK, CONFIG, FOLDER, TIMESHEET, ENVIRONMENT, ARCADE
+from EnneadTab import VERSION_CONTROL, ERROR_HANDLE, LOG, DATA_FILE, TIME, USER, DUCK, CONFIG, FOLDER, TIMESHEET, ENVIRONMENT, ARCADE, SYNC_SUMMARY, LEADER_BOARD
 from EnneadTab.REVIT import REVIT_FORMS, REVIT_SELECTION, REVIT_EVENT, REVIT_SYNC
 
 __title__ = "Doc Syncing Hook"
@@ -232,8 +232,8 @@ def _check_sync_queue_api_based(doc, user_name, api_result):
     current_queue += QUEUE_DIALOG_FOOTER + DASHBOARD_SSO_REMINDER
 
     opts = [
-        ["I will join the waitlist and sync later.(Click 'Close' when you see Revit Sync Fail on next step, it just means the sync has been cancelled. You still hold position on the waitlist.)", "Resume working and try syncing later.(+ $50 EA Coins)"],
-        ["I don't care! Sync me now!", "Jump in line will make other people who are syncing has to wait longer.(- $100 EA Coins for every position cut line)"]
+        ["I will join the waitlist and sync later.(Click 'Close' when you see Revit Sync Fail on next step, it just means the sync has been cancelled. You still hold position on the waitlist.)", "Resume working and try syncing later. (Earns EA Coins)"],
+        ["I don't care! Sync me now!", "Jump in line will make other people who are syncing has to wait longer. (Costs EA Coins)"]
     ]
     dialog_result = REVIT_FORMS.dialogue(
         main_text="There are other people queuing before you, do you want to resume working and try sync later?\n\nYour name has been added to the wait list even if you cancel current sync.\n\n[You are also welcomed to save local while waiting.]",
@@ -249,12 +249,16 @@ def _check_sync_queue_api_based(doc, user_name, api_result):
         res, open_dashboard = dialog_result, False
 
     if res == opts[1][0]:
+        # Queued locally and posted at the next startup -- the Bank's rules engine
+        # decides what cutting costs. We report the behaviour, never an amount.
+        LEADER_BOARD.report_sync_queue_cut(doc.Title)
         REVIT_SYNC.api_prioritize_sync(doc)
         return True
 
     # Joining the waitlist (any choice other than cut-in-line, including closing
     # the dialog -- the name is already on the list). Honor the opt-in checkbox
     # to open the dashboard so the user can watch the queue while they wait.
+    LEADER_BOARD.report_sync_queue_waited(doc.Title)
     if open_dashboard:
         _open_sync_dashboard(doc)
 
@@ -312,8 +316,8 @@ def _check_sync_queue_file_based(doc, user_name):
 
     current_queue = _build_queue_dialog_text(queue)
     opts = [
-        ["I will join the waitlist and sync later.(Click 'Close' when you see Revit Sync Fail on next step, it just means the sync has been cancelled. You still hold position on the waitlist.)", "Resume working and try syncing later.(+ $50 EA Coins)"],
-        ["I don't care! Sync me now!", "Jump in line will make other people who are syncing has to wait longer.(- $100 EA Coins for every position cut line)"]
+        ["I will join the waitlist and sync later.(Click 'Close' when you see Revit Sync Fail on next step, it just means the sync has been cancelled. You still hold position on the waitlist.)", "Resume working and try syncing later. (Earns EA Coins)"],
+        ["I don't care! Sync me now!", "Jump in line will make other people who are syncing has to wait longer. (Costs EA Coins)"]
     ]
     res = REVIT_FORMS.dialogue(
         main_text="There are other people queuing before you, do you want to resume working and try sync later?\n\nYour name has been added to the wait list even if you cancel current sync.\n\n[You are also welcomed to save local while waiting.]",
@@ -322,7 +326,10 @@ def _check_sync_queue_file_based(doc, user_name):
     )
 
     if res == opts[1][0]:
+        LEADER_BOARD.report_sync_queue_cut(doc.Title)
         return True
+
+    LEADER_BOARD.report_sync_queue_waited(doc.Title)
 
     # Arm doc-synced's guard BEFORE cancelling: the doc-synced hook still fires
     # after this cancel, and without this flag its update_sync_queue() would drop
@@ -384,6 +391,14 @@ def doc_syncing(doc):
     fill_drafter_info(doc)
 
     TIMESHEET.update_timesheet(doc.Title)
+
+    # Everything below runs microseconds before the UI thread freezes, so it must stay
+    # local-only: no network, no element collection, no filesystem walk.
+
+    # The session card. Renders out of process (NotificationHost), so the freeze does not
+    # affect it, and its lifetime is pinned to the arcade threshold below so the two
+    # surfaces hand over rather than stack. See EnneadTab/SYNC_SUMMARY.py.
+    SYNC_SUMMARY.show_session_card(doc.Title, doc)
 
     # Sync is about to freeze the UI thread. Arm the arcade wait-watcher LAST, so its 60s
     # clock measures the sync itself, not the queue/dialog steps above. If the sync ends in

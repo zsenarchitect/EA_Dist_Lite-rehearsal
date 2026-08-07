@@ -261,7 +261,11 @@
                                     <RadioButton  Content="Full." x:Name="radio_bt_popup_full" FontWeight="Bold"/>
                                     <TextBlock Text="The everything, including the fun stuff." Margin="20,0,0,20"/>
                                     <CheckBox Content="Weekly usage digest popup." IsChecked="True" x:Name="checkbox_recap_digest_weekly"/>
-                                    <TextBlock Text="A once-a-week look at your own usage. Choosing Minimal above turns this off too." Margin="20,0,0,0" TextWrapping="Wrap"/>
+                                    <TextBlock Text="A once-a-week look at your own usage. Choosing Minimal above turns this off too." Margin="20,0,0,20" TextWrapping="Wrap"/>
+                                    <CheckBox Content="Session summary while syncing." IsChecked="True" x:Name="checkbox_sync_summary_card"/>
+                                    <TextBlock Text="A short recap of your session - tools used, views touched, warnings cleared, coins and office rank - shown while you wait for a sync or a Rhino save. At most one every 45 minutes." Margin="20,0,0,20" TextWrapping="Wrap"/>
+                                    <CheckBox Content="Never offer the arcade during a long wait." x:Name="radio_bt_arcade_never"/>
+                                    <TextBlock Text="A sync or file open that runs past a minute can offer the EnneadTab Arcade, if it is installed. Tick this to never be asked." Margin="20,0,0,0" TextWrapping="Wrap"/>
                                 </StackPanel>
 
                             </GroupBox>

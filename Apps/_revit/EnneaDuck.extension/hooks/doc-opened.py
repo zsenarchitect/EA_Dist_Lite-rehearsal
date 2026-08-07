@@ -11,7 +11,7 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "KingDuck.lib")))
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
-from EnneadTab import NOTIFICATION, TIMESHEET, ERROR_HANDLE, EMAIL, NOTIFICATION, USER, FOLDER, DATA_FILE, ENVIRONMENT, SOUND, SPEAK
+from EnneadTab import NOTIFICATION, TIMESHEET, ERROR_HANDLE, EMAIL, NOTIFICATION, USER, FOLDER, DATA_FILE, ENVIRONMENT, SOUND, SPEAK, SESSION_STATS, LEADER_BOARD
 from EnneadTab.REVIT import REVIT_HISTORY, REVIT_EXTERNAL_FILE, REVIT_FORMS, REVIT_SYNC, REVIT_EVENT, REVIT_APPLICATION
 from pyrevit import forms, script
 from pyrevit import EXEC_PARAMS
@@ -471,7 +471,26 @@ def main():
         check_if_keynote_file_pointing_to_library(doc)
 
         REVIT_HISTORY.record_warning(doc)
-        
+
+        # Count once, use twice. Guarded so this can never break document opening.
+        #
+        #   - The Bank charge (cost_open_many_warnings). Local write only, no
+        #     network; report_model_opened enforces once-per-doc-per-day itself,
+        #     because that rule has no server-side cap or cooldown.
+        #   - The warning baseline for the session card. Without seeding it here
+        #     the first sync of a session has nothing to compare against and can
+        #     never report cleared warnings.
+        #
+        # Everything that must NOT be charged has already returned above:
+        # is_open_hook_disabled() (which the silent/batch openers set), a missing
+        # document, and family documents.
+        try:
+            warning_count = SESSION_STATS.count_warnings(doc)
+            SESSION_STATS.note_warning_baseline(doc, warning_count)
+            LEADER_BOARD.report_model_opened(warning_count, doc.Title)
+        except Exception:
+            pass
+
         check_group_usage(doc)
         log_time_sheet(doc)
 
