@@ -101,6 +101,18 @@ except ImportError as e:
 
 
 
+def _handbook_image(path, width, height):
+    """ReportLab Image, or Spacer if path is empty. Missing file is a hard fail."""
+    if not path:
+        return Spacer(width, height)
+    if not os.path.isfile(path):
+        raise IOError(
+            "Handbook icon missing: {}. Refusing to generate a PDF with a broken image."
+            .format(path)
+        )
+    return Image(path, width=width, height=height)
+
+
 def documentation2pdf(app, doc_data_list, pdf_path, tailor_count=0):
     if not REPORTLAB_AVAILABLE:
         raise ImportError("ReportLab is required for PDF generation. Please install it with: pip install reportlab")
@@ -162,7 +174,7 @@ class PDFGenerator:
         
         icon_width = 0.2 * inch
         icon_height = 0.2 * inch
-        tab_icon = Image(tab_icon_path, width=icon_width, height=icon_height) if tab_icon_path else Spacer(icon_width, icon_height)
+        tab_icon = _handbook_image(tab_icon_path, icon_width, icon_height)
         
         tab_data = [[tab_header, tab_icon]]
         tab_table = Table(tab_data, colWidths=[100, 30])
@@ -211,9 +223,10 @@ class PDFGenerator:
                 access_text = ""
                 
             if self.app == "Rhino":
-                icon = Image(os.path.join(ENVIRONMENT.RHINO_FOLDER, doc_data['icon']), width=0.5 * inch, height=0.5 * inch) if doc_data.get('icon') else Spacer(1, 0.8 * inch)
+                icon_path = os.path.join(ENVIRONMENT.RHINO_FOLDER, doc_data['icon']) if doc_data.get('icon') else None
             else:
-                icon = Image(os.path.join(ENVIRONMENT.REVIT_PRIMARY_EXTENSION, doc_data['icon']), width=0.5 * inch, height=0.5 * inch) if doc_data.get('icon') else Spacer(1, 0.8 * inch)
+                icon_path = os.path.join(ENVIRONMENT.REVIT_PRIMARY_EXTENSION, doc_data['icon']) if doc_data.get('icon') else None
+            icon = _handbook_image(icon_path, 0.5 * inch, 0.5 * inch)
 
             if is_popular:
                 poplular_info = "[Popular]"
@@ -321,7 +334,7 @@ class PDFGenerator:
         
         table_data = []
         for tab_name, page_number, tab_icon_path in toc_entries:
-            tab_icon = Image(tab_icon_path, width=0.2 * inch, height=0.2 * inch) if tab_icon_path else Spacer(0.2 * inch, 0.2 * inch)
+            tab_icon = _handbook_image(tab_icon_path, 0.2 * inch, 0.2 * inch)
             style_1 = ParagraphStyle('x',fontSize=9,textColor=colors.darkgray,alignment=0)
             style_2 = ParagraphStyle('y',fontSize=9,textColor=colors.darkgray,alignment=2)
             table_data.append([tab_icon, 
