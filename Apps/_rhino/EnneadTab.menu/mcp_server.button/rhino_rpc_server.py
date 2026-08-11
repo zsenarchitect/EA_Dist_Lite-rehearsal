@@ -220,6 +220,13 @@ def _handle_request(context):
 
         def do_on_ui():
             try:
+                # rhinoscriptsyntax (rs.*) operates on scriptcontext.doc, NOT Rhino.RhinoDoc.ActiveDoc.
+                # This server never runs through the Rhino script engine (handlers are queued straight
+                # onto the UI thread), so sc.doc is unset/stale here -- rs.LayerNames() etc. then return
+                # empty against a model full of layers ("0 layers" bug). Bind it to the live active doc
+                # on every request so every rs.*-based handler (layers, set-layer, object layer/params)
+                # targets the real document. Cheap and idempotent.
+                sc.doc = Rhino.RhinoDoc.ActiveDoc
                 r, s = _route(path, method, body, query)
                 result_holder[0] = r
                 result_holder[1] = s
@@ -272,6 +279,17 @@ def _route(path, method, body, query):
 
     Returns (result_dict, status_code).
     """
+    # Re-bind scriptcontext.doc to the live active document on EVERY request. This
+    # router runs on Rhino's UI thread (InvokeOnUiThread above), so ActiveDoc is
+    # reliable here. The RPC server module is persistent: scriptcontext.doc is set once
+    # at import and then goes STALE when the user opens or switches documents, so every
+    # rhinoscriptsyntax (rs.*) read -- rs.LayerNames(), object queries, etc. -- silently
+    # reads a dead doc and returns empty. A healthy Untitled.3dm with 4 layers reported
+    # 0 layers (status/ was fine because it reads Rhino.RhinoDoc.ActiveDoc directly).
+    # Refreshing sc.doc here is exactly how a normal Rhino script re-binds it per run,
+    # and repairs the entire rs.* read surface at a single point.
+    sc.doc = Rhino.RhinoDoc.ActiveDoc
+
     data = {}
     if body:
         try:

@@ -504,6 +504,7 @@
         "Apps/_revit/EnneaDuck.extension/routes/areas.py": "3e3603f0b2a5546c8a8a31229bf201a5f2a180fc57c2680abfc2c0822d334591",
         "Apps/_revit/EnneaDuck.extension/routes/create_sheet.py": "8d34d36e9e052e1a1fcbdb9d20936ba36bfa75ce1e2b1403e183df2397814455",
         "Apps/_revit/EnneaDuck.extension/routes/create_view.py": "d2c52b8796b7e548c0fca100d1acb8e058db09be0a16a66652e6afc32fd80f70",
+        "Apps/_revit/EnneaDuck.extension/routes/documents.py": "1de98c2f970ea6145847b0987535e8b720ed78420c4c671d916dda4341196ac0",
         "Apps/_revit/EnneaDuck.extension/routes/element_params.py": "f6c56700adcb2877fe04bd698a4562bb28074fcdf13ee40bd073d26d131460a7",
         "Apps/_revit/EnneaDuck.extension/routes/element_set_param.py": "64bf6841697097bda75a784d50dc142c82583b32bfe685818f72c39f4d10ec34",
         "Apps/_revit/EnneaDuck.extension/routes/elements.py": "c3c60cf8078ae5e739d065dac715f5979f1381810f9c39ac4f916b419602e89b",
@@ -518,7 +519,7 @@
         "Apps/_revit/EnneaDuck.extension/routes/rooms.py": "723d0237d1843d2827bc4eaedf2823f6fd07116adc1526444bc04e71bd764dd3",
         "Apps/_revit/EnneaDuck.extension/routes/selection.py": "292f3f03112fba998b37c9ddb348be417adfc6cffc354d7aa9a6d4110df94183",
         "Apps/_revit/EnneaDuck.extension/routes/sheets.py": "65fb86e085d6700e16ec75252897092b4519be38b460e1beb1f57dcd5d8d5a1d",
-        "Apps/_revit/EnneaDuck.extension/routes/startup.py": "1df5f13484dde80cc8da5412a4de3cdbf38d7e21c7a68d20c279072ece13fdc0",
+        "Apps/_revit/EnneaDuck.extension/routes/startup.py": "f097808d9f03eb13712e8dd65efe165960028f317b25fff23d8ebdef364f7fff",
         "Apps/_revit/EnneaDuck.extension/routes/status.py": "5ffb8ddbbbb1ef0e1d255376e7fe34cb2298efbc08862e011186569bd9009957",
         "Apps/_revit/EnneaDuck.extension/routes/sync.py": "895abbaae621b311989e02a8c4df372ea4eba97e6bacefb721329918e1b54d67",
         "Apps/_revit/EnneaDuck.extension/routes/view_image.py": "9dd7a68c53ef615fe04b810809f8833ff9c2b2015ca2541894720fae9cdaa5e3",
@@ -691,11 +692,11 @@
         "Apps/lib/EnneadTab/scripts/TimeSheetMiniApp/ui.py": "97ad45f79c63053f07cf5def3f34c00939ca3ec3a84a3110e09ac897a126829b",
         "Apps/lib/EnneadTab/scripts/display_pc_spec.py": "603fa5ccea2f60b0405a469696328edf697f6e589f1ac392a74b9f74fe334f80"
     },
-    "published_at": "2026-08-07T16:59:30",
-    "source_commit": "534e9e59355251a9a4cdce7a86395250b261394a",
+    "published_at": "2026-08-11T11:05:15",
+    "source_commit": "46e086caced2ca56c1cc7a669f81310fbeba7db1",
     "trees": [
         "Apps/lib/EnneadTab",
         "Apps/_revit/EnneaDuck.extension"
     ],
-    "version": "2026.08.07.1659"
+    "version": "2026.08.11.1105"
 }

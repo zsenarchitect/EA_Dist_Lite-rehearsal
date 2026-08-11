@@ -30,6 +30,7 @@ from worksets import register_worksets_routes
 from selection import register_selection_routes
 from links import register_links_routes
 from grids import register_grids_routes
+from documents import register_documents_routes
 
 register_status_routes(api)
 register_model_info_routes(api)
@@ -54,3 +55,4 @@ register_worksets_routes(api)
 register_selection_routes(api)
 register_links_routes(api)
 register_grids_routes(api)
+register_documents_routes(api)
