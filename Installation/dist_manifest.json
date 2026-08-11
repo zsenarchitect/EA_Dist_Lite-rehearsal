@@ -692,11 +692,11 @@
         "Apps/lib/EnneadTab/scripts/TimeSheetMiniApp/ui.py": "97ad45f79c63053f07cf5def3f34c00939ca3ec3a84a3110e09ac897a126829b",
         "Apps/lib/EnneadTab/scripts/display_pc_spec.py": "603fa5ccea2f60b0405a469696328edf697f6e589f1ac392a74b9f74fe334f80"
     },
-    "published_at": "2026-08-11T16:00:45",
-    "source_commit": "0e734a2da56eab9f1ae9efede3e877c437461cbc",
+    "published_at": "2026-08-11T16:55:35",
+    "source_commit": "875d6aafdf7d774d6a292a3ececbdcd9376eb4f6",
     "trees": [
         "Apps/lib/EnneadTab",
         "Apps/_revit/EnneaDuck.extension"
     ],
-    "version": "2026.08.11.1600"
+    "version": "2026.08.11.1655"
 }
