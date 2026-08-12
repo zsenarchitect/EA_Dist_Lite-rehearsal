@@ -39,6 +39,12 @@ _recent_exe_calls = {}
 # Maximum number of calls allowed per second (2 calls per second)
 _MAX_CALLS_PER_SECOND = 2
 
+# Last attempt to wake the persistent NotificationHost. List, not a bare float,
+# so the helper can mutate it without a `global` declaration (IronPython 2.7).
+_LAST_HOST_WAKE_ATTEMPT = [0.0]
+# A failed wake must not relaunch a ~38 MB onefile on every notification.
+_HOST_WAKE_COOLDOWN_SECONDS = 60.0
+
 def _is_rate_limited(exe_name):
     """Check if an executable is currently rate limited.
     
@@ -342,18 +348,46 @@ def _notification_host_lock_held():
 
 
 def ensure_notification_host():
-    """Wake NotificationHost if it is not already running.
+    """Report whether NotificationHost is up RIGHT NOW, starting it if it is not.
 
-    Unlike try_open_app, this is not rate-limited -- enqueue always writes the
-    inbox; this only starts the persistent host when the lock is free.
+    Contract (rewritten 2026-08-12, senzhang-todo #3895): the return value answers
+    "will the host drain the item I just enqueued?" -- NOT "did a launch get
+    requested?". The previous version returned True as soon as os.startfile()
+    did not raise, which is fire-and-forget: it returns before the process
+    exists and never surfaces an exit code. Callers use this to decide whether
+    to fall back to the legacy Messenger, so a launch-requested True silently
+    swallowed the user's message whenever the host could not actually start.
+
+    A freshly-launched host cannot drain the CURRENT item anyway -- the onefile
+    build is ~38 MB and takes seconds to unpack -- so we start it for the next
+    message and return False, routing this one through the legacy fallback.
+    That makes the degradation self-healing rather than silent.
 
     Returns:
-        bool: True if host appears running or was started, False if missing/failed.
+        bool: True only if the host is already running and draining the inbox.
     """
     if _notification_host_lock_held():
         return True
     if is_process_running("NotificationHost"):
         return True
+
+    _try_wake_notification_host()
+    return False
+
+
+def _try_wake_notification_host():
+    """Best-effort start of the persistent host. Never claims readiness.
+
+    Rate-limited because a failed wake would otherwise re-launch a ~38 MB
+    onefile on every single notification.
+
+    Returns:
+        bool: True if a start was successfully requested (NOT that it is up).
+    """
+    now = time.time()
+    if now - _LAST_HOST_WAKE_ATTEMPT[0] < _HOST_WAKE_COOLDOWN_SECONDS:
+        return False
+    _LAST_HOST_WAKE_ATTEMPT[0] = now
 
     exe_path = locate_executable("NotificationHost")
     if exe_path:

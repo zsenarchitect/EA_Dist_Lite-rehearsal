@@ -559,7 +559,7 @@
         "Apps/lib/EnneadTab/ENVIRONMENT.py": "15130413ba9255c41e338cec081ee3e37407ade5ab06943b37ddf6491cc7a179",
         "Apps/lib/EnneadTab/ERROR_HANDLE.py": "ec08b340d4e97662f8ca5cafd91f6b88216e9d3ed1f90500044e99938dbf0b69",
         "Apps/lib/EnneadTab/EXCEL.py": "be6d22ae3ec6dc15016dd19da0175c0f4ea970ea0c4cf74d5d518a0daf3b69d5",
-        "Apps/lib/EnneadTab/EXE.py": "72c3186d110613eb999ce3a53e24d2fa0f96596fd8de0eab41aee9032525eec3",
+        "Apps/lib/EnneadTab/EXE.py": "93e30f09fb706d67e2633a36a37fed96a6273c885e01ffb734d20c7132ff864f",
         "Apps/lib/EnneadTab/FILE_NAME_UTILITY.py": "6ab337cf76670af186570b576750cd656a250d27c58fd6b864f1f4829cbfaecd",
         "Apps/lib/EnneadTab/FOLDER.py": "64c19845a1036d1df74b21d30615b0680d5f30ce24e48752e6b9c0c10446e78c",
         "Apps/lib/EnneadTab/FUTURE.py": "b486d7f02a17427b54c18cc0f8cec5188dc3be41d2ebd6200cd7ba79a839656a",
@@ -692,11 +692,11 @@
         "Apps/lib/EnneadTab/scripts/TimeSheetMiniApp/ui.py": "97ad45f79c63053f07cf5def3f34c00939ca3ec3a84a3110e09ac897a126829b",
         "Apps/lib/EnneadTab/scripts/display_pc_spec.py": "603fa5ccea2f60b0405a469696328edf697f6e589f1ac392a74b9f74fe334f80"
     },
-    "published_at": "2026-08-12T11:37:08",
-    "source_commit": "5f35515011403312fe8b4bc84a9aee978cc93481",
+    "published_at": "2026-08-12T12:49:57",
+    "source_commit": "4601886a4752974f76cb8cd027d618b9f6cf2278",
     "trees": [
         "Apps/lib/EnneadTab",
         "Apps/_revit/EnneaDuck.extension"
     ],
-    "version": "2026.08.12.1137"
+    "version": "2026.08.12.1249"
 }
