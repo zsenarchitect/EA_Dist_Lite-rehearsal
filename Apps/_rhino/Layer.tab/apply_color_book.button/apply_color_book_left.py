@@ -51,7 +51,7 @@ def apply_color_book():
     token = AUTH.get_token()
     if not token:
         AUTH.request_auth()
-        NOTIFICATION.messenger("Sign in to enneadtab.com, then re-run ApplyColorBook.")
+        NOTIFICATION.messenger("Sign in to enneadtab.com, then re-run ApplyColorBook.", sticky=True)
         return
 
     # Always a dict (empty on auth/network trouble; never None).
@@ -59,7 +59,7 @@ def apply_color_book():
         source="online", project_number=project_number, sector=sector.upper(), token=token)
     lookup = _build_lookup(data)
     if not lookup:
-        NOTIFICATION.messenger("No colors returned. Check sign-in, project number, and sector.")
+        NOTIFICATION.messenger("No colors returned. Check sign-in, project number, and sector.", sticky=True)
         return
 
     layers = rs.LayerNames() or []

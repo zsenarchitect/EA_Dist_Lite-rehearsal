@@ -279,6 +279,15 @@ def read_log(user_name=USER.USER_NAME):
 
 
 INFRAWATCH_USAGE_URL = "https://enneadtab.com/infra/api/ingest/usage"
+INFRAWATCH_TIME_ESTIMATE_URL = "https://enneadtab.com/infra/api/ingest/time-estimate"
+
+# The recap "how long by hand?" picker offers six coarse buckets; the client
+# sends the bucket MIDPOINT in seconds. This is the client-side mirror of the
+# server-side whitelist in InfraWatch (ingest/time-estimate) -- keep them in
+# lockstep. Refusing an off-list value here too means a caller bug can never even
+# attempt to move the fleet median.
+#   < 2 min | 2-5 | 5-15 | 15-30 | 30-60 | 1 hr+
+TIME_ESTIMATE_BUCKET_SECONDS = (60, 210, 600, 1350, 2700, 5400)
 
 
 def _build_infrawatch_payload(environment, function_name, result):
@@ -403,6 +412,130 @@ def _try_infrawatch_urllib_request(environment, function_name, result):
         ERROR_HANDLE.print_note(
             "InfraWatch usage POST error (urllib.request): {}".format(e)
         )
+        return False
+
+
+# --- user-reported "how long by hand?" time estimates -> InfraWatch -----------
+# The fallback ladder below is intentionally a parallel copy of the usage senders
+# above rather than a shared refactor: the usage path is live fleet telemetry
+# that cannot be exercised outside Revit/Rhino, so it is left byte-for-byte
+# untouched. Unify onto one (url, payload) dispatcher once a live test harness
+# exists -- tracked as a follow-up todo.
+
+def _build_time_estimate_payload(script_path, function_name, seconds):
+    """Body for /api/ingest/time-estimate, or None to refuse sending.
+
+    Carries NO username/machine_name: the only consumer is an aggregate median,
+    so identity would be collected for nothing. `seconds` must be one of the
+    known bucket midpoints (mirrors the server whitelist); anything else -> None
+    so a caller bug can never even attempt a poisoning value.
+    """
+    try:
+        seconds = int(seconds)
+    except (TypeError, ValueError):
+        return None
+    if seconds not in TIME_ESTIMATE_BUCKET_SECONDS:
+        return None
+    if not script_path:
+        return None
+    return {
+        "occurred_at": TIME.get_utc_timestamp_iso(),
+        "script_path": script_path,
+        "function_name": function_name or "",
+        "seconds": seconds,
+    }
+
+
+def send_manual_time_estimate(script_path, function_name, seconds):
+    """Send one user-reported by-hand time estimate to InfraWatch.
+
+    Feeds the recap fleet time-saved baseline (a per-tool median). Best-effort:
+    tries urllib3 -> urllib2 -> urllib.request, silent on success, print_note on
+    failure, and NEVER raises -- a telemetry send must not break the caller. A
+    non-whitelisted `seconds` is dropped silently client-side.
+    """
+    payload = _build_time_estimate_payload(script_path, function_name, seconds)
+    if payload is None:
+        return
+    try:
+        if _try_time_estimate_urllib3(payload):
+            return
+        elif _try_time_estimate_urllib2(payload):
+            return
+        elif _try_time_estimate_urllib_request(payload):
+            return
+        else:
+            ERROR_HANDLE.print_note(
+                "No HTTP library available for InfraWatch time-estimate POST")
+    except Exception as e:
+        ERROR_HANDLE.print_note(
+            "Failed to send time estimate to InfraWatch: {}".format(e))
+
+
+def _try_time_estimate_urllib3(payload):
+    try:
+        import urllib3
+        body = json.dumps(payload).encode("utf-8")
+        http = urllib3.PoolManager()
+        response = http.request(
+            "POST", INFRAWATCH_TIME_ESTIMATE_URL, body=body,
+            headers={"Content-Type": "application/json"},
+            timeout=10.0, redirect=False)
+        if response.status == 200:
+            return True
+        ERROR_HANDLE.print_note(
+            "InfraWatch time-estimate POST non-200: {} (urllib3)".format(
+                response.status))
+        return False
+    except ImportError:
+        return False
+    except Exception as e:
+        ERROR_HANDLE.print_note(
+            "InfraWatch time-estimate POST error (urllib3): {}".format(e))
+        return False
+
+
+def _try_time_estimate_urllib2(payload):
+    try:
+        import urllib2
+        body = json.dumps(payload).encode("utf-8")
+        req = urllib2.Request(
+            INFRAWATCH_TIME_ESTIMATE_URL, data=body,
+            headers={"Content-Type": "application/json"})
+        response = WEB_GUARD.urlopen_no_redirect(req, 10)
+        if response.getcode() == 200:
+            return True
+        ERROR_HANDLE.print_note(
+            "InfraWatch time-estimate POST non-200: {} (urllib2)".format(
+                response.getcode()))
+        return False
+    except ImportError:
+        return False
+    except Exception as e:
+        ERROR_HANDLE.print_note(
+            "InfraWatch time-estimate POST error (urllib2): {}".format(e))
+        return False
+
+
+def _try_time_estimate_urllib_request(payload):
+    try:
+        import urllib.request
+        body = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            INFRAWATCH_TIME_ESTIMATE_URL, data=body,
+            headers={"Content-Type": "application/json"}, method="POST")
+        response = WEB_GUARD.urlopen_no_redirect(req, 10)
+        if response.getcode() == 200:
+            return True
+        ERROR_HANDLE.print_note(
+            "InfraWatch time-estimate POST non-200: {} (urllib.request)".format(
+                response.getcode()))
+        return False
+    except ImportError:
+        return False
+    except Exception as e:
+        ERROR_HANDLE.print_note(
+            "InfraWatch time-estimate POST error (urllib.request): {}".format(e))
         return False
 
 

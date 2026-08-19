@@ -172,7 +172,7 @@ class OwnershipInspectWindow(WPFWindow):
         self.all_element_rows = element_rows
         self.all_view_rows = view_rows
         if capped:
-            NOTIFICATION.messenger("Stopped after {} ownership lookups to keep Revit alive. Results are partial.".format(ownership_data.TOOLTIP_CALL_CAP))
+            NOTIFICATION.messenger("Stopped after {} ownership lookups to keep Revit alive. Results are partial.".format(ownership_data.TOOLTIP_CALL_CAP), sticky=True)
             self.debug_textbox.Text = "Scan capped - table shows partial results."
         elif cancelled:
             self.debug_textbox.Text = "Scan cancelled - table shows partial results."

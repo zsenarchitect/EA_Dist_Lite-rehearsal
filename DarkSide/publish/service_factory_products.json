@@ -1,0 +1,16 @@
+{
+  "_comment": "Service-factory standalone products whose SIGNED installer is mirrored into Apps/lib/ExeProducts on each publish, so EA_Dist ships it to the fleet as a quick-onboarding convenience. Driver for _mirror_service_factory_installers() in ________publish.py. SOURCE OF TRUTH for the product roster + slugs is the service-factory skill's references/service-registry.md (Slug column, byte-for-byte) — when a new product is registered there at Phase 7b, add a row HERE too. 'slug' is the exact enneadtab.com/<slug>/updates/ feed segment (NOT the repo name: KeynoteExporter's slug is 'keynote', OneDriveResolver's is 'one-drive-resolver'). 'installer' is the stable de-versioned target name (all-underscore, matches existing ExeProducts convention e.g. EnneadTab_For_Revit_Installer.exe); overwrite = keep-latest. EXCLUDED on purpose: WatchMe (no updater wired) and For-Indesign (UXP plugin, no NSIS installer, feed is latest.json).",
+  "products": [
+    { "slug": "indesign-repather",   "product": "EnneadTab-IndesignRepather",  "installer": "EnneadTab_IndesignRepather_Installer.exe" },
+    { "slug": "render-asset-editor",  "product": "EnneadTab-RenderAssetEditor", "installer": "EnneadTab_RenderAssetEditor_Installer.exe" },
+    { "slug": "keynote",              "product": "EnneadTab-KeynoteExporter",   "installer": "EnneadTab_KeynoteExporter_Installer.exe" },
+    { "slug": "pdf2anything",         "product": "EnneadTab-Pdf2Anything",      "installer": "EnneadTab_Pdf2Anything_Installer.exe" },
+    { "slug": "one-drive-resolver",   "product": "EnneadTab-OneDriveResolver",  "installer": "EnneadTab_OneDriveResolver_Installer.exe" },
+    { "slug": "arcade",               "product": "EnneadTab-Arcade",            "installer": "EnneadTab_Arcade_Installer.exe" },
+    { "slug": "timesheet",            "product": "EnneadTab-Timesheet",         "installer": "EnneadTab_Timesheet_Installer.exe" },
+    { "slug": "revit-assistant",      "product": "EnneadTab-RevitAssistant",    "installer": "EnneadTab_RevitAssistant_Installer.exe" },
+    { "slug": "rhino-assistant",      "product": "EnneadTab-RhinoAssistant",    "installer": "EnneadTab_RhinoAssistant_Installer.exe" },
+    { "slug": "teams-archive-mover",  "product": "EnneadTab-TeamsArchiveMover", "installer": "EnneadTab_TeamsArchiveMover_Installer.exe" },
+    { "slug": "pet-duck",             "product": "EnneadTab-PetDuck",           "installer": "EnneadTab_PetDuck_Installer.exe" }
+  ]
+}

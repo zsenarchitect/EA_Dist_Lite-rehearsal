@@ -91,7 +91,7 @@ def block2family(blocks = None):
     rs.StatusBarProgressMeterHide()
 
 
-    NOTIFICATION.messenger("Done exporting, now go to Revit and get in blocks as family.")
+    NOTIFICATION.messenger("Done exporting, now go to Revit and get in blocks as family.", sticky=True)
 
 
 

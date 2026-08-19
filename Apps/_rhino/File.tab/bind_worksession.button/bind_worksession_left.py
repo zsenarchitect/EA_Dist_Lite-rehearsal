@@ -85,7 +85,7 @@ def bind_worksession():
     # rs.Command("_SaveAs  \"{}\" -enter ".format(final_path))
     sc.doc.SaveAs(final_path)
     SOUND.play_sound()
-    NOTIFICATION.messenger(main_text = "Session Binding Done!")
+    NOTIFICATION.messenger(main_text = "Session Binding Done!", sticky=True)
     time_used = time.time() - begin_time
     EMAIL.email_to_self(subject="EnneadTab Auto Email: Session Binding Finished!",
                                 body="After {}, Your binding file is saved, check below:".format(TIME.get_readable_time(time_used)),

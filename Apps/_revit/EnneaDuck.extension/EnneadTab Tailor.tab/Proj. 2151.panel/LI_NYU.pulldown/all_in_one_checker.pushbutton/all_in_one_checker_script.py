@@ -426,7 +426,7 @@ class InternalCheck:
         T.Start()
 
         if not self.validate_all(self):
-            NOTIFICATION.messenger("Cannot proceed further before all setup is validated.")
+            NOTIFICATION.messenger("Cannot proceed further before all setup is validated.", sticky=True)
             T.RollBack()
             return
 
@@ -460,7 +460,7 @@ def all_in_one_checker(doc, show_log):
     during sync event hook can both work"""
     OPTION_MAIN.LEVEL_NAMES = DOC_LEVLEL_DICT.get(doc.Title)
     if not OPTION_MAIN.LEVEL_NAMES:
-        NOTIFICATION.messenger("Levels info not accuiqred.\nFail Fail Fail")
+        NOTIFICATION.messenger("Levels info not accuiqred.\nFail Fail Fail", sticky=True)
         return 
     for option in [
         OPTION_MAIN, 

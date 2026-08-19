@@ -1,25 +1,20 @@
 {
   "_README": [
-    "THE L-DRIVE CUTOVER LEVER. Edit 'shared_root' here, run the publisher, and",
-    "the whole fleet moves to the new shared location. Do not edit call sites.",
+    "THE SHARED-ROOT CUTOVER LEVER. The office L: drive is RETIRED.",
+    "Do not put an L: path here. Shared data lives in the enneadtab.com depot.",
     "",
-    "Resolution precedence (ENVIRONMENT._resolve_shared_root, first hit wins):",
-    "  1. EA_SHARED_ROOT environment variable (set to 'OFFLINE' for deliberate",
-    "     offline use -- that suppresses the 'data is not being shared' alarm)",
+    "Resolution (ENVIRONMENT._resolve_shared_root, first hit wins):",
+    "  1. EA_SHARED_ROOT environment variable ('OFFLINE' or any L: path = local dump)",
     "  2. <Documents>/EnneadTab Ecosystem/shared_root.json  (per-machine override)",
     "  3. THIS FILE (ships inside EA_Dist with every publish)",
-    "  4. the legacy L: path, hardcoded as a last resort",
+    "  4. no share configured -> local dump, deliberately offline",
     "",
-    "'db_folder' is optional. Leave it null unless the new target does NOT keep",
-    "the <shared_root>/05_EnneadTab-DB layout; then set it to the absolute path.",
+    "An L: value in env or json is ignored. Never last-resort to L:.",
     "",
-    "'offline': true declares deliberate offline operation for this install.",
-    "",
-    "UNC paths are supported and are the expected cutover target, e.g.",
-    "  \"shared_root\": \"\\\\\\\\fileserver\\\\DesignTechnology\"",
-    "(four backslashes per literal backslash inside JSON)."
+    "'offline': true is the fleet default until a replacement UNC exists.",
+    "If a new share is stood up, set shared_root to that UNC and offline to false."
   ],
-  "shared_root": "L:\\4b_Design Technology",
+  "shared_root": null,
   "db_folder": null,
-  "offline": false
+  "offline": true
 }

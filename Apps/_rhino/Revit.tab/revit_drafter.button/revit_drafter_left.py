@@ -112,7 +112,7 @@ def revit_drafter():
     # import and bundle layer
     setting = DATA_FILE.get_data("draft_transfer_revit2rhino_setting")
     if not setting:
-        NOTIFICATION.messenger(main_text = "No setting file found, please check your revit side.")
+        NOTIFICATION.messenger(main_text = "No setting file found, please check your revit side.", sticky=True)
         return
     # unit_opts = ["Millimeters", "Feet", "Inches"]
     # units = rs.ListBox(unit_opts , message = "Use which unit for the DWG?" , default = unit_opts[0])

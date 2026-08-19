@@ -1,0 +1,10 @@
+{
+  "revit": {
+    "manifest_digest": "d5b63079f601a97fc88210c32a60b3b7cc4c912c5d161972fefa74ac6b556398",
+    "synced_at": "2026-08-07T22:47:39Z"
+  },
+  "rhino": {
+    "manifest_digest": "87e19d72c248d45ee154081506d40e4d437a8d324957477d403cd67c621334a1",
+    "synced_at": "2026-08-07T22:47:43Z"
+  }
+}

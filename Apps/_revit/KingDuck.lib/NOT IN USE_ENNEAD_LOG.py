@@ -418,21 +418,8 @@ def get_central_name(doc=None):
 
 
 def get_user_root_folder():
-    """ wait for the new home in AVD"""
-    if not ENVIRONMENT.IS_L_DRIVE_ACCESSIBLE:
-        return FOLDER.DUMP_FOLDER
-    
-    folder = r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Project Settings\Users"
-    folder = FOLDER.secure_folder(folder)
-    try:
-        res = DATA_FILE.set_data(
-            dict(), folder + "\\SH_tester_account{}".format(ENVIRONMENT.PLUGIN_EXTENSION))
-        if not res:
-            folder = FOLDER.DUMP_FOLDER
-    except:
-        folder = FOLDER.DUMP_FOLDER
-    finally:
-        return folder
+    """Local dump only. The office L: drive is retired."""
+    return FOLDER.DUMP_FOLDER
 
 
 @try_catch_error
@@ -446,7 +433,7 @@ def is_money_negative(user_name=get_current_user_name()):
 
         SPEAK.speak(
             "You are bankrupt. Don't worry, you are not the only one.")
-        folder = r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Project Settings\Misc"
+        folder = ENVIRONMENT.IMAGE_FOLDER
         image = "LOG_BANKRUPT.png"
 
         NOTIFICATION.messenger("Woahaha! You don't have enough EA Coins...",
@@ -474,7 +461,7 @@ def get_current_money(user_name=get_current_user_name()):
 
 def log_money_change_toast(title, message, gain_money=True):
 
-    folder = r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Project Settings\Misc"
+    folder = ENVIRONMENT.IMAGE_FOLDER
     if gain_money:
         image = "LOG_TOAST_MONEY_GAIN.png"
     else:
@@ -542,7 +529,7 @@ def print_leader_board():
     print("Note: If you are wondering about the zipper mouth icon, those people has decided to disable the Text2Speech feature.")
 
     output.print_image(
-        r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Project Settings\Misc\Rich_Duck.jpg")
+        os.path.join(ENVIRONMENT.IMAGE_FOLDER, "Rich_Duck.jpg"))
 
 
 def assign_default_key_values_to_data(data):
@@ -679,13 +666,13 @@ def update_error_log(error, user_name=get_current_user_name()):
 
 def get_data_from_error_log():
     data = DATA_FILE.get_data(
-        r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Project Settings\Users\Error_Log{}".format(ENVIRONMENT.PLUGIN_EXTENSION))
+        os.path.join(FOLDER.DUMP_FOLDER, "Error_Log{}".format(ENVIRONMENT.PLUGIN_EXTENSION)))
     return data
 
 
 def set_data_to_error_loge(data):
     DATA_FILE.set_data(
-        data, r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Project Settings\Users\Error_Log{}".format(ENVIRONMENT.PLUGIN_EXTENSION))
+        data, os.path.join(FOLDER.DUMP_FOLDER, "Error_Log{}".format(ENVIRONMENT.PLUGIN_EXTENSION)))
 
 
 def is_recently_recorded(tool_used, search_length=5):
@@ -882,14 +869,13 @@ def sync_gap_too_long(mins_exceeded, doc_name=None):
             EMAIL.email(receiver_email_list=["szhang@ennead.com", "{}@ennead.com".format(get_current_user_name())],
                                   subject="EnneadTab Auto Email: Sync Gap Way Too Long!",
                                   body_image_link_list=[
-                                      r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Published\ENNEAD.extension\lib\EnneadTab\images\revit_wait_too_long.jpg"],
+                                      os.path.join(ENVIRONMENT.IMAGE_FOLDER, "revit_wait_too_long.jpg")],
                                   body="Q: Why am I getting this email?\nA: The longer you wait to synchronize file, the higher risk you are at losing work should anything happen to it. \n\nQ: But I dont want to sync often becasue it takes a long time to sync!\nA: I will cap your lost to $1000 even though the record shown you will lose ${}.\n\nQ: That is not fair!\nA: You can also just save your file to reset the timer. And in the rare case that you are detaching file or SaveAs new file, a new record will be generated due to the new file name, so it will seems like the old record never close. If that apply to you, talk to Sen.Z and get refund.\n\nUser: {}{}\nMinutes past since 90 mins mark:{}\nUnit Price:{}\nCoin Change:{}".format(coin_change,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      get_current_user_name(),
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      additional_note,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      mins_exceeded,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      unit_price,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      coin_change))
-        # body_image_link_list = [r"L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Published\ENNEAD.extension\lib\EnneadTab\images\revit_wait_too_long.jpg"],
         coin_change = -1000
         history = "Wait really really long to Sync. {} mins pass 90 mins mark.".format(
             mins_exceeded)

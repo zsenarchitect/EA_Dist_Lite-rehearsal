@@ -1085,7 +1085,7 @@ def list_family():
    
     lister.run()
     tg.Assimilate ()
-    NOTIFICATION.messenger("All families listed. Totally take {}".format(TIME.get_readable_time(time.time() - start_time)))
+    NOTIFICATION.messenger("All families listed. Totally take {}".format(TIME.get_readable_time(time.time() - start_time)), sticky=True)
     SOUND.play_finished_sound()
 
     if is_sync:

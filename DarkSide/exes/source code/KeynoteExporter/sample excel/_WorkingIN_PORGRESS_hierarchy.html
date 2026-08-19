@@ -1,0 +1,2864 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+        <title>EnneadTab Keynote Viewer</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<style>
+:root { --fg:#1a202c; --muted:#718096; --brand:#4a5568; --pill:#f7fafc; --bg:#ffffff; --line:#e2e8f0; --success:#38a169; --warning:#d69e2e; --danger:#e53e3e; --category:#3182ce; --group:#805ad5; }
+body { font-family: Segoe UI, Arial, sans-serif; margin: 0; color: var(--fg); background: var(--bg); }
+.header { background: linear-gradient(135deg, var(--category)10, var(--group)10); border-bottom: 2px solid var(--line); padding: 20px; margin-bottom: 0; }
+.header h1 { margin: 0 0 8px 0; color: var(--category); font-size: 28px; font-weight: 700; }
+.header p { margin: 0; color: var(--muted); font-size: 14px; }
+.toolbar { display:flex; gap:8px; align-items:center; margin: 16px 20px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+.toolbar.sticky { box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-bottom: 1px solid var(--line); }
+.toolbar input[type="search"] { flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background: var(--pill); color: var(--fg); }
+.btn { padding:6px 10px; border:1px solid var(--line); border-radius:8px; background: var(--pill); cursor:pointer; color: var(--fg); }
+.btn:hover { background: var(--line); }
+details { margin: 6px 0; border-left: 2px solid var(--pill); padding-left: 8px; }
+summary { list-style: none; cursor: pointer; position: relative; }
+summary::-webkit-details-marker { display:none; }
+summary::before { content: '▶'; color: var(--brand); margin-right: 6px; transition: all 0.2s; font-size: 12px; }
+details[open] > summary::before { content: '▼'; transform: none; }
+.title { display:inline-flex; align-items:center; gap:8px; }
+.badge { font-size:12px; background: var(--line); border:1px solid var(--line); padding:2px 6px; border-radius:999px; color: var(--fg); }
+.key { color: var(--brand); font-weight:600; }
+.desc { color: var(--muted); }
+/* Category level (Division) styling */
+.category-level { background: linear-gradient(135deg, var(--category)15, var(--category)08); border: 1px solid var(--category)40; border-radius: 8px; padding: 12px; margin: 6px 0; }
+.category-level summary { font-weight: 600; color: var(--category); }
+/* Group level (Section) styling */
+.group-level { background: linear-gradient(135deg, var(--group)15, var(--group)08); border: 1px solid var(--group)40; border-radius: 6px; padding: 10px; margin: 4px 0; }
+.group-level summary { font-weight: 500; color: var(--group); }
+/* Entry level styling */
+.node-item { background: var(--pill); border: 1px solid var(--line); border-radius: 6px; padding: 8px; margin: 4px 0; }
+.node-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.node-details { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:6px; }
+.pill { display:inline-flex; align-items:center; gap:6px; background: #f7fafc; border:1px solid var(--line); color: var(--fg); padding: 3px 8px; border-radius: 999px; font-size: 11px; line-height: 1; }
+.pill .label { color: var(--muted); font-weight: 600; }
+.pill .value { color: var(--fg); }
+.scope-badge { font-size: 11px; padding: 4px 8px; border-radius: 999px; margin-right: 6px; margin-bottom: 6px; display: inline-flex; align-items:center; gap:6px; }
+.scope-int { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
+.scope-ext { background: #fffbeb; color: #b7791f; border: 1px solid #f6e05e; }
+.scope-none { background: var(--line); color: var(--muted); }
+ul { margin: 6px 0 10px 18px; }
+li { margin: 2px 0; }
+.hidden { display:none; }
+/* Search highlighting */
+.search-highlight { background: #fef5e7; color: #b7791f; padding: 1px 2px; border-radius: 2px; font-weight: 600; }
+/* Do not highlight inside pills/badges to keep layout intact */
+.pill .search-highlight, .scope-badge .search-highlight { background: transparent; color: inherit; font-weight: inherit; padding: 0; }
+.search-match { background: #f7fafc; border-left: 3px solid var(--brand); padding-left: 4px; }
+/* Context menu styling */
+.context-menu { position: fixed; background: var(--pill); border: 1px solid var(--line); border-radius: 6px; padding: 4px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 160px; }
+.context-menu-item { padding: 8px 12px; cursor: pointer; color: var(--fg); border-bottom: 1px solid var(--line); }
+.context-menu-item:last-child { border-bottom: none; }
+.context-menu-item:hover { background: var(--line); }
+.context-menu-item.disabled { color: var(--muted); cursor: not-allowed; }
+.context-menu-item.disabled:hover { background: transparent; }
+/* Duplicate code styling */
+.duplicate-code { background: #fef2f2 !important; border: 2px solid #f56565 !important; }
+.duplicate-code .key { color: #c53030 !important; font-weight: 700 !important; }
+</style>
+<script src="keynote_viewer.js"></script>
+</head>
+<body>
+<div class="header">
+  <h1>EnneadTab Keynote Viewer</h1>
+  <p>Interactive keynote hierarchy visualization with advanced search and navigation</p>
+</div>
+<div class="toolbar">
+  <input id="search" type="search" placeholder="Search by keynote number or description…" oninput="filterTree()" />
+  <button class="btn" onclick="toggleAll(true)">Expand all</button>
+  <button class="btn" onclick="toggleAll(false)">Collapse all</button>
+  <button class="btn" onclick="document.getElementById('search').value=''; filterTree();">Clear</button>
+  
+</div>
+<div style="margin: 0 20px 20px 20px;">
+  <p>Division → Section → Entries. Use search to filter; expand/collapse controls affect the whole tree.</p>
+
+
+  <div style="background: #fef2f2; border: 2px solid #f56565; border-radius: 8px; padding: 16px; margin: 16px 0; color: #742a2a;">
+    <h3 style="margin: 0 0 12px 0; color: #c53030; font-size: 18px;">⚠️ PROBLEMATIC DUPLICATES DETECTED</h3>
+    <p style="margin: 0 0 12px 0; font-weight: 600;">The following codes have conflicts and will cause warnings in Revit:</p>
+    <p style="margin: 0 0 12px 0; font-size: 14px; color: #742a2a;"><em>Note: Division duplicates are normal - multiple entries can belong to the same division.</em></p>
+
+    <h4 style="margin: 12px 0 8px 0; color: #c53030;">🟡 Section Codes with Different Names:</h4>
+    <ul style="margin: 0 0 12px 0; padding-left: 20px;">
+      <li><strong>92400</strong> - 2 occurrences
+<br/>        <em>Different names: SECTION 092400 - CEMENT PLASTERING (STUCCO), SECTION 092400 - STUCCO CEILINGS EXTERIOR</em>
+</li>
+      <li><strong>92900</strong> - 3 occurrences
+<br/>        <em>Different names: SECTION 092900 - GYPSUM BOARD, SECTION 092900 - FIRE RATED CEILINGS</em>
+</li>
+    </ul>
+
+    <p style="margin: 12px 0 0 0; font-size: 14px; color: #742a2a;">
+      <strong>Action Required:</strong> Review and resolve these conflicts before importing into Revit to avoid import warnings.
+    </p>
+  </div>
+
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>3 - DIVISION 03 - CONCRETE</strong><span class="badge">7</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">33100 - SECTION 033100 - CAST-IN-PLACE STRUCTURAL  CONCRETE<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CNC-50</span>
+          <span class="desc">CAST-IN PLACE CONCRETE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">33300 - SECTION 033300 - CAST-IN-PLACE ARCHITECTURAL CONCRETE<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CNC-1</span>
+          <span class="desc">SEALED CONCRETE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CNC-2</span>
+          <span class="desc">PAINTED CONCRETE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CNC-51</span>
+          <span class="desc">SEALED CONCRETE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span><span class="pill"><span class="label">Color:</span><span class="value">Sen </span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING, MILLWORK</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">34000 - SECTION 034000 - PRECAST CONCRETE<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">PCC-50</span>
+          <span class="desc">PRECAST PANELS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">PCC-51</span>
+          <span class="desc">PRECAST PAVERS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Bldg:</span><span class="value">building1</span></span><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span><span class="pill"><span class="label">Color:</span><span class="value">dwdww</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: FENESTRATION, PAVING</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">34900 - SECTION 034900 - GLASS-FIBER-REINFORCED CONCRETE<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GFC-50</span>
+          <span class="desc">GLASS-FIBER-REINFORCED CONCRETE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>4 - DIVISION 04 - MASONRY</strong><span class="badge">5</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">42100 - SECTION 042100 - CLAY UNIT MASONRY<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">BR-50</span>
+          <span class="desc">BRICK</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TC-50</span>
+          <span class="desc">TERRACOTTA</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">42200 - SECTION 042200 - CONCRETE UNIT MASONRY<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CMU-50</span>
+          <span class="desc">CONCRETE MASONRY UNIT</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">44200 - SECTION 044200 - EXTERIOR STONE CLADDING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">ST-50</span>
+          <span class="desc">STONE PANEL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">47200 - SECTION 044200 - CAST STONE MASONRY<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CST-50</span>
+          <span class="desc">CAST STONE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. WALL</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>5 - DIVISION 05 - METALS</strong><span class="badge">10</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">55000 - SECTION 055000 - METAL FABRICATIONS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MF-50</span>
+          <span class="desc">METAL MESH</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">55200 - SECTION 055200 - PIPE AND TUBE RAILINGS<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RLG-50</span>
+          <span class="desc">STEEL PIPE RAILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RLG-51</span>
+          <span class="desc">STEEL STANCHION</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">55300 - SECTION 055300 - METAL GRATINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GRT-50</span>
+          <span class="desc">STEEL GRATING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">57000 - SECTION 057000 - DECORATIVE METALS<span class="badge">5</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MTL-1</span>
+          <span class="desc">STEEL (COLD FORMED, PAINTED, PATINATED, BLACKENED)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MTL-2</span>
+          <span class="desc">STAINLESS STEEL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MTL-3</span>
+          <span class="desc">ALUMINUM (ANODIZED, PAINTED)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MTL-4</span>
+          <span class="desc">ALTERNATE METAL (BRONZE, BRASS, COPPER, ETC.)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MTL-50</span>
+          <span class="desc">METAL BASE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">57300 - SECTION 057300 - DECORATIVE METAL RAILINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RLG-52</span>
+          <span class="desc">DECORATIVE GLASS GUARDRAIL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>6 - DIVISION 06 - WOOD, PLASTICS, AND COMPOSITES</strong><span class="badge">6</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">64000 - SECTION 064000 - ARCHITECTURAL WOODWORK<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WD-1</span>
+          <span class="desc">ARCHITECTURAL WOOD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: MILLWORK</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">64023 - SECTION 064023 - INTERIOR ARCHITECTURAL WOODWORK<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WB-1</span>
+          <span class="desc">WOOD BASE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: BASE</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">64116 - SECTION 064113 - PLASTIC LAMINATE CASEWORK<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">PLM-1</span>
+          <span class="desc">PLASTIC LAMINATE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: MILLWORK</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">64200 - SECTION 064200 - ARCHITECTURAL WOOD PANELING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WV-1</span>
+          <span class="desc">WOOD VENEER FLUSH WOOD PANELING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">64313 - SECTION 064313 - WOOD STAIRS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WDS-1</span>
+          <span class="desc">SOLID WOOD TREAD AND RISER</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">66113 - SECTION 066113 - PLASTIC RESIN<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">PLR-1</span>
+          <span class="desc">RESIN WALL PANELING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>7 - DIVISION 07 - THERMAL AND MOISTURE PROTECTION</strong><span class="badge">6</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">71413 - SECTION 71413 - MEMBRANE WATERPROOFING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WP-50</span>
+          <span class="desc">MEMBRANE WATERPROOFING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">74213 - SECTION 074213 - METAL WALL PANEL<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MP-50</span>
+          <span class="desc">FLAT SEAM PANELS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">75210 - SECTION 075210 - GREEN ROOFING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RFG-50</span>
+          <span class="desc">INTENSIVE GREEN ROOF ASSEMBLY</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: ROOF</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">75323 - SECTION 075323 - EPDM ROOFING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RFG-51</span>
+          <span class="desc">EPDM</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: ROOF</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">79500 - SECTION 079500 - EXPANSION JOINT<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">EJ-1</span>
+          <span class="desc">FLOOR-TO-FLOOR EXPANSION CONTROL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">EJ-50</span>
+          <span class="desc">ALUM. EXPANSION JOINT</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>8 - DIVISION 08 - OPENINGS</strong><span class="badge">10</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">84400 - SECTION 084400 - CURTAIN WALL AND GLAZED ASSEMBLIES<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CW-50</span>
+          <span class="desc">ALUMINUM AND GLASS UNITIZED CURTAIN WALL SYSTEM</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: FENESTRATION</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">88000 - SECTION 088000 - GLAZING<span class="badge">8</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-1</span>
+          <span class="desc">GLASS (NON LAMINATED, NON TEMPERED)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-2</span>
+          <span class="desc">LAMINATED GLASS (CLEAR, TRANSLUCENT INTERLAYER)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-3</span>
+          <span class="desc">TEMPERED GLASS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-4</span>
+          <span class="desc">OPAQUE BACK PAINTED</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-5</span>
+          <span class="desc">OPAQUE MAGNETIC AND/OR WRITEABLE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-50</span>
+          <span class="desc">VISION GLASS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: FENESTRATION</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-51</span>
+          <span class="desc">SPANDREL GLASS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: FENESTRATION</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GL-6</span>
+          <span class="desc">MIRROR GLASS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">89000 - SECTION 089000 - LOUVERS AND VENTS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">LVR-50</span>
+          <span class="desc">EXTRUDED ALUMINUM HORIZONTAL STORM LOUVER</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>9 - DIVISION 09 - FINISHES</strong><span class="badge">54</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">92216 - SECTION 092216 - NON-STRUCTURAL METAL FRAMING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">STD-1</span>
+          <span class="desc">METAL STUD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">92226 - SECTION 092226 - GYPSUM BOARD CEILING<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GWB-1A</span>
+          <span class="desc">GYPSUM BOARD CEILING (SUSPENSION)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">GWB-1B</span>
+          <span class="desc">GYPSUM BOARD CEILING (BLACK IRON NYC)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">92400 - SECTION 092400 - CEMENT PLASTERING (STUCCO)<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item duplicate-code">
+        <div class="node-header">
+          <span class="key">STC-50</span><span style="background: #d69e2e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">SECTION</span>
+          <span class="desc">PORTLAND CEMENT PLASTER, EXTERIOR SOFFIT FINISH</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: SOFFIT</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">92400 - SECTION 092400 - STUCCO CEILINGS EXTERIOR<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item duplicate-code">
+        <div class="node-header">
+          <span class="key">STO-1</span><span style="background: #d69e2e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">SECTION</span>
+          <span class="desc">STUCCO CEILING (EXTERIOR)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">92900 - SECTION 092900 - FIRE RATED CEILINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item duplicate-code">
+        <div class="node-header">
+          <span class="key">FRC-1</span><span style="background: #d69e2e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">SECTION</span>
+          <span class="desc">FIRE RATED CEILING 1 HR</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">92900 - SECTION 092900 - GYPSUM BOARD<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item duplicate-code">
+        <div class="node-header">
+          <span class="key">GWB-1</span><span style="background: #d69e2e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">SECTION</span>
+          <span class="desc">GYPSUM WALL BOARD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item duplicate-code">
+        <div class="node-header">
+          <span class="key">GWB-50</span><span style="background: #d69e2e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">SECTION</span>
+          <span class="desc">GYPSUM WALL BOARD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">92901 - SECTION 092900 - FIRE RATED CEILINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">FRC-2</span>
+          <span class="desc">FIRE RATED CEILING 2 HR</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">93000 - SECTION 093000 - TILING<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TL-1</span>
+          <span class="desc">WALL TILE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TL-2</span>
+          <span class="desc">FLOOR TILE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95113 - SECTION 095113 - ACOUSTICAL PANEL CEILINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">ACP-1</span>
+          <span class="desc">ACOUSTICAL PANELS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95123 - SECTION 095123 - ACOUSTICAL TILE CEILINGS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">ACT-1</span>
+          <span class="desc">ACOUSTICAL TILE CEILING (CONCEALED GRID)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">ACT-1A</span>
+          <span class="desc">ACOUSTICAL TILE CEILING (CONCEALED GRID)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">ACT-1B</span>
+          <span class="desc">ACOUSTICAL TILE CEILING (CONCEALED GRID)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95133 - SECTION 095133 - METAL CEILINGS<span class="badge">6</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-1</span>
+          <span class="desc">ACOUSTICAL PERFORATED METAL PAN CEILING SYSTEM</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-1A</span>
+          <span class="desc">ACOUSTICAL PERFORATED METAL PAN CEILING SYSTEM</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-1B</span>
+          <span class="desc">ACOUSTICAL PERFORATED METAL PAN CEILING SYSTEM</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-2</span>
+          <span class="desc">ACOUSTICAL METAL PAN CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-2A</span>
+          <span class="desc">ACOUSTICAL METAL PAN CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-2B</span>
+          <span class="desc">ACOUSTICAL METAL PAN CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95423 - SECTION  095423 -LINEAR METAL CEILINGS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-3</span>
+          <span class="desc">LINEAR METAL CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-3A</span>
+          <span class="desc">LINEAR METAL CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-3B</span>
+          <span class="desc">LINEAR METAL CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95426 - SECTION 095426 - WOOD CEILINGS<span class="badge">6</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WCP-1</span>
+          <span class="desc">SUSPENDED WOOD CEILING (TILE OR PLANK)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WCP-1A</span>
+          <span class="desc">SUSPENDED WOOD CEILING (TILE OR PLANK)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WCP-1B</span>
+          <span class="desc">SUSPENDED WOOD CEILING (TILE OR PLANK)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WCP-2</span>
+          <span class="desc">SUSPENDED WOOD CEILING (GRILLE)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WCP-2A</span>
+          <span class="desc">SUSPENDED WOOD CEILING (GRILLE)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WCP-2B</span>
+          <span class="desc">SUSPENDED WOOD CEILING (GRILLE)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95436 - SECTION 095436 - SUSPENDED DECORATIVE GRIDS<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-4A</span>
+          <span class="desc">METAL CEILING PANELS MESH</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MCP-4B</span>
+          <span class="desc">METAL CEILING PANELS MESH</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">95446 - SECTION 095446 - FABRIC WARPPED CEILING PANELS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">FCP-1</span>
+          <span class="desc">FELT CEILING PANELS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96340 - SECTION 096340 - STONE FLOORING<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">STF-1</span>
+          <span class="desc">STONE FLOOR TILE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">STF-2</span>
+          <span class="desc">STONE STAIR TREAD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96400 - SECTION 096400 - WOOD FLOORING<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WDF-1</span>
+          <span class="desc">WOOD FLOORING (SOLID, ENGINEERED, PREFINISHED)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WDF-2</span>
+          <span class="desc">CORK FLOORING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96500 - SECTION 096500 - RESILIENT FLOORING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RF-1</span>
+          <span class="desc">RESILIENT TILE FLOORING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96513 - SECTION 096513 - RESILIENT BASE AND ACCESSORIES<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RB-1</span>
+          <span class="desc">RUBBER BASE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: BASE</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96600 - SECTION 096600 - TERRAZZO<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TZ-1</span>
+          <span class="desc">CEMENT TERRAZZO FLOORING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TZ-2</span>
+          <span class="desc">EPOXY TERRAZZO FLOORING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96700 - SECTION 096700 - FLUID APPLIED FLOORING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RSF-1</span>
+          <span class="desc">FLUID APPLIED FLOORING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96813 - SECTION 096813 - CARPET TILE<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CPT-1</span>
+          <span class="desc">CARPET TILE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">96816 - SECTION 096816 - SHEET CARPET<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CPT-2</span>
+          <span class="desc">CARPET BROADLOOM</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: FLOOR</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">97200 - SECTION 097200 - WALL COVERINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WC-1</span>
+          <span class="desc">WALLCOVERING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">97500 - SECTION 097500 - STONE WALL FACING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">ST-2</span>
+          <span class="desc">STONE WALL PANELS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">97700 - SECTION 097700 - FIBERGLASS REINFORCED PLASTIC CEILINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">FRP-1</span>
+          <span class="desc">FIBERGLASS REINFORCED PLASTIC PANEL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">97723 - SECTION 097723 - FABRIC WRAPPED PANELS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">FWP-1</span>
+          <span class="desc">FABRIC-WRAPPED WALL PANEL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">98000 - SECTION 098000 - ACOUSTIC TREATMENT<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">AT-1</span>
+          <span class="desc">ACOUSTIC PLASTER CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">98316 - SECTION 098316 - METAL CEILINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">SAT-1</span>
+          <span class="desc">SPRAYED CELLULOSE ACOUSTICAL INSULATION</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">98443 - SECTION 098443 - WOOD ACOUSTICAL PANELS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">WG-2</span>
+          <span class="desc">WOOD GRILLE PANEL CEILING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: CEILING</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">99100 - SECTION 099100 - INTERIOR PAINTING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">PT-1</span>
+          <span class="desc">PAINT</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. WALL</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">99300 - SECTION 099300 - STAINING AND TRANSPARENT FINISHING<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">SF-1</span>
+          <span class="desc">STAINING AND TRANSPARENT FINISH</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">99600 - SECTION 099600 - HIGH-PERFORMANCE COATINGS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">CTG-1</span>
+          <span class="desc">HIGH-PERFORMANCE COATING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: INT. OTHER</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>10 - DIVISION 10 - SPECIALTIES</strong><span class="badge">7</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">101123 - SECTION 101123 - TACKBOARDS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MB-1</span>
+          <span class="desc">MARKERBOARD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">MBP-1</span>
+          <span class="desc">MONOLITHIC MARKER BOARD PANELS (CERAMIC STEEL FULL HEIGHT)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TB-1</span>
+          <span class="desc">TACKBOARD</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">101423 - SECTION 101423 - PANEL SIGNAGE<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">PS-1</span>
+          <span class="desc">PANEL SIGN</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">102100 - SECTION 102100 - TOILET PARTITIONS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TP-1</span>
+          <span class="desc">SOLID-POLYMER TOILET COMPARTMENT</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">102800 - SECTION 102800 - TOILET, BATH, AND LAUNDRY ACCESSORIES<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">TA-1</span>
+          <span class="desc">TOILET TISSUE (ROLL) DISPENSER</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">104413 - SECTION 104413 - FIRE PROTECTION CABINETS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">FE-1</span>
+          <span class="desc">FIRE EXTINGUISHER  WITH CABINET</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>12 - DIVISION 12 - FURNISHINGS</strong><span class="badge">5</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">122200 - SECTION 122200 - DRAPERIES<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">DRO-1</span>
+          <span class="desc">MANUALLY OPERATED DRAPERY</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">122413 - SECTION 122413 - ROLLER WINDOW SHADES<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">RS-1</span>
+          <span class="desc">MANUALLY OPERATED ROLLER SHADE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">123640 - SECTION 123640 - STONE COUNTERTOPS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">STC-1</span>
+          <span class="desc">STONE COUNTERTOPS</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: MILLWORK</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">123661 - SECTION 123661 -SIMULATED STONE COUNTERTOPS<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">SSC-1</span>
+          <span class="desc">SIMULATED STONE COUNTERTOPS (SOLID SURFACING OR QUARTZ AGGLOMERATE)</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: MILLWORK</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">124813 - SECTION 124813 - ENTRANCE FLOOR MATS AND FRAMES<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">EM-50</span>
+          <span class="desc">ALUMINUM AND CARPET MAT</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">MASTERSPEC</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: EXT. OTHER</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>ARCH NOTES - BY CATEGORY</strong><span class="badge">63</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">CASEWORK/MILLWORK<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">101</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">102</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">103</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">CURTAINWALL<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">201</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">202</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">203</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">DETAIL ITEMS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">301</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">302</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">303</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">DOORS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">401</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">402</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">403</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">ELEVATORS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">501</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">502</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">503</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">EQUIPMENT<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">601</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">602</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">603</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">FLOORS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">701</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">702</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">703</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">FURNITURE<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">801</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">802</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">GENERAL ANNOTATIONS<span class="badge">19</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">901</span>
+          <span class="desc">ALIGN</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">902</span>
+          <span class="desc">ALIGN WITH FACE OF WALL BELOW</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">903</span>
+          <span class="desc">OPEN TO BELOW</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">904</span>
+          <span class="desc">OPEN TO ABOVE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">905</span>
+          <span class="desc">OUTLINE OF FLOOR ABOVE, SHOWN DASHED</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">906</span>
+          <span class="desc">OUTLINE OF SOFFIT ABOVE, SHOWN DASHED</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">907</span>
+          <span class="desc">EDGE OF EXTERIOR ENVELOPE ABOVE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">908</span>
+          <span class="desc">EDGE OF SURFACE BELOW</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">909</span>
+          <span class="desc">EDGE OF CANOPY ABOVE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">910</span>
+          <span class="desc">EDGE OF FOUNDATION BELOW</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">911</span>
+          <span class="desc">EDGE OF BRIDGE ABOVE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">912</span>
+          <span class="desc">EDGE OF SURFACE ABOVE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">913</span>
+          <span class="desc">EDGE OF SHAFT OPENING BELOW</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">914</span>
+          <span class="desc">FINISH TO MATCH ADJACENT WALL</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">915</span>
+          <span class="desc">ACCESSIBLE ROUTE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">916</span>
+          <span class="desc">AREAWAY ABOVE</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">917</span>
+          <span class="desc">SLOPE TO DRAIN</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">918</span>
+          <span class="desc">OMITTED THIS AREA FOR CLARITY</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">919</span>
+          <span class="desc">ADD  LAYER TYPE &#x27;X&#x27; GYPSUM BOARD TO EACH SIDE FOR UL #419 1-HR FIRE RATING</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">RAMPS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1101</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1102</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1103</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">ROOFS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1201</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1202</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1203</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">SITE<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1301</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1302</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1303</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">STAIRS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1401</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1402</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1403</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">TOILET ACCESSORIES<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1501</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1502</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1503</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">WALLS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1601</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1602</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1603</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">WINDOWS<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1701</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1702</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">1703</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>SYSTEM NOTES - BY CATEGORY</strong><span class="badge">27</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">AV<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5101</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5102</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5103</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">COMM<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5201</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5202</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5203</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">ELECTRICAL<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5301</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5302</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5303</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">FIRE PROTECTION<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5401</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5402</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5403</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">LAB<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5501</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5502</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5503</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">LIGHTING<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5601</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5602</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5603</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">MECHANICAL<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5701</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5702</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5703</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">PLUMBING<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5704</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5705</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">5706</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+  <details data-section class="group-level">
+    <summary><span class="title">STRUCTURAL<span class="badge">3</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">7101</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">7102</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">7103</span>
+          <span class="desc"></span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">NOTES</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>B - SHELL</strong><span class="badge">2</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">B20 - Exterior Vertical Enclosures<span class="badge">2</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">B2010.20</span>
+          <span class="desc">Exterior Wall Construction</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">UNIFORMAT</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">B2020.30</span>
+          <span class="desc">Exterior Window Wall</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">UNIFORMAT</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+<details open data-division class="category-level">
+  <summary><span class="title"><strong>C - INTERIORS</strong><span class="badge">1</span></span></summary>
+  <details data-section class="group-level">
+    <summary><span class="title">C10 - Interior Construction<span class="badge">1</span></span></summary>
+    <ul>
+      <li class="node-item ">
+        <div class="node-header">
+          <span class="key">C1010.10</span>
+          <span class="desc">Interior Fixed Partitions</span>
+        </div>
+        <div class="node-details"><div class="meta-row"><span class="pill"><span class="label">Format:</span><span class="value">UNIFORMAT</span></span></div></div>
+        <div class="meta-row" style="margin-top: 6px;">
+          <span class="scope-badge scope-int"><span class="label">Interior</span>: None</span>
+          <span class="scope-badge scope-ext"><span class="label">Exterior</span>: None</span>
+        </div>
+      </li>
+    </ul>
+  </details>
+</details>
+
+</body>
+</html>

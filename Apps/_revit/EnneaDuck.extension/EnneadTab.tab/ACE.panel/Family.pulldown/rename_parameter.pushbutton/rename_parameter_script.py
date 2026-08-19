@@ -474,7 +474,7 @@ class RenameParameterController(object):
                 errors.append("Name '{}' already exists in the family.".format(item.new_name))
 
         if errors:
-            NOTIFICATION.messenger("Cannot proceed:\n- " + "\n- ".join(errors))
+            NOTIFICATION.messenger("Cannot proceed:\n- " + "\n- ".join(errors), sticky=True)
             return False
         return True
 

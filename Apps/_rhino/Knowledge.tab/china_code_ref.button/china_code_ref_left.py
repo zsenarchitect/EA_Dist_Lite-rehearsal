@@ -26,7 +26,7 @@ def china_code_ref():
     if not os.path.exists(folder):
         try:
             os.makedirs(folder)
-            NOTIFICATION.messenger("Created BuildingCode folder. Please add your code reference files there.")
+            NOTIFICATION.messenger("Created BuildingCode folder. Please add your code reference files there.", sticky=True)
             return
         except Exception as e:
             NOTIFICATION.messenger("Failed to create BuildingCode folder: {}".format(str(e)))

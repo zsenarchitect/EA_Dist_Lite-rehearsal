@@ -360,11 +360,12 @@ def api_request_sync(doc):
     return _api_post("/request", data)
 
 
-def api_complete_sync(doc):
+def api_complete_sync(doc, changes=None):
     """Notify EnneadTab-DB that sync is complete. Remove from queue.
 
     Args:
         doc: Revit Document object
+        changes: Array or object representing model changes
 
     Returns:
         dict or None: {"success": bool, "found": bool, "queue": [...]}
@@ -375,7 +376,23 @@ def api_complete_sync(doc):
         "model_guid": model_guid,
         "username": USER.USER_NAME
     }
+    if changes:
+        data["changes"] = changes
     return _api_post("/complete", data)
+
+
+def api_get_status(model_guid):
+    """Read-only queue snapshot. Does not join or heartbeat.
+
+    Args:
+        model_guid: Central model identifier
+
+    Returns:
+        dict or None: {"queue": [...], "dashboard_url": str}
+    """
+    if not model_guid:
+        return None
+    return _api_get("/status", {"model_guid": model_guid})
 
 
 def api_prioritize_sync(doc):

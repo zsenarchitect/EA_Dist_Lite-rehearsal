@@ -18,119 +18,37 @@ import ENVIRONMENT
 import NOTIFICATION
 import DATA_FILE
 import USER
-import shutil
 import threading
 import traceback
 import ERROR_HANDLE
 
-def is_github_connection_ok():
-    """
-    Checks if GitHub connection is available by attempting to connect to github.com.
-    This is particularly important for users in China where GitHub may be blocked.
-    
-    Returns:
-        bool: True if GitHub is accessible, False otherwise
-    """
-    try:
-        import socket
-        socket.setdefaulttimeout(5)  # Set 5 second timeout
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("github.com", 443))
-        ERROR_HANDLE.print_note("GitHub connection is OK")
-        return True
-    except:
-        ERROR_HANDLE.print_note(traceback.format_exc())
-        return False
 
-def updater_for_shanghai():
-    """
-    Updates the distribution repository for Shanghai by copying from BACKUPFOLDER into ECO_SYS_FOLDER\\EA_Dist in a s indepdendet thread.
-    This is to avoid blocking the main thread. the copy thread will survice even if the main caller is terminated 
-    """
-    def copy_from_backup_to_dist():
-        """
-        Copies all files from BACKUPFOLDER into ECO_SYS_FOLDER\\EA_Dist
-        """
-        ERROR_HANDLE.print_note("Checking backup folder: {}".format(ENVIRONMENT.BACKUP_REPO_FOLDER))
-        if not os.path.exists(os.path.join(ENVIRONMENT.BACKUP_REPO_FOLDER)):
-            ERROR_HANDLE.print_note("Backup folder not found at: {}".format(ENVIRONMENT.BACKUP_REPO_FOLDER))
-            # 2026-07-29 (per request): popup is developer-only, but the developer
-            # still needs a fleet signal -> silent ErrorDump. Runs on a background
-            # thread (no UI freeze), but it is reached from startup/save/sync gated
-            # only by a ~60-min cap, so throttle 24h/machine to avoid flooding
-            # during a sustained outage.
-            ERROR_HANDLE.report_infra_warning_to_error_dump(
-                "Update backup folder unreachable: {}".format(ENVIRONMENT.BACKUP_REPO_FOLDER),
-                "VERSION_CONTROL.updater_for_shanghai",
-                throttle_key="version_control_backup_unreachable")
-            if USER.IS_DEVELOPER:
-                NOTIFICATION.messenger("You will need to connect to the shared network folder to update EnneadTab")
-            return False
-        
-        ERROR_HANDLE.print_note("Checking ECO_SYS_FOLDER: {}".format(ENVIRONMENT.ECO_SYS_FOLDER))
-        if not os.path.exists(ENVIRONMENT.ECO_SYS_FOLDER):
-            ERROR_HANDLE.print_note("Creating ECO_SYS_FOLDER: {}".format(ENVIRONMENT.ECO_SYS_FOLDER))
-            os.makedirs(ENVIRONMENT.ECO_SYS_FOLDER)
+def update_dist_repo():
+    """Updates the distribution repository if sufficient time has passed since last update"""
+    if is_update_too_soon():
+        return
 
-        target_folder = os.path.join(ENVIRONMENT.ECO_SYS_FOLDER, "EA_Dist")
-        try:
-            ERROR_HANDLE.print_note("Shanghai updater started")
-            time_start = time.time()
-            ERROR_HANDLE.print_note("Copying to target folder: {}".format(target_folder))
-            source_folder = os.path.join(ENVIRONMENT.BACKUP_REPO_FOLDER)
-            if os.path.exists(target_folder):
-                # Recursively copy and overwrite files from source to target.
-                # NOTE: this writes straight into the LIVE folder -- it is not
-                # atomic and a failure partway leaves a torn install. That is
-                # why the verification below exists and why the success record
-                # is written ONLY after it passes. See the module docstring of
-                # EnneadTab.INTEGRITY for why a stage-and-swap was not done here.
-                for root, dirs, files in os.walk(source_folder):
-                    rel_path = os.path.relpath(root, source_folder)
-                    dest_dir = os.path.join(target_folder, rel_path)
-                    if not os.path.exists(dest_dir):
-                        os.makedirs(dest_dir)
-                    for file in files:
-                        src_file = os.path.join(root, file)
-                        dst_file = os.path.join(dest_dir, file)
-                        shutil.copy2(src_file, dst_file)
-            else:
-                shutil.copytree(source_folder, target_folder)
-            time_end = time.time()
-            time_taken = time_end - time_start
-            formated_time_taken = time.strftime("%H:%M:%S", time.gmtime(time_taken))
-            ERROR_HANDLE.print_note("Shanghai update completed in {}".format(formated_time_taken))
+    # Stamp the ATTEMPT, up front, before anything that can fail.
+    #
+    # This key used to be called "last_update_time" and was written AFTER a
+    # fire-and-forget EXE.try_open_app -- unconditionally, with no idea whether
+    # the installer had done anything at all. The machine recorded a successful
+    # update that may never have happened.
+    #
+    # It is now named for what it actually is: a rate-limiter that stops
+    # update_dist_repo (reached from startup/save/sync paths) from hammering the
+    # installer every few seconds. It is NOT a success record and nothing may
+    # read it as one. The ONLY success record is a .duck file in ECO_SYS_FOLDER,
+    # and those are now written exclusively by a VERIFIED update -- which is what
+    # get_last_update_time / alert_user_to_update have always read.
+    DATA_FILE.set_data({"last_update_attempt_time": time.time()}, "last_update_time")
 
-        except Exception:
-            # A swallowed print_note used to be the ONLY trace of this. The copy
-            # writes into the live install, so this except branch means the user
-            # is now running a half-new/half-old tree -- the loudest possible
-            # moment in the whole system, and it told nobody.
-            trace = traceback.format_exc()
-            ERROR_HANDLE.print_note("Error during update: {}".format(trace))
-            _record_update_failure(
-                "shanghai copy from backup failed", detail=trace)
-            NOTIFICATION.messenger(
-                "EnneadTab update FAILED partway through.\n"
-                "Your install may now be INCONSISTENT (some files new, some old).\n"
-                "Please re-run the EnneadTab installer.")
-            return False
+    launched = EXE.try_open_app("EnneadTab_OS_Installer", safe_open=True)
+    if not launched:
+        _record_update_failure(
+            "installer exe EnneadTab_OS_Installer could not be launched")
 
-        # The copy finished without raising. That is NOT the same as "the tree on
-        # disk is correct" -- a file skipped by a swallowed OS-level lock still
-        # reaches here. Only a manifest check earns the success record.
-        if not _verify_deployed_tree(target_folder, source="post_update_shanghai"):
-            return False
-
-        timestamp_file = os.path.join(ENVIRONMENT.ECO_SYS_FOLDER, "{}.duck".format(time.strftime("%Y-%m-%d_%H-%M-%S")))
-        ERROR_HANDLE.print_note("Creating timestamp file: {}".format(timestamp_file))
-        with open(timestamp_file, "w") as f:
-            f.write("Shanghai update completed in {}".format(formated_time_taken))
-        return True
-
-    thread = threading.Thread(target=copy_from_backup_to_dist)
-    thread.daemon = False
-    thread.start()
-    return True
+    alert_user_to_update()
 
 
 def _verify_deployed_tree(root, source):
@@ -214,45 +132,6 @@ def timestamp_string_to_unix(timestamp_str):
         return time.mktime(dt.timetuple())
     except (ValueError, TypeError):
         return None
-
-
-def update_dist_repo():
-    """Updates the distribution repository if sufficient time has passed since last update"""
-    if is_update_too_soon():
-        return
-
-    # Stamp the ATTEMPT, up front, before anything that can fail.
-    #
-    # This key used to be called "last_update_time" and was written AFTER a
-    # fire-and-forget EXE.try_open_app -- unconditionally, with no idea whether
-    # the installer had done anything at all. The machine recorded a successful
-    # update that may never have happened.
-    #
-    # It is now named for what it actually is: a rate-limiter that stops
-    # update_dist_repo (reached from startup/save/sync paths) from hammering the
-    # installer every few seconds. It is NOT a success record and nothing may
-    # read it as one. The ONLY success record is a .duck file in ECO_SYS_FOLDER,
-    # and those are now written exclusively by a VERIFIED update -- which is what
-    # get_last_update_time / alert_user_to_update have always read.
-    DATA_FILE.set_data({"last_update_attempt_time": time.time()}, "last_update_time")
-
-    if is_github_connection_ok():
-        # try_open_app returns False when the installer exe cannot be located or
-        # launched at all. It still cannot tell us whether the installer, once
-        # launched, SUCCEEDED -- that answer arrives asynchronously as a .duck or
-        # _ERROR.duck marker, which alert_user_to_update below consumes. Checking
-        # the launch at least stops a machine with a missing installer from
-        # failing in total silence forever.
-        launched = EXE.try_open_app("EnneadTab_OS_Installer", safe_open=True)
-        if not launched:
-            _record_update_failure(
-                "installer exe EnneadTab_OS_Installer could not be launched")
-    else:
-        updater_for_shanghai()
-
-    alert_user_to_update()
-
-
 
 
 def is_update_too_soon():
@@ -390,9 +269,7 @@ def show_last_success_update_time():
 def unit_test():
     """Run simple unit test of the module"""
     update_dist_repo()
-    print ("is_github connected: {}".format(is_github_connection_ok()))
-    
 
 
 if __name__ == "__main__":
-    updater_for_shanghai()
+    update_dist_repo()

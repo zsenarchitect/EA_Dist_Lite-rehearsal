@@ -287,7 +287,7 @@ def run_apply(target):
     if problems:
         header = ("Can't apply %s numbering yet -- %d issue(s) to clear first:" % (
             target_label, len(problems)))
-        NOTIFICATION.messenger(main_text=header + "\n\n" + "\n\n".join(problems))
+        NOTIFICATION.messenger(main_text=header + "\n\n" + "\n\n".join(problems), sticky=True)
         return
     kind, plan = AL.plan_apply(rows, target)
     # Sheets left out because they have no value in the target store -- surfaced

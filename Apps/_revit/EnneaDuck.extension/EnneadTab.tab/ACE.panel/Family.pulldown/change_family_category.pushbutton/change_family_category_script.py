@@ -212,7 +212,8 @@ class FamilyCategoryChanger:
             NOTIFICATION.messenger("All {} families processed successfully!".format(self.success_count))
         else:
             NOTIFICATION.messenger("Processed {} families. {} successful, {} failed.".format(
-                self.success_count + self.failure_count, self.success_count, self.failure_count))
+                self.success_count + self.failure_count, self.success_count, self.failure_count),
+                sticky=True)
     
     def select_processing_mode(self):
         """Let user choose between processing selected families or selecting from category."""

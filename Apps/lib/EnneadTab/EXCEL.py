@@ -877,23 +877,50 @@ def save_data_to_excel(data, filepath, worksheet=ENVIRONMENT.PLUGIN_NAME, open_a
         DATA_FILE.set_data(job_data, "DEBUGER_excel_handler_input")
 
         EXE.try_open_app("ExcelHandler")
-        max_wait = 100
+
+        # Poll the input channel for ExcelHandler.exe to report back. On success it
+        # overwrites this file with status="done"; on a handled failure it writes
+        # status="error" (+ traceback). If the exe is blocked by endpoint security
+        # (AppLocker / Defender / EDR) or never finishes its cold start, NEITHER status
+        # is ever written and we time out. In every non-"done" outcome we return False so
+        # the caller falls back to the in-process xlsxwriter path (no exe -> unblockable).
+        max_wait = 300  # 30s @ 0.1s; longer than the old 10s to survive a slow cold start
         wait = 0
-        while wait<max_wait:
-            job_data = DATA_FILE.get_data("excel_handler_input")
-            if job_data.get("status") == "done":
+        status = None
+        while wait < max_wait:
+            result = DATA_FILE.get_data("excel_handler_input")
+            status = result.get("status")
+            if status == "done":
+                break
+            if status == "error":
+                ERROR_HANDLE.print_note("ExcelHandler reported an error: {}".format(result.get("error")))
                 break
             time.sleep(0.1)
             wait += 1
 
-        return True
-    
-    if not new_method():
-        print ("new method failed, using legacy method")
-        legacy_method()
-    
-    if open_after and os.path.exists(filepath):
+        # Only a real "done" AND a file on disk counts as success. Never trust the
+        # status alone - the exe writes "done" from its own process before the caller
+        # can see the file, so confirm the artifact exists.
+        return status == "done" and os.path.exists(filepath)
+
+    exe_ok = new_method()
+    if not exe_ok:
+        # The ExcelHandler exe did not produce the file (blocked / timed out / errored).
+        # Write the workbook in-process with xlsxwriter instead - no external exe, so this
+        # still works on locked-down machines where the exe cannot execute.
+        ERROR_HANDLE.print_note(
+            "ExcelHandler unavailable - falling back to in-process xlsxwriter for '{}'".format(filepath))
+        try:
+            legacy_method()
+        except Exception as e:
+            print (ERROR_HANDLE.get_alternative_traceback())
+
+    saved_ok = os.path.exists(filepath)
+
+    if open_after and saved_ok:
         os.startfile(filepath)
+
+    return saved_ok
 
 
 def check_formula(excel, worksheet, highlight_formula=True):

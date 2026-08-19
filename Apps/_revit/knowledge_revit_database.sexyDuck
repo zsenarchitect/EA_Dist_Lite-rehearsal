@@ -10,7 +10,7 @@
     },
     "EnneadTab Library.tab\\Browser.panel\\meta_data_exporter.pushbutton\\meta_data_exporter_script.py": {
         "alias": "MetaData Exporter",
-        "doc": "Read every family in the library and record its details for later search.\n\nBuilds the data the Ennead Library browser uses, so families can be found by\ntheir type and view information instead of by filename alone. Run it after\nadding or changing families in the library.\n\nFeatures:\n- Covers every family in the library in one pass\n- Existing records are refreshed, not duplicated",
+        "doc": "Process all the family file to generate a metadata file for usage later.",
         "icon": "EnneadTab Library.tab\\Browser.panel\\meta_data_exporter.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Library.tab\\Browser.panel\\meta_data_exporter.pushbutton\\meta_data_exporter_script.py",
@@ -19,7 +19,7 @@
     },
     "EnneadTab Library.tab\\Contents.panel\\how to.pushbutton\\instruction to library_script.py": {
         "alias": "How to Use Ennead Library",
-        "doc": "Explains how to load a family from the Ennead Library into your model.\n\nClick a family icon in the library to load it. Families saved in an older\nRevit version are upgraded for you as they load, so they are ready to use\nstraight away.",
+        "doc": "Click the icon to load the family, some older revit version family will be upgraded during the process. Then you can start to use it.",
         "icon": "EnneadTab Library.tab\\Contents.panel\\how to.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Library.tab\\Contents.panel\\how to.pushbutton\\instruction to library_script.py",
@@ -28,7 +28,7 @@
     },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\06_group by creator.pushbutton\\group by creaqtor_script.py": {
         "alias": "Alias not set",
-        "doc": "Rename every model group type so it starts with the name of the person who made it.\n\nGroup names become creator_original name, so it is obvious at a glance\nwho owns each group. Groups that already carry a creator name, and the\n\"members excluded\" variants, are left alone. The rename runs as a single\nundo step and every change is listed in the output window.",
+        "doc": "xxx",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\06_group by creator.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\06_group by creator.pushbutton\\group by creaqtor_script.py",
@@ -53,39 +53,12 @@
         "tab": "Personal",
         "tab_icon": null
     },
-    "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\10_GET FILTER COLOR.pushbutton\\script.py": {
-        "alias": "10_GET FILTER COLOR",
-        "doc": "List the surface override color of every filter in the active view.\n\nPrints each view filter by name with its surface foreground pattern\nRGB values, so you can copy exact colors when matching or rebuilding\nfilter overrides in another view or project.",
-        "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\10_GET FILTER COLOR.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\10_GET FILTER COLOR.pushbutton\\script.py",
-        "tab": "Personal",
-        "tab_icon": null
-    },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\13_changhe louverss.pushbutton\\change louver_script.py": {
         "alias": "Find Louvers",
         "doc": "Filter selection for panels with 'is_double pane spandrel' and 'is_louver lower' checked.",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\13_changhe louverss.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\13_changhe louverss.pushbutton\\change louver_script.py",
-        "tab": "Personal",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\17_remove dup mark value.pushbutton\\script.py": {
-        "alias": "remove dup value",
-        "doc": "Resolve duplicate Mark and Number warnings by making the values unique.\n\nScans the document warning list for duplicate Mark/Number entries and\nappends the element ID to each offending value so the warning clears.\nElements currently edited by someone else are skipped and reported.",
-        "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\17_remove dup mark value.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\17_remove dup mark value.pushbutton\\script.py",
-        "tab": "Personal",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\Populate Legend.pushbutton\\script.py": {
-        "alias": "Populate Legend But Vertically",
-        "doc": "Lay out every family type of a category on the active legend view, stacked vertically.\n\nOpen a legend view that already holds at least one legend component as\nthe seed, pick a category, and one legend component per family type is\nplaced in a vertical column. Vertical variant of the pyChilizer tool.",
-        "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\Populate Legend.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\Populate Legend.pushbutton\\script.py",
         "tab": "Personal",
         "tab_icon": null
     },
@@ -136,7 +109,7 @@
     },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\hide_sectionmark.pushbutton\\hide_sectionmark_script.py": {
         "alias": "Hide Section in Elevation by Orientation",
-        "doc": "Hide wall section marks that face the wrong way in each selected elevation.\n\nA section mark whose Orientation does not match the Orientation of the\nelevation it appears in is hidden in that view, so you no longer see\nsection marks coming from the far side of the building. This solves the\nproblem without touching view depth. Views and sections with no\nOrientation value assigned stay visible.\n\nUsage:\n1. Run the button and pick the elevation views to process\n2. Review the hidden section marks listed in the output window",
+        "doc": "Hide the wall section marks in elevations if its defined orientation does not match the orienation of the elevation. \n\nThis will resolve the issue of seeing wall section mark from the other side of the building, but you cannot change view depth per design reason.",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\hide_sectionmark.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\hide_sectionmark.pushbutton\\hide_sectionmark_script.py",
@@ -154,7 +127,7 @@
     },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\refomula_label.pushbutton\\refomula_label_script.py": {
         "alias": "Refomula Label",
-        "doc": "Reformat the labels on the current selection to follow project standards.\n\nSelect the elements first, then run the button to bring their labelling\nin line with the documentation standard for the project.",
+        "doc": "Automates the creation and placement of reformula labels in Revit. Streamlines the process of labeling elements according to project standards, improving documentation consistency and efficiency.",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\refomula_label.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\refomula_label.pushbutton\\refomula_label_script.py",
@@ -199,7 +172,7 @@
     },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\temp.pushbutton\\temp_script.py": {
         "alias": "Temp",
-        "doc": "Run the in-house scratch button used to try out new Revit automation ideas.\n\nReserved for quick experiments and workflow checks so that production\ntools never have to be used as a testing ground.",
+        "doc": "Temporary script for prototyping and testing new Revit automation features. Use this as a scratchpad for quick experiments, workflow validation, or debugging without affecting production tools.",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\temp.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\temp.pushbutton\\temp_script.py",
@@ -208,7 +181,7 @@
     },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\temp_graphic_test.pushbutton\\temp_graphic_test_script.py": {
         "alias": "Temp Graphic Test",
-        "doc": "Draw a sample text image in the Revit canvas to confirm in-canvas graphics work.\n\nA small picture made from sample text is shown floating in the model\nview. Nothing is added to the model and nothing is saved; the graphic\ndisappears once it is dismissed.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\temp_graphic_test.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\temp_graphic_test.pushbutton\\temp_graphic_test_script.py",
@@ -226,7 +199,7 @@
     },
     "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\test_schema.pushbutton\\test_schema_script.py": {
         "alias": "test_schema",
-        "doc": "Write a sample piece of hidden data onto every grid to verify hidden data storage.\n\nA sample data container is created if the model does not have one yet,\nthen a test value is stored on each grid. Nothing visible changes in the\ndrawing; use this to confirm that hidden data can be written to and read\nback from this model.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\test_schema.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Personal.panel\\Generic Order.pulldown\\test_schema.pushbutton\\test_schema_script.py",
@@ -253,7 +226,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\archive\\(OLD)excel_to_diagram.pushbutton\\(OLD)excel_to_diagram_script.py": {
         "alias": "(OLD)Excel2Diagram",
-        "doc": "Older version of Excel To Diagram, kept for reference. Reads an earlier Lenox Hill program Excel file and updates AreaShader family types in the program shading view to build the colored program bubble diagram.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\archive\\(OLD)excel_to_diagram.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\archive\\(OLD)excel_to_diagram.pushbutton\\(OLD)excel_to_diagram_script.py",
@@ -271,7 +244,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\assign_linked_view.pushbutton\\assign_linked_view_script.py": {
         "alias": "Assign Linked Views to PlanSet 7",
-        "doc": "Set every PlanSet 7 view to show the EC link through its matching linked view.\n\nEach PlanSet 7 view is paired with its counterpart in the EC link using a\nfixed level-by-level map, so you no longer have to open Visibility and\nGraphics and assign the linked view one plan at a time. Views that cannot\nbe found are reported in the output window.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\assign_linked_view.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\assign_linked_view.pushbutton\\assign_linked_view_script.py",
@@ -298,7 +271,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\excel_to_diagram.pushbutton\\excel_to_diagram_script.py": {
         "alias": "Excel2Diagram",
-        "doc": "Build the Lenox Hill program bubble diagram from the program Excel file.\n\nThe program spreadsheet is read and the shading and title families in the\nprogram shading view are updated: every bubble is sized to its program\narea and filled in with count, unit area, NSF, DGSF and notes.\n\nFeatures:\n- One bubble per program line, resized to match the Excel area\n- Titles filled in automatically, no retyping\n- Names that appear in the Excel but not in the model, or the other way\n  around, are reported so the two lists can be reconciled",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\excel_to_diagram.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\excel_to_diagram.pushbutton\\excel_to_diagram_script.py",
@@ -307,7 +280,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\fillet_area.pushbutton\\fillet_area_script.py": {
         "alias": "Fillet Area Corner",
-        "doc": "Round the corners of every area boundary in the active view.\n\nFilleted boundary lines are drawn at each corner of every area and\ngrouped per area, giving area diagrams a soft look without redrawing the\nboundaries by hand. The areas themselves are left in place.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\fillet_area.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\fillet_area.pushbutton\\fillet_area_script.py",
@@ -334,7 +307,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\match_phase_sheet_layout.pushbutton\\match_phase_sheet_layout_script.py": {
         "alias": "Match Phase Sheet Layout",
-        "doc": "Align viewports across many sheets to match one reference sheet layout.\n\nViewports are paired between sheets by detail number, then the view title\noffset and title line length from the reference sheet are applied to every\nmatching viewport. Built for the Lenox Hill phasing diagram sheets, where\nit is far quicker than aligning each sheet by hand.",
+        "doc": "Use me to batch align viewports over many sheet. It search the matching rule by detail number, then apply same title offset and title line length. This is built or LHH phasing diagrams and works way better than Ideate for this senario.",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\match_phase_sheet_layout.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\match_phase_sheet_layout.pushbutton\\match_phase_sheet_layout_script.py",
@@ -352,7 +325,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\publish_360.pushbutton\\publish_360_script.py": {
         "alias": "publish_360",
-        "doc": "Publish the Lenox Hill cloud model so the team sees the latest version.\n\nSends a cloud publish request for the central model, without publishing\nits links, so you do not have to open the model just to publish it. A\nmessage tells you whether the request was accepted.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\publish_360.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\publish_360.pushbutton\\publish_360_script.py",
@@ -370,7 +343,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\smart_match_grid_bubble.pushbutton\\smart_match_grid_bubble_script.py": {
         "alias": "Smart Match Grid Graphic",
-        "doc": "Match grid bubbles and extents in every plan view to the Life Safety views.\n\nThe main Life Safety plan for each level is the reference: its grid bubble\npositions, leaders and extents are pushed out to the other plan views on\nthe same level, so grids read consistently across the whole set instead of\nbeing nudged view by view.",
+        "doc": "This use the grphaical extend setup on all main LifeSafety view as guide to set all plan view grid visual. \n\nIt is the best invention since ketchup.",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\smart_match_grid_bubble.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\smart_match_grid_bubble.pushbutton\\smart_match_grid_bubble_script.py",
@@ -379,7 +352,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\surfix_views.pushbutton\\surfix_views_script.py": {
         "alias": "Rename Views",
-        "doc": "Rewrite phase codes in the Title on Sheet of selected views into milestone names.\n\nPH1 through PH5 become Existing, Milestone 1, Milestone 2, Milestone 2.5\nand Milestone 3, so sheet titles read the way the team names the\nmilestones. Views can come from the current selection or from a picker.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\surfix_views.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\surfix_views.pushbutton\\surfix_views_script.py",
@@ -388,7 +361,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\text_area_to_area.pushbutton\\text_area_to_area_script.py": {
         "alias": "Text Area --> Area",
-        "doc": "Convert the old text-based area value on every area into a real number.\n\nThe old proposed-data text has its SF suffix stripped and is written into\nthe numeric proposed-data parameter, so the value can be scheduled and\ntotalled instead of sitting in the model as plain text.",
+        "doc": "Get the text type parameter value to area value by removing the 'SF' in the value and convert to float type",
         "icon": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\text_area_to_area.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 1643.panel\\Lenox Hill.pulldown\\text_area_to_area.pushbutton\\text_area_to_area_script.py",
@@ -496,7 +469,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2125.panel\\Inova.pulldown\\find_all_door_tag.pushbutton\\find_all_door_tag_script.py": {
         "alias": "Find All Door Not Tagged",
-        "doc": "List every door that is still missing a tag on the sheets you pick.\n\nOnly plan views placed on the selected sheets are checked. Untagged doors\nare reported with clickable links so they can be found and tagged in the\nmodel. Nothing in the model is changed.\n\nRequested by J.H.Park",
+        "doc": "Find doors from this project that are not tagged yet. You can pick sheets to process. Only plan views will be considered.\n\nRequested by J.H.Park",
         "icon": "EnneadTab Tailor.tab\\Proj. 2125.panel\\Inova.pulldown\\find_all_door_tag.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2125.panel\\Inova.pulldown\\find_all_door_tag.pushbutton\\find_all_door_tag_script.py",
@@ -541,37 +514,19 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\bind_new_shared_para.pushbutton\\bind_new_shared_para_script.py": {
         "alias": "Bind New Shared Para",
-        "doc": "Add the shared parameters listed in an Excel file to the Room category in one pass.\n\nPick a spreadsheet that has a worksheet named \"Shared Paras To Add\", then\nchoose which column holds the parameter names and which holds the\nparameter types. Every listed parameter is added to the project and bound\nto Rooms. Ask if you need them bound to other categories as well.",
+        "doc": "Bind new shared parameters to Room category from Excel file. Requires a worksheet named 'Shared Paras To Add' with parameter names and types. User selects which columns contain parameter names and parameter types during execution. Those parameters will be added to the project document and bind to Room category. Let me know if you want to bind to other categories.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\bind_new_shared_para.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\bind_new_shared_para.pushbutton\\bind_new_shared_para_script.py",
         "tab": "Proj. 2142",
         "tab_icon": null
     },
-    "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\check_external_schema.pushbutton\\check_external_schema_script.py": {
-        "alias": "Check External Schema",
-        "doc": "List the hidden data stored in this model, both ours and other consultants'.\n\nReports every hidden data container found in the file, who it belongs to,\nand how many elements carry it, so you can tell which add-ins have written\ndata into the model. The current Revit session log is also scanned for\nrelated hints. Nothing in the model is changed.",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\check_external_schema.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\check_external_schema.pushbutton\\check_external_schema_script.py",
-        "tab": "Proj. 2142",
-        "tab_icon": null
-    },
     "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\room_data_sheet_helper.pushbutton\\room_data_sheet_helper_script.py": {
         "alias": "Room Data Sheet Helper",
-        "doc": "Report every text and label in the open room data sheet family.\n\nRun this inside the family document to see each text element, its\nparameters, and which family parameter every Label is wired to. Use it to\nverify the label wiring before loading the family into the project.\nNothing in the family is changed.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\room_data_sheet_helper.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\room_data_sheet_helper.pushbutton\\room_data_sheet_helper_script.py",
-        "tab": "Proj. 2142",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\set_grid_bubble_from_excel.pushbutton\\set_grid_bubble_from_excel_script.py": {
-        "alias": "Set Grid Bubble From Excel",
-        "doc": "Match grid visibility and bubble placement across views using an Excel view list.\n\nThe spreadsheet names one source-of-truth view per level. In every other\nview on that level, grid visibility is forced to follow the source view:\ngrids shown there are shown, grids hidden there are hidden. Bubble\npositions and leaders are then copied across, so grids read the same way\non every drawing of that level.",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\set_grid_bubble_from_excel.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2142.panel\\NYU Lich.pulldown\\set_grid_bubble_from_excel.pushbutton\\set_grid_bubble_from_excel_script.py",
         "tab": "Proj. 2142",
         "tab_icon": null
     },
@@ -595,7 +550,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\confirm_RGB.pushbutton\\confirm_RGB_script.py": {
         "alias": "DEPRECIATED: Confirm RGB",
-        "doc": "Check that the RGB numbers typed in the color Excel match the actual cell colors.\n\nAny cell whose written RGB value disagrees with its own fill color is\nreported so the spreadsheet can be corrected. The safer habit is to leave\nRGB numbers out of the spreadsheet entirely and let the cell color be the\nsingle source of truth, but this check exists for teams that need both.",
+        "doc": "Even when you type in the RGB value in excel, that might get changed by someone in the future and cannot be trusted. I suggest to NOT include RGB value in the excel so there is only one source of truth, but if the team REALLY nned to have RGB value in excel written out, run this to confirm the color of cell is matching the number in excel",
         "icon": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\confirm_RGB.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\confirm_RGB.pushbutton\\confirm_RGB_script.py",
@@ -604,7 +559,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\dgsf_area_data_check.pushbutton\\dgsf_area_data_check_script.py": {
         "alias": "DGSF Area Data Name Check",
-        "doc": "Stamp every unnamed DGSF area with a _DO NOT FILL marker in its Name field.\n\nAreas in the DGSF Scheme that you are allowed to edit and that have no\nname yet get the marker written into Name. This signals to the team that\nthe Name field is off-limits for manual data entry on this project. The\nwhole pass is one undo step.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\dgsf_area_data_check.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\dgsf_area_data_check.pushbutton\\dgsf_area_data_check_script.py",
@@ -640,7 +595,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\query_main_excel.pushbutton\\query_main_excel_script.py": {
         "alias": "DEPRECIATED: Query Main Excel",
-        "doc": "Compare department and program type names in the model against the shared Excel.\n\nThe shared program spreadsheet holds the approved department and program\ntype names. Areas whose naming does not match are listed, and a batch fix\nis offered so the whole model can be brought back in line in one go.",
+        "doc": "Use the shaed excel file to read the correct naming for department and program type. Provide solution to batch fix.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\query_main_excel.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\query_main_excel.pushbutton\\query_main_excel_script.py",
@@ -649,7 +604,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\register_area_comment_updater.pushbutton\\register_area_comment_updater_script.py": {
         "alias": "(Un)Register Area Comment Live Updater",
-        "doc": "Turn the live Area comment updater on or off for this model.\n\nOnce switched on, the Comments of an area are refreshed from the shared\nprogram spreadsheet every time its department or program type changes, so\nthe target data stays current without re-running anything. Run the button\nagain to switch it back off. Re-register after editing the spreadsheet so\nthe new targets are picked up.",
+        "doc": "Registration tool for automatic Area comment updates from Excel data. Monitors area elements for changes and syncs with external data.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\register_area_comment_updater.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\register_area_comment_updater.pushbutton\\register_area_comment_updater_script.py",
@@ -667,7 +622,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\show_parking_mark.pushbutton\\show_parking_mark_script.py": {
         "alias": "Show Parking Mark",
-        "doc": "Chart every parking space at its plan location, labeled with its parking mark.\n\nOne chart opens per parking level, plotting each space where it sits in\nplan with its mark as the label, so parking numbering can be reviewed at a\nglance instead of hunting through the model. Nothing is changed.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\show_parking_mark.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\show_parking_mark.pushbutton\\show_parking_mark_script.py",
@@ -694,7 +649,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\update_material_setting.pushbutton\\update_material_setting_script.py": {
         "alias": "Update Material Setting",
-        "doc": "Apply the standard LI NYU site material settings to this model in one click.\n\nThe Curb, Road and Grass materials are updated with the agreed shading\ncolors and solid surface pattern settings, so site drawings read the same\nway across the team. A message confirms when the update is done.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\update_material_setting.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2151.panel\\LI_NYU.pulldown\\update_material_setting.pushbutton\\update_material_setting_script.py",
@@ -712,7 +667,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2233.panel\\CR Land.pulldown\\get_special_selection.pushbutton\\get_special_selection_script.py": {
         "alias": "Get Special Selection",
-        "doc": "Select the curtain panels that match the shapes marked up in the Rhino file.\n\nPick the panel family to work with, and the panels nearest the locations\nflagged in the companion Rhino file are highlighted as the current\nselection, ready to be edited, tagged or reported on.",
+        "doc": "Based on the special brep defined in Rhino file, highlight specific panel instances in the current document.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2233.panel\\CR Land.pulldown\\get_special_selection.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2233.panel\\CR Land.pulldown\\get_special_selection.pushbutton\\get_special_selection_script.py",
@@ -802,7 +757,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\format_stairs.pushbutton\\format_stairs_script.py": {
         "alias": "(Depreciated)Format Egress Stairs",
-        "doc": "Give every egress stair a consistent run width and push it to the stair calculator.\n\nStairs whose runs disagree in width are reported with clickable links, as\nare stairs with no egress id. The confirmed width is written into the\nmatching stair life safety calculator so the capacity math is based on the\nreal stair width.",
+        "doc": "Make sure all egress stair has consistent width on run, and push that to calculator stair width",
         "icon": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\format_stairs.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\format_stairs.pushbutton\\format_stairs_script.py",
@@ -811,7 +766,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\line2structure.pushbutton\\line2structure_script.py": {
         "alias": "Line2Structure",
-        "doc": "Turn lines exported from Rhino into Revit columns and structural framing.\n\nPick the family, the type and the unit the Rhino file was drawn in, and\neach incoming line is rebuilt as a Revit element. Whether a line becomes\nan architectural column, a structural column or a frame is decided on the\nRhino side before the export.",
+        "doc": "Convert line in Rhino into Revit Structure frame. Become a archi-column, strcutre column or frame needs to be defined in previous step at Rhino.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\line2structure.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\line2structure.pushbutton\\line2structure_script.py",
@@ -829,7 +784,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\revision_setting.pushbutton\\set_revision_script.py": {
         "alias": "Set Revision By BlackSquare",
-        "doc": "Set sheet revisions from the black-square issue parameters on each title block.\n\nThe issue values carried on the sheets are read and the matching revision\nis added to each sheet, so the title block revision schedule lines up with\nhow the set was actually issued. Issue data from the previous round can be\ncarried into the current one. Sheets owned by another user are skipped.",
+        "doc": "Transfer the data between issing parameter and titleblock revision schedule. Also can transfer issue data from last round to current round.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\revision_setting.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\revision_setting.pushbutton\\set_revision_script.py",
@@ -847,7 +802,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\transfer_old_room_data.pushbutton\\transfer_old_room_data_script.py": {
         "alias": "Transfer Old Room Data",
-        "doc": "Prime the room occupancy override parameter on every room in the model.\n\nRooms whose manual occupancy value is still unset are marked as having no\nmanual override, so the life safety count falls back to the area-per-person\nrule instead of reading a stale zero. The whole pass is one undo step.",
+        "doc": "Transfer room occupancy load data from old parameter to new parameter. See detail in script",
         "icon": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\transfer_old_room_data.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\transfer_old_room_data.pushbutton\\transfer_old_room_data_script.py",
@@ -856,7 +811,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\updateStairCalc.pushbutton\\updateStairCalc_script.py": {
         "alias": "(Depreciated)Update Stair Capacity Calculator",
-        "doc": "Sum the occupant load of each level and feed it to the stair capacity calculator.\n\nOccupancy for a room comes from its manual override when one is set,\notherwise from its area divided by the area-per-person of its life safety\nroom style. Rooms with no room style assigned are reported with clickable\nlinks so the gaps can be filled before the required stair capacity is\ntrusted.",
+        "doc": "Gather the room life safety data from rooms of each level can sum and feed into the Stair Capacity Calculator for capacity required.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\updateStairCalc.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2306.panel\\Universal Hydro.pulldown\\updateStairCalc.pushbutton\\updateStairCalc_script.py",
@@ -883,7 +838,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\DWG export setting_check.pushbutton\\check_export setting_script.py": {
         "alias": "Check DWG Export Layer Mapping",
-        "doc": "Display detailed Layer Mapping table for a selected DWG Export Setting.",
+        "doc": "check NYU CAD export layer mapping rule",
         "icon": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\DWG export setting_check.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\DWG export setting_check.pushbutton\\check_export setting_script.py",
@@ -892,7 +847,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\assign_door_mat.pushbutton\\assign_door_mat_script.py": {
         "alias": "Assign Door Mat",
-        "doc": "Assign panel and frame materials to every door in the latest phase at once.\n\nYou pick one material for door panels and one for door frames, and every door\nin the newest phase gets both assigned in a single undoable step. Doors that\nbelong to a secondary design option are left alone.\n\nFeatures:\n- Only doors in the latest project phase are touched\n- Doors whose material parameters are locked are skipped\n- A message reports how many doors were updated\n\nUsage:\n1. Run the button and pick the panel material\n2. Pick the frame material\n3. Read the confirmation message",
+        "doc": "Assign materials to door panels and frames in the current phase using instance parameters Door_$Panel_Material and Door_$Frame_Material",
         "icon": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\assign_door_mat.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\assign_door_mat.pushbutton\\assign_door_mat_script.py",
@@ -901,7 +856,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\cleanup_dr_tag.pushbutton\\cleanup_dr_tag_script.py": {
         "alias": "Cleanup Dr Tag",
-        "doc": "Cleanup 'TAG_Door_work' tags that are tagging elements with 'NEST' in their Type Mark.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\cleanup_dr_tag.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\cleanup_dr_tag.pushbutton\\cleanup_dr_tag_script.py",
@@ -910,7 +865,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\room_to_door_mark.pushbutton\\room_to_door_mark_script.py": {
         "alias": "[DEPRECATED] Room To Door Mark",
-        "doc": "Renumber door Marks in the Renovation 1 phase to match the room each door serves.\n\nEvery door takes the number of the room it opens into. When several doors serve\nthe same room, a letter suffix keeps each Mark unique. The whole renumber is one\nundo step.\n\nFeatures:\n- Doors owned by another user or locked in a design option are reported and skipped\n- Nested door types are left out of the renumbering\n- Doors with no room on either side are flagged in the report so you can fix the data",
+        "doc": "Update door marks based on their To Room parameter values. If multiple doors lead to the same room, append A, B, C etc. to make them unique.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\room_to_door_mark.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\room_to_door_mark.pushbutton\\room_to_door_mark_script.py",
@@ -919,7 +874,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\test_door_data.pushbutton\\test_door_data_script.py": {
         "alias": "Test Door Data",
-        "doc": "Repair doors that carry more than one Fire Rating parameter with a bad value.\n\nSome doors ended up with duplicate Fire Rating parameters, and one copy holds an\nunusable value. This copies the good reading across to the other Fire Rating\nparameter on the same door, then stamps the emptied one so you can see it was\nalready handled. The whole cleanup is one undo step.\n\nFeatures:\n- Only doors with a bad Fire Rating reading are touched\n- Doors with a single healthy Fire Rating parameter are left alone",
+        "doc": "Process door fire rating parameters by transferring 'Bad' values to other fire rating parameters.\nThis script will:\n1. Find all doors with 'Bad' fire rating values\n2. Transfer these values to other fire rating parameters on the same door\n3. Mark the original parameters as 'Transfered out'\n",
         "icon": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\test_door_data.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\test_door_data.pushbutton\\test_door_data_script.py",
@@ -937,7 +892,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\update_dr_style_name.pushbutton\\update_dr_style_name_script.py": {
         "alias": "Update Dr Style Name",
-        "doc": "Copy the Door Style value into the internal note field on every door.\n\nKeeps the internal note in step with the door style so schedules and filters that\nread the note stay accurate after a style change. Runs across the whole project in\none undo step; doors with no style set are left untouched.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\update_dr_style_name.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2317.panel\\Kimmel.pulldown\\update_dr_style_name.pushbutton\\update_dr_style_name_script.py",
@@ -946,43 +901,25 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2330.panel\\Studio 54.pulldown\\update_life_safety.pushbutton\\update_life_safety_script.py": {
         "alias": "Update Life Safety",
-        "doc": "Recalculate occupant load and egress capacity across every room and door.\n\nReads the occupancy area-per-person on each room, works out the required occupant\nload, and pushes the matching egress capacity onto the doors and stairs that serve\nthem. If anything goes wrong mid-run the model is rolled back untouched.\n\nFeatures:\n- Occupant load targets written back to every room\n- Required clear width and capacity written to egress doors and stairs\n- Stale life safety tags removed from doors no longer on an egress path\n\nUsage:\n1. Run the button and let the calculation finish\n2. Choose whether to display the egress targets, then pick the views to show them in",
+        "doc": "This tool updates life safety parameters in a Revit project, ensuring compliance with occupancy and egress requirements.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2330.panel\\Studio 54.pulldown\\update_life_safety.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2330.panel\\Studio 54.pulldown\\update_life_safety.pushbutton\\update_life_safety_script.py",
         "tab": "Proj. 2330",
         "tab_icon": null
     },
-    "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\disjoin_columns_from_wall.pushbutton\\disjoin_columns_from_wall_script.py": {
-        "alias": "Disjoin Columns From Walls",
-        "doc": "Detach columns from any walls they are currently joined to.\n\nThis utility checks the current selection first; if no columns are selected it will process\nall editable architectural and structural columns in the active document.\n\nA detailed log is printed to the console so you can review which joins were removed or skipped.",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\disjoin_columns_from_wall.pushbutton\\icon.png",
+    "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\welcome_sparc.pushbutton\\welcome_sparc_script.py": {
+        "alias": "Welcome Sparc",
+        "doc": "Displays a welcome message and project-specific information for the Sparc project in Revit. Use this tool to onboard team members, share project guidelines, or provide quick access to essential resources.",
+        "icon": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\welcome_sparc.pushbutton\\icon.png",
         "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\disjoin_columns_from_wall.pushbutton\\disjoin_columns_from_wall_script.py",
-        "tab": "Proj. 2412",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\recover_cw3.pushbutton\\recover_cw3_script.py": {
-        "alias": "Recover CW-3",
-        "doc": "Record or apply CW-3 pier metadata.\n\nUse \"Record\" in the source model to capture pier flags for every\n\"EA_CW-3 (Wrap)\" curtain panel. Use \"Apply\" in the target model to\nreplay the captured flags on matching elements by UniqueId.",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\recover_cw3.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\recover_cw3.pushbutton\\recover_cw3_script.py",
-        "tab": "Proj. 2412",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\update_furning_wall.pushbutton\\update_furning_wall_script.py": {
-        "alias": "Update Furning Wall",
-        "doc": "Update Furring Wall\n\n2025-11 discovery: curtain-panel marker families can appear in multiple prefix\ngroups (for example none/left/right). The automation now evaluates every prefix\nvariation when building pier walls, sill walls, and room separation lines so we\ncapture whichever group actually contains host points. Diagnostic logging shows\nwhich groups were used or skipped, making it easier to troubleshoot missing\ngeometry.",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\update_furning_wall.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\update_furning_wall.pushbutton\\update_furning_wall_script.py",
+        "script": "EnneadTab Tailor.tab\\Proj. 2412.panel\\Sparc.pulldown\\welcome_sparc.pushbutton\\welcome_sparc_script.py",
         "tab": "Proj. 2412",
         "tab_icon": null
     },
     "EnneadTab Tailor.tab\\Proj. 2418.panel\\Texttile.pulldown\\make_filter_legend.pushbutton\\make_filter_legend_script.py": {
         "alias": "Make Filter Legend",
-        "doc": "Color-code every generic model family in the view and drop a matching legend on the sheet.\n\nOne filter is created per generic model family found in the active view, each given\nits own color, so panel types read apart at a glance. A legend keying color to family\nname is then placed on the sheet that hosts the view.\n\nUsage:\n1. Open a view that is already placed on a sheet\n2. Run the button and let the filters and legend build",
+        "doc": "Create view filters based on Generic Model family names, apply colors from CSS definitions, and generate a legend.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2418.panel\\Texttile.pulldown\\make_filter_legend.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2418.panel\\Texttile.pulldown\\make_filter_legend.pushbutton\\make_filter_legend_script.py",
@@ -991,7 +928,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\chained_family_loading.pushbutton\\chained_family_loading_script.py": {
         "alias": "Chained Family Loading",
-        "doc": "Reload a whole stack of nested panel families in the right order in one go.\n\nFacade panel families depend on each other, so loading them by hand in the wrong\norder silently loses edits. Pick a design scenario and this walks the known\ndependency chain, loading each family into the one above it from the bottom up.\nSource families that are finished with are closed as it goes.\n\nUsage:\n1. Open every family in the chain first (see Chained Family Opening)\n2. Run the button and pick the scenario\n3. Watch the load order print out as each family is pushed up the chain",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\chained_family_loading.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\chained_family_loading.pushbutton\\chained_family_loading_script.py",
@@ -1000,7 +937,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\chained_family_opening.pushbutton\\chained_family_opening_script.py": {
         "alias": "Chained Family Opening",
-        "doc": "Open every panel family in the loading chain, including nested ones, ready to edit.\n\nSets up the workspace for Chained Family Loading. Each family in the chain is pulled\nout of the model, saved to your local dump folder, and opened for editing. Families\nnested inside those are opened the same way, all the way down.\n\nFeatures:\n- Local copies are saved so the model itself is never edited in place\n- A message names each family as it opens\n- Run this before Chained Family Loading",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\chained_family_opening.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\chained_family_opening.pushbutton\\chained_family_opening_script.py",
@@ -1009,7 +946,7 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\print_all_family_name.pushbutton\\print_all_family_name_script.py": {
         "alias": "Print All Family Name",
-        "doc": "List every family currently open for editing in this Revit session.\n\nA quick roll call of the open family editors, printed to the output window. Use it\nto confirm the whole panel chain is open before running Chained Family Loading.\nNothing in the model is changed.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\print_all_family_name.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2419.panel\\SinoChem.pulldown\\print_all_family_name.pushbutton\\print_all_family_name_script.py",
@@ -1027,29 +964,11 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2501.panel\\SAIF.pulldown\\panel_location_map.pushbutton\\panel_location_map_script.py": {
         "alias": "Panel Location Map",
-        "doc": "Work out the row and column position of every curtain wall panel and save the map.\n\nEach panel gets matched to its place in the curtain grid, so panels can later be\npicked or reported by row and column instead of by clicking. The finished map is\nsaved with the project and reused by the other SAIF panel tools.\n\nFeatures:\n- Covers every curtain wall panel in the model\n- Panels that sit slightly off grid are still matched by widening the search\n- The model itself is not modified; only the saved map is written",
+        "doc": "Maps curtain wall panels to their grid positions (U and V indices) and saves the mapping data for use in other tools. This tool analyzes all curtain wall panels in the document and creates a location map that can be used for panel selection and analysis.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2501.panel\\SAIF.pulldown\\panel_location_map.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2501.panel\\SAIF.pulldown\\panel_location_map.pushbutton\\panel_location_map_script.py",
         "tab": "Proj. 2501",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\dob_sheet_cleanup.pushbutton\\dob_sheet_cleanup_script.py": {
-        "alias": "DOB Sheet Cleanup",
-        "doc": "Clean up MetroTech (2512) sheets: strip a trailing '.00' and set DOB_Rev to '00'.\n\nRuns on every sheet you are able to edit.\n\nFeatures:\n- Removes a trailing '.00' from the sheet number\n- Sets the DOB_Rev parameter to '00'\n- Sheets owned by another user are skipped and reported, never changed",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\dob_sheet_cleanup.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\dob_sheet_cleanup.pushbutton\\dob_sheet_cleanup_script.py",
-        "tab": "Proj. 2512",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\invalid_phase_element.pushbutton\\invalid_phase_element_script.py": {
-        "alias": "Invalid Phase Element",
-        "doc": "Find elements with invalid phase references that cause crashes during regeneration.",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\invalid_phase_element.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\invalid_phase_element.pushbutton\\invalid_phase_element_script.py",
-        "tab": "Proj. 2512",
         "tab_icon": null
     },
     "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\room_bounding_to_area_b_line.pushbutton\\room_bounding_to_area_b_line_script.py": {
@@ -1061,18 +980,9 @@
         "tab": "Proj. 2512",
         "tab_icon": null
     },
-    "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\update_door_info_by_room.pushbutton\\update_door_info_by_room_script.py": {
-        "alias": "Update Door Info by Room",
-        "doc": "Update Door Info by Room\n\nThis tool updates door 'Location' and 'Mark' parameters based on the room they belong to.\nIt analyzes all phases to find the most appropriate room for each door.\n\nLOGIC:\n1. Location:\n   - Sets 'Location' parameter to the Room Name.\n   - Prioritizes non-corridor rooms.\n   - If a door connects two valid rooms, picks the smaller room.\n   - Special handling for 'CORRIDOR', 'no room', 'missing room name'.\n\n2. Mark:\n   - Sets 'Mark' parameter to Room Number.\n   - If multiple doors belong to the same room, appends a suffix (A, B, C...).\n   - Doors are sorted by Element ID to ensure consistent suffix assignment.\n\nUSAGE:\nClick the button to run. A transaction will be committed to update the parameters.\n",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\update_door_info_by_room.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2512.panel\\MetroTech.pulldown\\update_door_info_by_room.pushbutton\\update_door_info_by_room_script.py",
-        "tab": "Proj. 2512",
-        "tab_icon": null
-    },
     "EnneadTab Tailor.tab\\Proj. 2526.panel\\St Paul.pulldown\\check_arc_center.pushbutton\\check_arc_center_script.py": {
         "alias": "Check Arc Center",
-        "doc": "Find curved walls whose arc center has drifted off the intended setting-out point.\n\nGroups every curved wall in the model by where its arc center falls, so walls that\nshare a center land together and strays stand out. Centers that sit near the\nintended point but not on it are called out as suspicious.\n\nFeatures:\n- Each group lists its wall types and a clickable link to select the walls\n- Nothing in the model is changed; this is a read-only check",
+        "doc": "Analyze all arc walls in the project, group their centers by XY coordinates, and generate select links for inspection.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2526.panel\\St Paul.pulldown\\check_arc_center.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2526.panel\\St Paul.pulldown\\check_arc_center.pushbutton\\check_arc_center_script.py",
@@ -1081,20 +991,11 @@
     },
     "EnneadTab Tailor.tab\\Proj. 2534.panel\\NYU HQ.pulldown\\monitor_area.pushbutton\\monitor_area_script.py": {
         "alias": "Monitor Area",
-        "doc": "Check the designed areas against the program requirement and open a fulfillment report.\n\nEvery area in the model is matched to its line in the program spreadsheet, so you\ncan see at a glance which departments are over, under, or on target. Color schemes\nand the area parameters are refreshed from the match, and a report opens in your\nbrowser.\n\nFeatures:\n- Areas that have no match in the program are called out\n- Color schemes are rebuilt so over and under areas read by color in plan\n- Actual design areas can be written back into the program spreadsheet\n- Department level summary spreadsheets can be exported to the file exchange folder",
+        "doc": "PlaceHolder Documentation, To Be Updated.",
         "icon": "EnneadTab Tailor.tab\\Proj. 2534.panel\\NYU HQ.pulldown\\monitor_area.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Proj. 2534.panel\\NYU HQ.pulldown\\monitor_area.pushbutton\\monitor_area_script.py",
         "tab": "Proj. 2534",
-        "tab_icon": null
-    },
-    "EnneadTab Tailor.tab\\Proj. 2538.panel\\NYULI Kips Bay.pulldown\\load_color_template.pushbutton\\load_color_template_script.py": {
-        "alias": "Load NYULI Kips Bay Color Template",
-        "doc": "Update NYULI Kips Bay (Proj. 2538) Revit color schemes from the\nproject's color template Excel.\n\nSource:\nJ:\\2538\\2_Master File\\B-70_Programming\\04_Colors\\Color Scheme_NYULI Kips Bay.xlsx\n\nThe Excel uses the firm Ennead Healthcare dual-pair layout:\n    A: Department (full name)   B: Department Abbr.   C: Department Color\n    D: Program (full name)      E: Program Abbr.      F: Program Color\n\nFor Kips Bay specifically, only the \"CANCER CENTER\" worksheet is loaded;\nthe \"HEALTHCARE\" sheet is intentionally excluded per team decision\n(2026-05-20 -- the Kips Bay floor plates only use the Cancer Center\ncolor set, and HEALTHCARE + CANCER CENTER are meant to live in two\nindependent color schemes, never combined).\n\nLoaded targets:\n    department  ->  \"Department Type_Primary\"\n    program     ->  \"Program Type_Primary\"\n\nNOTE: full names from col A / col D are used as Revit entry names,\nNOT the abbreviations in col B / col E.\n\nMulti-sheet merge logic with conflict detection is preserved below in\ncase a future project needs it -- just add sheet names to SOURCE_SHEETS.\nWith a single sheet, no conflicts can fire by construction.\n",
-        "icon": "EnneadTab Tailor.tab\\Proj. 2538.panel\\NYULI Kips Bay.pulldown\\load_color_template.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab Tailor.tab\\Proj. 2538.panel\\NYULI Kips Bay.pulldown\\load_color_template.pushbutton\\load_color_template_script.py",
-        "tab": "Proj. 2538",
         "tab_icon": null
     },
     "EnneadTab Tailor.tab\\Proj. Princeton.panel\\Proj. Princetong.pulldown\\fire_door_checker.pushbutton\\fire_door_checker_script.py": {
@@ -1117,7 +1018,7 @@
     },
     "EnneadTab Tailor.tab\\Tester.panel\\test_encoder_2025.pushbutton\\test_encoder_2025_script.py": {
         "alias": "Test Encoder 2025",
-        "doc": "Confirm the keynote tools still load correctly on this build of Revit.\n\nA quick smoke test for the Tester panel. It loads the keynote and interop machinery\nthat the keynote buttons rely on and opens and closes an empty transaction. If the\nbutton finishes without an error, keynote support is healthy on this Revit version.\nNothing in your model is changed.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\Tester.panel\\test_encoder_2025.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\Tester.panel\\test_encoder_2025.pushbutton\\test_encoder_2025_script.py",
@@ -1171,7 +1072,7 @@
     },
     "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135A.pulldown\\03.0_assign ID by scopebox.pushbutton\\assign ID data by scopebox_script.py": {
         "alias": "03.0_Assign Bldg ID data  by Scopebox",
-        "doc": "Legacy Proj. 2135 tool that writes each selected scopebox name into the MC_$BuildingID parameter of areas, rooms, floors, walls and furniture located inside that scopebox, with site-level elements forced to SITE. Afterwards it reports and marks elements whose building ID does not match their associated level.",
+        "doc": "xxx",
         "icon": "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135A.pulldown\\03.0_assign ID by scopebox.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135A.pulldown\\03.0_assign ID by scopebox.pushbutton\\assign ID data by scopebox_script.py",
@@ -1305,8 +1206,8 @@
         "tab_icon": null
     },
     "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135A.pulldown\\18_set_revision.pushbutton\\18_setPtByRevision_script.py": {
-        "alias": "18_set bullet point by/to revision on sheet",
-        "doc": "Transfer the data between missing parameter and titleblock revision schedule. Also can transfer issue data from last round to current round.",
+        "alias": "18_set bullit point by/to revision on sheet",
+        "doc": "Transfer the data between issing parameter and titleblock revision schedule. Also can transfer issue data from last round to current round.",
         "icon": "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135A.pulldown\\18_set_revision.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135A.pulldown\\18_set_revision.pushbutton\\18_setPtByRevision_script.py",
@@ -1531,7 +1432,7 @@
     },
     "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135B.pulldown\\43_Review Keynotes.pushbutton\\inspect_keynote_script.py": {
         "alias": "Alias not set",
-        "doc": "Legacy Proj. 2135 tool that searches the views placed on selected sheets for keynote tags with the hardcoded key value CW-7A. Each match is printed with its keynote text, host view and clickable links for review.",
+        "doc": "xxx",
         "icon": "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135B.pulldown\\43_Review Keynotes.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\archive\\Proj. 2135.panel\\A.stack\\Proj 2135B.pulldown\\43_Review Keynotes.pushbutton\\inspect_keynote_script.py",
@@ -1999,7 +1900,7 @@
     },
     "EnneadTab Tailor.tab\\archive\\test_get_rvt_link_data_in_template.pushbutton\\test_get_rvt_link_data_in_template_script.py": {
         "alias": "test_get_rvt_link_data_in_template",
-        "doc": "Developer test utility that reads the RVT Links category hidden state and graphic overrides from a view template named tester and prints the results. Not intended for production use.",
+        "doc": "Sen Zhang has not writed documentation for this tool, but he should!",
         "icon": "EnneadTab Tailor.tab\\archive\\test_get_rvt_link_data_in_template.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab Tailor.tab\\archive\\test_get_rvt_link_data_in_template.pushbutton\\test_get_rvt_link_data_in_template_script.py",
@@ -2008,55 +1909,28 @@
     },
     "EnneadTab.tab\\ACE.panel\\AutoExporter.pushbutton\\revit_auto_export_script.py": {
         "alias": "Amazing Auto Export",
-        "doc": "Export a scheduled set of sheets to PDF, DWG, and JPG without anyone at the keyboard.\n\nThe workhorse behind the firm's overnight exports. It opens the cloud model on its\nown, produces the sheet set in each requested format, drops the files in the agreed\nproject folder, tells the team the run is done, and closes Revit behind itself.\n\nFeatures:\n- PDF, DWG, and JPG produced in one pass over the sheet set\n- Runs unattended on a schedule, so the model is fresh each morning\n- A notification goes out when the export finishes or fails",
+        "doc": "AutoExporter - Opens cloud model, exports files, sends notifications, closes Revit",
         "icon": "EnneadTab.tab\\ACE.panel\\AutoExporter.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\AutoExporter.pushbutton\\revit_auto_export_script.py",
         "tab": "ACE",
         "tab_icon": null
     },
+    "EnneadTab.tab\\ACE.panel\\AutoExporter.pushbutton\\revit_server_entry_script.py": {
+        "alias": "Amazing Auto Export",
+        "doc": "AutoExporter - Opens cloud model, exports files, sends notifications, closes Revit",
+        "icon": "EnneadTab.tab\\ACE.panel\\AutoExporter.pushbutton\\icon.png",
+        "is_popular": false,
+        "script": "EnneadTab.tab\\ACE.panel\\AutoExporter.pushbutton\\revit_server_entry_script.py",
+        "tab": "ACE",
+        "tab_icon": null
+    },
     "EnneadTab.tab\\ACE.panel\\CollectTextures.pushbutton\\collect textures_script.py": {
         "alias": "Collect Textures",
-        "doc": "Gather every material texture image into one folder and repoint the materials at it.\n\nRenders break when texture images live on someone's desktop. This copies the image\nbehind each material into a shared folder and updates the material to point at the\nnew copy, so the model renders the same on any machine.\n\nFeatures:\n- Runs across every material in the model\n- A progress bar shows the material being processed, and can be cancelled\n- The whole repoint is one undo step",
+        "doc": "Choose a new destination for texture images. Then Collect Textures copies all material texture images to this new location, and updates texture image path.\n",
         "icon": "EnneadTab.tab\\ACE.panel\\CollectTextures.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\CollectTextures.pushbutton\\collect textures_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\Excel2ColorScheme.pushbutton\\excel2color_scheme_script.py": {
-        "alias": "Excel2ColorScheme",
-        "doc": "Push colors edited in Excel back into a Revit color scheme.\n\nEdit your colors where it is comfortable, then bring them back in one step. Two\nworkflows are supported and the button asks which one your spreadsheet came from.\n\nFeatures:\n- Round-trip: for a spreadsheet you exported with ColorScheme2Excel, one scheme per file\n- Office template: for the standard Ennead sheet with Department and Program columns\n  side by side, which updates both schemes in one pass\n- Online: no Excel needed - pull the project's color book straight from enneadtab.com\n  (Department + Program), applied in one pass. Sign in once when prompted.\n\nUsage:\n1. Run the button and pick the source (Excel round-trip, Excel office template, or Online)\n2. For Excel: pick the file and scheme. For Online: enter the project number and sector.",
-        "icon": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\Excel2ColorScheme.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\Excel2ColorScheme.pushbutton\\excel2color_scheme_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\color_scheme_to_filled_region_types.pushbutton\\color_scheme_to_filled_region_types_script.py": {
-        "alias": "ColorScheme To FilledRegion Types",
-        "doc": "Turn a color scheme into filled region types so diagrams match your plan colors.\n\nPick a color scheme and every entry in it becomes a filled region type carrying that\nentry's exact color, ready to draw with. Existing types are refreshed rather than\nduplicated, so re-running after a color change keeps your diagrams in step with the\nplans.\n\nFeatures:\n- Each type is named after its scheme entry so it is easy to find in the type list\n- The whole conversion is one undo step\n\nUsage:\n1. Run the button and pick the color scheme to convert",
-        "icon": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\color_scheme_to_filled_region_types.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\color_scheme_to_filled_region_types.pushbutton\\color_scheme_to_filled_region_types_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\export_color_scheme.pushbutton\\export_color_scheme_script.py": {
-        "alias": "ColorScheme2Excel",
-        "doc": "Export any color scheme to Excel so the colors can be edited outside Revit.\n\nEvery entry in the scheme lands in a spreadsheet with its color, ready to hand to a\nconsultant or mark up yourself. Bring the edits back with Excel2ColorScheme.\n\nFeatures:\n- Export several schemes at once, each on its own worksheet\n- Choose whether to include entries that no element currently uses\n- The model is not changed; this only writes a spreadsheet\n\nUsage:\n1. Run the button and tick the schemes to export\n2. Say whether unused colors should be included",
-        "icon": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\export_color_scheme.pushbutton\\icon.png",
-        "is_popular": true,
-        "script": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\export_color_scheme.pushbutton\\export_color_scheme_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\transfer_color_scheme.pushbutton\\transfer_color_scheme_script.py": {
-        "alias": "Transfer Color Scheme",
-        "doc": "Copy every entry, color, and fill pattern from one color scheme onto another.\n\nSaves rebuilding a scheme by hand when a second one needs to look the same. Entries\nmissing from the destination are added; where an entry already exists you are asked\nbefore its color is overwritten.\n\nFeatures:\n- The two schemes must cover the same category, and you are told if they do not\n- A summary lists what was added and what was overwritten\n- The transfer is one undo step\n\nUsage:\n1. Run the button and pick the scheme to copy from, then the one to copy onto",
-        "icon": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\transfer_color_scheme.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\ACE.panel\\ColorScheme.pulldown\\transfer_color_scheme.pushbutton\\transfer_color_scheme_script.py",
         "tab": "ACE",
         "tab_icon": null
     },
@@ -2080,7 +1954,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\Family.pulldown\\Family RePath.pushbutton\\family repath_script.py": {
         "alias": "Family RePath",
-        "doc": "Save the project's families out to a folder of your choice, sorted by category.\n\nPulls the families you pick out of the model, files them into category subfolders in\nthe folder you name, and loads the tidied copies back into the model. The result is\none clean, findable family library instead of paths scattered across desktops.\n\nFeatures:\n- Families are grouped into subfolders by their Revit category\n- Optionally reach into nested families and save those out too\n- Optionally sync and close the model when the reload is done, so you can walk away\n\nUsage:\n1. Run the button and tick the families to save out\n2. Pick the destination folder\n3. Choose whether to include nested families and whether to sync and close afterwards",
+        "doc": "Find family file path. And remap the path to a folder you picked. In this folder, families will be organised based on their category.\nThis will also load the repathed families back to central model.\n\nYou have the option to sync and close after the long-boring reloading.\nYou also have the option to dig inside the nesting family and save them.\n",
         "icon": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\Family RePath.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\Family RePath.pushbutton\\family repath_script.py",
@@ -2089,7 +1963,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\Family.pulldown\\batch_fix_family_name.pushbutton\\batch_fix_family_name_script.py": {
         "alias": "Batch Format Family Name",
-        "doc": "Batch rename family names to the Healthcare standard convention.\n\nFormat: CATEGORY_MainDescription_FIRM[_AdditionalInfo][_HOSTING]\n\nEdit the components inline in the grid, check the families to fix, and\nApply. Analysis and naming-rules helpers are one click away.",
+        "doc": "Batch rename family names to follow Healthcare standard naming convention.\n\nFormat: \n    CATEGORY_MainDescription_FIRM[_AdditionalInfo][_HOSTING]\n\nExamples:\n    LITE_PendantLamp_EA_Vitra_CH\n    DOOR_Telescopic_EC_TwoPanel_WH\n    FURN_Chair_EA_Tack\n    \nComponents:\n    - CATEGORY: Category abbreviation or CSI Division No. (e.g., LITE, DOOR, FURN)\n    - MainDescription: CamelCase, no underscores or spaces (e.g., PendantLamp, Telescopic)\n    - FIRM: EA (EnneadArchitects) or EC (EwingCole)\n    - AdditionalInfo: Optional - Shape/Brand/Note\n    - HOSTING: Optional - WH(Wall)/CH(Ceiling)/FH(Floor)/FC(Face)\n\nFeatures:\n    - Fix Category Prefix Only: Automatically updates family name prefixes to match current categories\n      * Handles wrong prefixes (e.g., WALL_Door_EA -> DOOR_Door_EA)\n      * Handles missing prefixes (e.g., Door_EA -> DOOR_Door_EA)\n    - Fix by Excel: Export/import workflow for manual editing\n    - Analyze hosting behaviors and category mappings\n",
         "icon": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\batch_fix_family_name.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\batch_fix_family_name.pushbutton\\batch_fix_family_name_script.py",
@@ -2105,18 +1979,9 @@
         "tab": "ACE",
         "tab_icon": null
     },
-    "EnneadTab.tab\\ACE.panel\\Family.pulldown\\cleanup_family.pushbutton\\cleanup_family_script.py": {
-        "alias": "CleanUp Family",
-        "doc": "Slim down the families you pick by purging what is unused inside them.\n\nBloated families make a model slow to open and heavy to sync. This opens each family\nyou select, throws out the unused types, materials, and imports hiding inside, then\nreloads the lighter version into the project.\n\nFeatures:\n- Nested families are cleaned too, all the way down\n- Optionally set every cleaned family to consistent metric or imperial units\n- A summary reports what came out of each family\n\nUsage:\n1. Run the button and tick the families to clean\n2. Choose whether to standardize units\n3. Review the summary when the reload finishes",
-        "icon": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\cleanup_family.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\cleanup_family.pushbutton\\cleanup_family_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\ACE.panel\\Family.pulldown\\family_tree.pushbutton\\family_tree_script.py": {
         "alias": "Family Tree",
-        "doc": "See what is nested inside your families as an interactive tree in your browser.\n\nDraws the whole parent and child chain of a family so you can finally see what is\nburied inside it, and click any node to read its parameters. Handy before cleaning\nor repathing a family you did not build.\n\nFeatures:\n- Works from a project or from inside an open family\n- Click through the tree to expand and collapse each level\n- Nothing in the model is changed; the tree is only a view of it",
+        "doc": "Family hierarchy visualization tool that reveals the complete nesting structure of complex Revit families. This utility generates a clear, hierarchical display of all nested components within the current family, showing parent-child relationships and dependency chains. Perfect for understanding complex families, troubleshooting parameter inheritance, or documenting family architecture.",
         "icon": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\family_tree.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\family_tree.pushbutton\\family_tree_script.py",
@@ -2134,19 +1999,10 @@
     },
     "EnneadTab.tab\\ACE.panel\\Family.pulldown\\rename_nesting_family.pushbutton\\rename_nesting_family_script.py": {
         "alias": "Rename Nesting Family",
-        "doc": "Strip the conflicting-name tag Revit leaves on nested families after a bad load.\n\nWhen two families collide on load, Revit quietly renames the nested one and leaves an\nugly marker in its name. This finds every nested family carrying that marker, cleans\nthe name back up, and reloads the corrected family into the project.\n\nFeatures:\n- Every family in the project is checked, including the ones nested inside them\n- Families you cannot edit are skipped\n- A log lists every rename that was made\n\nUsage:\n1. Run the button and let it work through the families\n2. Review the list of renames in the output window",
+        "doc": "Scans through project families and their nested components to remove '*ConflictingName' string.\n            \nPROCESS:\n- Iterates through all families in current project\n- Opens each family document\n- Checks nested families for '*ConflictingName' string\n- Renames affected nested families by removing the conflicting string\n- Loads modified families back to project\n- Logs all changes made during the process\n\nYou can also requist to locate and rename based on other rules.\n",
         "icon": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\rename_nesting_family.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\rename_nesting_family.pushbutton\\rename_nesting_family_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\ACE.panel\\Family.pulldown\\rename_parameter.pushbutton\\rename_parameter_script.py": {
-        "alias": "Rename Parameters",
-        "doc": "Rename family parameters without losing the values already set in the project.\n\nRenaming a parameter by hand normally wipes whatever every instance had in it. This\ncarries the values across, so schedules, tags, and filters keep reading the same\nnumbers under the new name.\n\nFeatures:\n- Rename several parameters in one pass from a single dialog\n- The dialog stays open so you can keep working in the model beside it\n- Values are read back and re-applied after the rename\n\nUsage:\n1. Run the button and pick the family to work on\n2. Type the new name beside each parameter you want changed\n3. Apply, and check the values survived in a schedule",
-        "icon": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\rename_parameter.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\ACE.panel\\Family.pulldown\\rename_parameter.pushbutton\\rename_parameter_script.py",
         "tab": "ACE",
         "tab_icon": null
     },
@@ -2161,7 +2017,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\Project Starter.pushbutton\\project_starter_script.py": {
         "alias": "Project Initiating",
-        "doc": "Set up a brand new project in one window instead of a dozen separate dialogs.\n\nEverything you normally do by hand on day one of a model, gathered in one place. The\nwindow stays open beside the model so you can work through the setup at your own pace.\n\nFeatures:\n- Create the office standard worksets in one click\n- Build levels from a grid you fill in\n- Create the whole sheet set from a spreadsheet\n- Fill in the project information fields quickly",
+        "doc": "A simple window that give you quick access to all kinds of function needed when a new project is starting.\n\n+Default Workset Creation\n+New Sheet Created From Excel\n+Quick project info filling",
         "icon": "EnneadTab.tab\\ACE.panel\\Project Starter.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\Project Starter.pushbutton\\project_starter_script.py",
@@ -2170,7 +2026,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\QAQC_AI.pushbutton\\qaqc_ai_UI_script.py": {
         "alias": "QAQC Reporter",
-        "doc": "Produce a health report on the model and ask questions about it in plain English.\n\nRuns the firm's quality checks over the open model and gathers the results into one\nreport. Instead of scrolling it, you can just ask: what are the critical issues, is\nthis model ready to issue, which worksets are a mess. Good before a milestone or a\ncoordination review.\n\nFeatures:\n- Ask follow-up questions in plain English and get answers from the report\n- The window stays open beside the model so you can fix issues as you read\n- Nothing in the model is changed; this is a read-only review",
+        "doc": "AI-powered quality control assistant that transforms complex model data into actionable insights. This innovative tool generates comprehensive QAQC reports for your current document and features a natural language interface powered by OpenAI, allowing you to interrogate the results through simple conversation. Perfect for project milestones, coordination reviews, or when preparing deliverables that require rigorous quality verification.",
         "icon": "EnneadTab.tab\\ACE.panel\\QAQC_AI.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\QAQC_AI.pushbutton\\qaqc_ai_UI_script.py",
@@ -2206,7 +2062,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\check_formula.pushbutton\\check_formula_script.py": {
         "alias": "Inspect Excel Formula",
-        "doc": "Reveal the hidden formulas in a spreadsheet before you trust its numbers.\n\nA cell that looks like a plain number may be a formula pointing somewhere else. This\nlists every formula in the worksheet you pick and marks those cells with a dashed\nborder in a local copy, so you can see at a glance which numbers are calculated and\nwhich were typed. Worth doing before importing consultant data into Revit.\n\nFeatures:\n- Your original spreadsheet is not modified; the marked-up copy is a separate file\n- Every formula is printed to the output window\n\nUsage:\n1. Run the button and pick the Excel file\n2. Pick the worksheet to inspect",
+        "doc": "Excel formula validation tool that reveals hidden calculation relationships. This quality control utility inspects spreadsheets for embedded formulas, highlighting cells with dependencies to help verify calculation accuracy. Perfect for validating critical data before importing into Revit or when reviewing calculations from external sources to prevent errors in your documentation.",
         "icon": "EnneadTab.tab\\ACE.panel\\check_formula.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\check_formula.pushbutton\\check_formula_script.py",
@@ -2224,10 +2080,19 @@
     },
     "EnneadTab.tab\\ACE.panel\\check_view_link.pushbutton\\check_view_link_script.py": {
         "alias": "Check Linked-View Relationship",
-        "doc": "Report which views depend on which, so you know what breaks before you delete one.\n\nViews quietly reference each other through dependents and callouts. This lists every\none of those relationships, so you can see why a view is showing something you did not\nexpect, and what would go with it if you deleted it.\n\nFeatures:\n- Circular references between views are called out\n- Nothing in the model is changed; this is a read-only check",
+        "doc": "View dependency analyzer that identifies all linked-view relationships throughout your project. This diagnostic tool generates a comprehensive report showing which views reference others, helping identify potential circular dependencies or visualization issues. Perfect for troubleshooting views that unexpectedly display or hide content, or when preparing to delete views that might be referenced elsewhere.",
         "icon": "EnneadTab.tab\\ACE.panel\\check_view_link.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\check_view_link.pushbutton\\check_view_link_script.py",
+        "tab": "ACE",
+        "tab_icon": null
+    },
+    "EnneadTab.tab\\ACE.panel\\color_scheme_to_filled_region_types.pushbutton\\color_scheme_to_filled_region_types_script.py": {
+        "alias": "ColorScheme To FilledRegion Types",
+        "doc": "Doc string not set",
+        "icon": "EnneadTab.tab\\ACE.panel\\color_scheme_to_filled_region_types.pushbutton\\icon.png",
+        "is_popular": false,
+        "script": "EnneadTab.tab\\ACE.panel\\color_scheme_to_filled_region_types.pushbutton\\color_scheme_to_filled_region_types_script.py",
         "tab": "ACE",
         "tab_icon": null
     },
@@ -2240,6 +2105,15 @@
         "tab": "ACE",
         "tab_icon": null
     },
+    "EnneadTab.tab\\ACE.panel\\export_color_scheme.pushbutton\\export_color_scheme_script.py": {
+        "alias": "ColorScheme To Excel",
+        "doc": "Use me tp export selected Color Scheme To Excel. You have the option to exclude unused color.",
+        "icon": "EnneadTab.tab\\ACE.panel\\export_color_scheme.pushbutton\\icon.png",
+        "is_popular": true,
+        "script": "EnneadTab.tab\\ACE.panel\\export_color_scheme.pushbutton\\export_color_scheme_script.py",
+        "tab": "ACE",
+        "tab_icon": null
+    },
     "EnneadTab.tab\\ACE.panel\\export_filled_region_types.pushbutton\\export_filled_region_types_script.py": {
         "alias": "Export Filled Region Types",
         "doc": "Export the filled region color setting to excel so you can use it elsewhere.",
@@ -2249,18 +2123,9 @@
         "tab": "ACE",
         "tab_icon": null
     },
-    "EnneadTab.tab\\ACE.panel\\get_model_guids.pushbutton\\get_model_guids_script.py": {
-        "alias": "Get Model GUIDs",
-        "doc": "Read out the cloud identifiers of the open model so it can be added to Auto Export.\n\nSetting a model up for overnight export needs two identifiers that Revit does not show\nanywhere in its interface. Run this from the open cloud model and both are printed,\nready to copy into the Auto Export setup.\n\nFeatures:\n- The cloud region is reported alongside the identifiers\n- You are told plainly if the open model is not a cloud model\n- Nothing in the model is changed",
-        "icon": "EnneadTab.tab\\ACE.panel\\get_model_guids.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\ACE.panel\\get_model_guids.pushbutton\\get_model_guids_script.py",
-        "tab": "ACE",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\ACE.panel\\inspect_local_graphic_override.pushbutton\\inspect_local_graphic_override_script.py": {
         "alias": "Inspect Local Graphic Override",
-        "doc": "Find the views where someone has overridden graphics by hand instead of by template.\n\nLocal overrides and hand-hidden elements are invisible until a drawing prints wrong.\nThis walks the views on the sheets you pick and reports every override and hidden\nelement that the view template does not control, so you can put the view back under\ntemplate control.\n\nFeatures:\n- Read the findings in Revit, or export them for review in Excel\n- Nothing in the model is changed; this is a read-only audit\n\nUsage:\n1. Run the button and pick the sheets whose views you want checked\n2. Choose whether to review in Revit or export the list",
+        "doc": "For views on selected sheets, inspect if there are local graphic override or local hidden objects that is not controlled by template.",
         "icon": "EnneadTab.tab\\ACE.panel\\inspect_local_graphic_override.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\inspect_local_graphic_override.pushbutton\\inspect_local_graphic_override_script.py",
@@ -2269,7 +2134,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\keynote_assistant.pushbutton\\keynote_assistant_script.py": {
         "alias": "Keynote Assistant",
-        "doc": "Manage the whole project keynote list from one searchable window.\n\nAdd, edit, and reorganize keynotes without hunting through the keynote text file.\nSearch the whole list, move keynotes between categories, and edit many at once\ninstead of one at a time.\n\nFeatures:\n- Search across every keynote in the project\n- Reorganize keynotes into categories by dragging\n- Edit or retire a batch of keynotes in one go\n- Translate keynote text for international project teams",
+        "doc": "Comprehensive keynote management system that extends Revit's standard functionality. This powerful utility provides an intuitive interface for creating, editing, and organizing keynotes with additional features for categorization, search, batch operations, and translation capabilities. Perfect for maintaining consistent documentation standards and streamlining the keynoting workflow across complex projects.",
         "icon": "EnneadTab.tab\\ACE.panel\\keynote_assistant.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\keynote_assistant.pushbutton\\keynote_assistant_script.py",
@@ -2278,7 +2143,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\lines_in_view_locator.pushbutton\\lines_in_view_locator_script.py": {
         "alias": "Lines-In-View Locator",
-        "doc": "Rank the views hoarding the most drafting and model lines, worst offenders first.\n\nA model that has grown slow is usually carrying a few views stuffed with hand-drawn\nlines. This counts them and ranks the views, so you know exactly where to go and what\nto clean up.\n\nFeatures:\n- Detail lines and model lines are reported separately\n- Each line's workset is listed so you can trace who owns the mess\n- Nothing in the model is changed; this is a read-only report",
+        "doc": "Line usage analysis tool that helps identify views with excessive detail and model lines. This diagnostic utility generates a ranked report of views containing the most line elements, helping pinpoint potential performance bottlenecks or documentation management issues. Perfect for troubleshooting slow performance or when establishing documentation standards for line usage.",
         "icon": "EnneadTab.tab\\ACE.panel\\lines_in_view_locator.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\lines_in_view_locator.pushbutton\\lines_in_view_locator_script.py",
@@ -2287,7 +2152,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\merge_ost.pushbutton\\merge_ost_script.py": {
         "alias": "Merge Object Style",
-        "doc": "Merge duplicate object styles (subcategories) into a single target.\n\nSolves the 'boomerang' problem where deleted subcategories reappear because\nfamilies still carry them internally.\n\nWorkflow:\n  1. Pick the bad subcategory to remove and the target to keep.\n  2. Dry-delete the bad subcategory (rolled back) to discover every\n     family and project element that references it.\n  3. Open each affected family (loadable and in-place), reassign\n     geometry from bad to target subcategory, delete the bad one,\n     and load the family back.\n  4. Reassign project-level elements (detail lines, filled regions, etc.)\n     and delete the bad subcategory from the project.\n\nNote: Category.Name is read-only in the Revit API so subcategories\ncannot be renamed directly; elements must be reassigned instead.\n",
+        "doc": "Consider using Ideate instead",
         "icon": "EnneadTab.tab\\ACE.panel\\merge_ost.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\merge_ost.pushbutton\\merge_ost_script.py",
@@ -2305,7 +2170,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\open_keynote_exporter.pushbutton\\open_keynote_exporter_script.py": {
         "alias": "Open Keynote Exporter",
-        "doc": "Open the Keynote Exporter -- now a standalone web service.\n\nThe Keynote Exporter has been extracted from EnneadTab-OS into its own product at\nhttps://enneadtab.com/keynote-exporter. This button opens it in your browser; the old\nbundled .exe was retired to shrink the repo. Revit stays open and your model is untouched.",
+        "doc": "Us the Keynote Exporter app to interact with the KeynoteExcel with legacy format.",
         "icon": "EnneadTab.tab\\ACE.panel\\open_keynote_exporter.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\open_keynote_exporter.pushbutton\\open_keynote_exporter_script.py",
@@ -2341,7 +2206,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\revision_cloud_color_manager.pushbutton\\revision_cloud_color_manager_script.py": {
         "alias": "Revision Cloud Color Manager",
-        "doc": "Give each revision its own cloud color so revisions read apart at a glance.\n\nEvery revision cloud in the model looks the same until you color them. This assigns a\ndistinct color per revision, so a sheet carrying three revisions tells its own story.\n\nFeatures:\n- A ready-made color palette, or pick your own color per revision\n- Turn the coloring on for review and off again before issue\n- Your color choices are remembered and reused on the next model\n\nUsage:\n1. Run the button and set a color against each revision\n2. Turn coloring on to review, and off when you are done",
+        "doc": "Manage revision cloud colors based on revision ID. Enable/disable color display and set custom colors for each revision across all documents.",
         "icon": "EnneadTab.tab\\ACE.panel\\revision_cloud_color_manager.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\revision_cloud_color_manager.pushbutton\\revision_cloud_color_manager_script.py",
@@ -2350,7 +2215,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\sheet_tree.pushbutton\\sheet_tree_script.py": {
         "alias": "View Reference Tree",
-        "doc": "Map how your sheets and views reference each other, and open the map to explore.\n\nFollows every callout, section, and elevation marker to build a picture of which view\npoints at which. Use it to find orphan views, trace where a detail is called up from,\nor see the shape of the drawing set before an issue.\n\nFeatures:\n- Covers every sheet and every view placed on them\n- Nothing in the model is changed; the map is only a view of it",
+        "doc": "Generate sheet and view relationship data for visualization. Data is saved to DUMP folder for later use with visualization tools.",
         "icon": "EnneadTab.tab\\ACE.panel\\sheet_tree.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\sheet_tree.pushbutton\\sheet_tree_script.py",
@@ -2359,7 +2224,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\smart_egress_path.pushbutton\\smart_egress_path_script.py": {
         "alias": "Smart Egress Path",
-        "doc": "Draw egress paths whose travel distance and tags update themselves as the plan changes.\n\nEach path is placed as a tagged marker with its travel distance read straight off the\ngeometry, so when a wall moves the distance on the drawing moves with it. No more\nre-measuring routes by hand every time the plan shifts.\n\nFeatures:\n- The path marker and tag families are loaded for you if they are missing\n- An egress path schedule is created so every route can be checked in one table\n- Distances stay correct as the design evolves, ready for the code review",
+        "doc": "Intelligent egress path creation tool that automates code-compliant exit routing. This utility helps you create and maintain accurate egress paths with smart dynamic updating capabilities, ensuring proper path widths and distances to exits are maintained as the design evolves. Perfect for life safety documentation and code compliance verification.",
         "icon": "EnneadTab.tab\\ACE.panel\\smart_egress_path.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\smart_egress_path.pushbutton\\smart_egress_path_script.py",
@@ -2368,7 +2233,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\smart_match_grid_extend.pushbutton\\smart_match_grid_extend_script.py": {
         "alias": "Smart Match Grid Extend",
-        "doc": "Match grid bubbles and extents across every plan to a reference view you nominate.\n\nGrid bubbles drift out of step view by view until no two plans agree. Pick the view\nthat is right, and every other floor plan and area plan is brought into line: the same\nbubbles shown, the same ends hidden, the same extents.\n\nFeatures:\n- Covers every floor plan and area plan in the model\n- Each grid end is matched independently, so half-shown grids stay half-shown\n- The whole match is one undo step\n\nUsage:\n1. Run the button and nominate the reference view whose grids are correct\n2. Let it work through the remaining plans",
+        "doc": "Get all floor plans and area plans for each view, find all grids. Then for each end of the grid decide if it should show bubble or not based on the status of same bubble from same level in REF dict.",
         "icon": "EnneadTab.tab\\ACE.panel\\smart_match_grid_extend.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\smart_match_grid_extend.pushbutton\\smart_match_grid_extend_script.py",
@@ -2395,7 +2260,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\visulize_door_room_calc_pt.pushbutton\\visulize_door_room_calc_pt_script.py": {
         "alias": "Door Calc Pt Visualizer",
-        "doc": "Draw detail lines from each door to its room calculation points in the views you pick.\n\nMakes it obvious which rooms a door is reporting to and from, so doors that feed\nthe wrong room in a schedule stand out instead of hiding in the numbers.\n\nFeatures:\n- Blue lines run to the To Room, red lines run to the From Room\n- Doors that carry no calculation points are counted and skipped\n- Summary of processed doors printed when it finishes",
+        "doc": "Visualize door calculation points by drawing detail lines from To/From points to door insertion points. Blue lines for ToRoom, red lines for FromRoom. Works on selected views.",
         "icon": "EnneadTab.tab\\ACE.panel\\visulize_door_room_calc_pt.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\ACE.panel\\visulize_door_room_calc_pt.pushbutton\\visulize_door_room_calc_pt_script.py",
@@ -2404,7 +2269,7 @@
     },
     "EnneadTab.tab\\ACE.panel\\wall_type_diagram.pushbutton\\wall_type_diagram_script.py": {
         "alias": "Wall Type Diagram",
-        "doc": "Create a wall type legend and matching view filters, one color per wall type.\n\nEach wall type takes its color from the filled region type already associated\nwith it; when there is none, a fresh color is picked for you. The filters can be\npushed onto a view template so every plan reads the same way.\n\nFeatures:\n- Legend view with a color box and label for each selected wall type\n- One view filter per wall type, with a consistent color override\n- Optional apply to a view template you choose",
+        "doc": "Generate walltype legand view as well as view filter. The color is picked based on related filled region type, if not avaibale then pick new color for you.",
         "icon": "EnneadTab.tab\\ACE.panel\\wall_type_diagram.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\ACE.panel\\wall_type_diagram.pushbutton\\wall_type_diagram_script.py",
@@ -2449,7 +2314,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\brep2mass.pushbutton\\brep2mass_script.py": {
         "alias": "Brep2Mass",
-        "doc": "Rebuild breps exported from Rhino as native Revit mass geometry.\n\nThe shapes come back as real Revit forms you can host, schedule, and cut in\nsection, instead of a dumb import you cannot work with.\n\nUsage:\n1. In Rhino, export the breps with EnneadTab for Rhino\n2. Run this button and confirm the unit the Rhino file was drawn in",
+        "doc": "Based on the brep data exported from EnneadTab for Rhino, create adaptive mass shape as native Revit object.",
         "icon": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\brep2mass.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\brep2mass.pushbutton\\brep2mass_script.py",
@@ -2467,7 +2332,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\import_rhino_material.pushbutton\\import_rhino_material_script.py": {
         "alias": "Import Rhino Material",
-        "doc": "Bring Rhino material definitions into Revit as new or refreshed Revit materials.\n\nMaterials that already exist in the project keep their identity and simply pick\nup the incoming color; the ones that are missing are created for you, so a Rhino\nmodel and a Revit model can be kept looking like the same building.\n\nUsage:\n1. Export the materials from Rhino with EnneadTab for Rhino\n2. Run this button and review what was created versus updated",
+        "doc": "Import material definitions from Rhino into Revit. Creates new materials or updates existing ones based on Rhino material properties.",
         "icon": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\import_rhino_material.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\import_rhino_material.pushbutton\\import_rhino_material_script.py",
@@ -2476,7 +2341,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\map_Rhino_block.pushbutton\\map_rhino_block_script.py": {
         "alias": "Map Rhino Block to Revit Family",
-        "doc": "Place Revit families at the position and orientation of matching Rhino blocks.\n\nEach Rhino block is matched to a Revit family type of the same name. The placed\ninstance is no longer stuck being a level-based, vertical-up family: it can sit\nin any freeform orientation, exactly as it did in Rhino.\n\nUsage:\n1. Export the blocks from Rhino with EnneadTab for Rhino\n2. Run this button and confirm the unit the Rhino file was drawn in\n3. Blocks with no family type of the same name are listed in the output",
+        "doc": "Transform the Rhino block orientation to Adaptive Revit Family. It will be searching for same name as block name.\n The biggest benift is You will no longer be restricted by level based vertical up family. It can be freeform as in Rhino.",
         "icon": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\map_Rhino_block.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\map_Rhino_block.pushbutton\\map_rhino_block_script.py",
@@ -2503,7 +2368,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\rhino_draft_UI.pushbutton\\rhino_draft_UI_script.py": {
         "alias": "Rhino Drafter",
-        "doc": "Draft curves and surfaces in Rhino and bring them into the current Revit view.\n\nCurves arrive as detail lines and surfaces arrive as filled regions, so awkward\n2D geometry can be shaped where it is easy to shape and finished where it needs\nto live. Rhino units are converted for you.\n\nFeatures:\n- Curves can also land as area boundary lines or room separation lines\n- Works in plan views and in elevation views\n- Round trip as many times as you need without retracing anything",
+        "doc": "A drafter that allow you to take advantage of Rhino fast editing power. You can operate however you want for crvs and surfaces in Rhino, and transfer those content to Revit detail lines and filled regions with matching linestyle and filled region type.\n\nSome Rhino command to consider:\n+Trim\n+Split\n+Fillet\n+CurveBoolean\n+EditControlPoints\n+Surface trim/split.\n\nIt also support nurbs crv or srf with nurbs edge, and it support AreaBoundaryLine and RoomSeperationLine drafting.",
         "icon": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\rhino_draft_UI.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\rhino_draft_UI.pushbutton\\rhino_draft_UI_script.py",
@@ -2530,25 +2395,16 @@
     },
     "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\srf2adp.pushbutton\\srf2adp_script.py": {
         "alias": "Srf2Adp",
-        "doc": "Turn surfaces drawn in Rhino into placed Revit adaptive components.\n\nPick the adaptive family and type to use, and each incoming surface is built from\nits corner points. Set the corner order in Rhino first so the adaptive points\nland where you expect them to.\n\nUsage:\n1. In Rhino, set the adaptive corner sequence and export the surfaces\n2. Run this button, pick the family and type, and confirm the file unit",
+        "doc": "Convert surface in Rhino into Revit Adaptive. The sequence of the adaptive corner needs to be defined in previous step at Rhino.",
         "icon": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\srf2adp.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\Rhino.pulldown\\srf2adp.pushbutton\\srf2adp_script.py",
         "tab": "Import Export",
         "tab_icon": null
     },
-    "EnneadTab.tab\\Import Export.panel\\apply_doh_sheet_number.pushbutton\\apply_doh_sheet_number_script.py": {
-        "alias": "Apply DOH SheetNum",
-        "doc": "Toggle live sheet numbers between the firm Internal scheme and the client DOH scheme.\n\nBoth schemes are stored permanently, so nothing is lost when you switch.\nApplying a scheme copies the stored numbers into the live sheet number slot.",
-        "icon": "EnneadTab.tab\\Import Export.panel\\apply_doh_sheet_number.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Import Export.panel\\apply_doh_sheet_number.pushbutton\\apply_doh_sheet_number_script.py",
-        "tab": "Import Export",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\Import Export.panel\\content_transfer.pushbutton\\content_transfer_script.py": {
         "alias": "Content Transfer",
-        "doc": "Copy selected view templates, object styles, and materials between open models.\n\nUnlike Transfer Project Standards, you choose exactly which items travel instead\nof swallowing a whole category. When a name already exists in the destination you\ncan keep the destination version rather than overwrite it.\n\nUsage:\n1. Open both the source model and the destination model\n2. Run the button, pick the source model, then tick the items to send\n3. Review what transferred in the output window",
+        "doc": "A simple window that enables the transfer of view templates, object styles (SubCategory), and materials. The primary distinction between this tool and the default 'Transfer Project Standard' is its selective transfer capabilities.",
         "icon": "EnneadTab.tab\\Import Export.panel\\content_transfer.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Import Export.panel\\content_transfer.pushbutton\\content_transfer_script.py",
@@ -2557,7 +2413,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\ennead_exporter.pushbutton\\super_exporter_script.py": {
         "alias": "Ennead Exporter",
-        "doc": "Export sheets to PDF, DWG, and JPG in one pass with consistent names and folders.\n\nSet the issue up once and the exporter handles the rest: file names built from\nthe prefix you choose, a folder per format, color or black and white, and only\nthe sheets carrying the revision you are issuing.\n\nFeatures:\n- Preview every output file name before a single file is written\n- Time estimate so you know whether to go get a coffee\n- Optional sync before exporting, and an email notification when it finishes",
+        "doc": "Professional export solution that handles multiple file formats and workflows. This comprehensive utility manages PDF, DWG, and JPG exports simultaneously with intelligent organization by prefix and file type. Features include email notifications with folder links, accurate time estimation, color/BW export control, revision-based filtering, and option to sync and close after completion. Perfect for meeting tight deadlines while maintaining project organization.",
         "icon": "EnneadTab.tab\\Import Export.panel\\ennead_exporter.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Import Export.panel\\ennead_exporter.pushbutton\\super_exporter_script.py",
@@ -2575,7 +2431,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\export isolated walltype.pushbutton\\isolated export walltype_script.py": {
         "alias": "Isolated Export By System Family Type",
-        "doc": "Export a separate DWG file for each wall, floor, roof, column, or stair type.\n\nPick a category and the types you care about, and every type is isolated in the\nview and written to its own file. Child elements such as shared families ride\nalong with their parent type.\n\nAimed at the system-family categories that are normally impossible to pull apart\nin a single DWG export. On the Rhino side, use Import Revit Export Collection to\nland each file under its own type parent layer.",
+        "doc": "Pick category and type for the dwg export. It will isolate elements by types in the view and give individual .dwg file.\n\nThe child elements such as shared family will be isolated as well.\n\nUse EnneadTab for Rhino <Import Revit Export Collection> to get things under type parent layers.\n\nCurrently handle Wall/Floor/Roof/Column/Stair\n\nThis tool primarily deal with the system family category that normally will be difficult to separate in dwg export.",
         "icon": "EnneadTab.tab\\Import Export.panel\\export isolated walltype.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Import Export.panel\\export isolated walltype.pushbutton\\isolated export walltype_script.py",
@@ -2584,7 +2440,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\export_ost_material_table.pushbutton\\export_ost_material_table_script.py": {
         "alias": "Export SubCategory Material Table",
-        "doc": "Export the object style and material table so Rhino can match layers to materials.\n\nFeeds the Map Revit SubC tool in EnneadTab for Rhino: once this table exists,\neach Rhino layer can be given the Revit material that belongs to the matching\nsubcategory, and the two models finally agree on what is made of what.\n\nIf you have not done it yet, update the DWG export layer mapping with EnneadTab\nfirst, so subcategory names come out in a shape Rhino layer names can match.",
+        "doc": "Export the OST and material table so it can be used in Rhino import when using 'map Revit SubC'.\n\nWith this tool, the layer in Rhino can be assigned with similar Revit material based on layer names.\nIf you have not done already, you can update dwg export layer mapping with EnneadTab first so each SubCategory in object style table become something rhino layer can match.\n",
         "icon": "EnneadTab.tab\\Import Export.panel\\export_ost_material_table.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\export_ost_material_table.pushbutton\\export_ost_material_table_script.py",
@@ -2602,7 +2458,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\update_miro.pushbutton\\update_miro_script.py": {
         "alias": "Review On Miro",
-        "doc": "Push selected sheets to a Miro board and keep markup alive across sheet updates.\n\nBecause each sheet image is replaced in place, comments and redlines stay stuck\nto the drawing instead of being thrown away with the old PDF every time the\nbackground changes. Review history survives the whole set of revisions.\n\nFeatures:\n- Sheets new to the board are flagged with a blue cross\n- Sheets whose background changed are flagged with an orange star\n- The last board URL you used is remembered for next time",
+        "doc": "Intelligent Miro integration for continuous design review workflows. This powerful utility exports sheets directly to Miro with automatic version tracking - new sheets get blue crosses, updated sheets get orange stars. Allows for persistent markup across document revisions, eliminating the need to recreate comments on each iteration. Perfect for maintaining feedback history when traditional PDF markup would be lost with new backgrounds.",
         "icon": "EnneadTab.tab\\Import Export.panel\\update_miro.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\update_miro.pushbutton\\update_miro_script.py",
@@ -2611,7 +2467,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\Keynote Tags.pulldown\\wrong type of TAGS.pushbutton\\identy wrong keynote_script.py": {
         "alias": "Identify Wrong Type Of KeynoteTAG",
-        "doc": "Find keynote tags that use the wrong tag family or point at a user keynote.\n\nA tag whose family or type name says material but that reads element keynote data\nis flagged, and the reverse case is flagged too. User keynotes, which the office\nstandard steers away from, are called out separately.\n\nFeatures:\n- Mismatched tags are color overridden in the view they sit in\n- User keynote tags are highlighted in blue\n- Run KeynoteTAG Reset Color afterwards to clear all the highlights",
+        "doc": "You should avoid using user keynotes, but if someone already did in the project, you can find them here.\n\nAlso, element keynote and material keynote should be used by it repsected types. \nIf there is mismatch, this tool will attempt to find them. The rule as as such, if there is 'material' mentioned in the type name or family name, and the tag is pointing to a element key data, it will warn you. \nThe same go for the element keynote types.\n\nUser keynote, since no one should really use it, will be highlighted as blue.",
         "icon": "EnneadTab.tab\\Manage.panel\\Keynote Tags.pulldown\\wrong type of TAGS.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\Keynote Tags.pulldown\\wrong type of TAGS.pushbutton\\identy wrong keynote_script.py",
@@ -2620,7 +2476,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\Keynote Tags.pulldown\\z_reset all tag to default color.pushbutton\\reset tag color_script.py": {
         "alias": "KeynoteTAG Reset Color",
-        "doc": "Clear the color overrides on every keynote tag so they draw in their default color.\n\nUse this after the keynote checking tools, which color-code tags to flag problems.\nTags or views owned by someone else in a workshared model are left alone and\nreported, so nothing is quietly half-reset.\n\nFeatures:\n- Sweeps every keynote tag in the model in a single undo step\n- Count of reset and skipped tags shown when it finishes",
+        "doc": "Reset all keynote tag local override color to default. It might got its color from the other checking type button.",
         "icon": "EnneadTab.tab\\Manage.panel\\Keynote Tags.pulldown\\z_reset all tag to default color.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Manage.panel\\Keynote Tags.pulldown\\z_reset all tag to default color.pushbutton\\reset tag color_script.py",
@@ -2638,7 +2494,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\Shake All Tags.pushbutton\\shake all tags_script.py": {
         "alias": "Shake All Tags",
-        "doc": "Force every tag on the sheets you pick to redraw itself with current text.\n\nFixes blank or stale tag text without leaving any permanent change behind: each\ntag is nudged, the view refreshes, and the tag is put straight back where it was.\nThe whole run is one undo step.\n\nFeatures:\n- Pinned tags are temporarily unpinned, then re-pinned\n- Tags owned by another user in a workshared model are skipped\n- Summary of shaken, refreshed, failed, and skipped tags when it finishes",
+        "doc": "Sometimes the tag will not update after updating the component info. This can be resolved by shifting the tags up and down to force them to update.\nThis tool moved all tags on the selected sheets back-and-forth by a tiny amount to force Revit to regenerate the tag and update the display. This makes sure the tags are all reading something.",
         "icon": "EnneadTab.tab\\Manage.panel\\Shake All Tags.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Manage.panel\\Shake All Tags.pushbutton\\shake all tags_script.py",
@@ -2647,7 +2503,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\abstract_wall.pushbutton\\abstract_wall_script.py": {
         "alias": "CurtainWall Location Manager",
-        "doc": "Manage curtain wall locations by turning the walls in a plan into an abstract diagram.\n\nThe diagram gives you a clean line drawing to study and adjust curtain wall\npositions on. When the lines say what you want, run the tool again to push the\nlocations back onto the real curtain walls.\n\nFeatures:\n- Left click processes the current view; right click processes views you select\n- Edge of slab lines can be included when the floor type name contains \"struc\"\n- Export the diagram views to images with Manage Working Views for quick review",
+        "doc": "Manager your curtain wall locations by converting walls in current plan to abstract line.\nYou can then modify/confirm the location of CW wall in that diagram and update the actual CW wall with this tool.\n\nLeft Click: Process current view\nRight Click: Process selected views\n\n\nYou also have the option to include EOS lines in the diagrams, as long as the floor type name contain \"struc\".\nYou can use working-view-manager to export those Abstract wall diagram views to jpgs and can review those quicker.",
         "icon": "EnneadTab.tab\\Manage.panel\\abstract_wall.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Manage.panel\\abstract_wall.pushbutton\\abstract_wall_script.py",
@@ -2674,7 +2530,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\dwg_manager.pushbutton\\dwg_manager_script.py": {
         "alias": "DWG Manager",
-        "doc": "Find, review, and clean up every DWG in the model from one window.\n\nEach imported or linked DWG is listed with who brought it in, which view it lives\nin, whether it is hidden, its workset, its path, and its file size, so a\ndeliberate link is easy to tell apart from stray import junk.\n\nFeatures:\n- Select and zoom to any DWG in the model\n- For linked DWGs, open the source file or its folder, or repath the link\n- File sizes and paths shown, so heavy or missing links stand out",
+        "doc": "A simple window that help you manage DWG in the files. \nYou can find, select, zoom any dwgs with detailed infor on creator, view association, hidden status, workset, file path and file size. \n\nFor linked dwgs, you might also open file directly, open folder directly, and repath links to a selected folder.",
         "icon": "EnneadTab.tab\\Manage.panel\\dwg_manager.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\dwg_manager.pushbutton\\dwg_manager_script.py",
@@ -2692,7 +2548,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\fix_warnings.pushbutton\\fix_generic_warnings_script.py": {
         "alias": "Isolate Warnings",
-        "doc": "Work through model warnings one by one in a window that zooms straight to each one.\n\nPick a warning and the model isolates and zooms to the elements causing it in a\n3D view with a section box, so you can fix it where it lives instead of hunting\nfor it. The warning count drops as you go, and syncing after the cleanup earns\nyou EA coins.\n\nUsage:\n1. Run the button to open the warning window\n2. Pick a warning to zoom to it, fix it, then move to the next\n3. Sync when the list looks the way you want it",
+        "doc": "In the standalone window, you can zoom in with section box to a region that have a warning.\n\nAs you are fixing it, you will see the warning count going down. When you sync baack after all the fix, the EA coins will be rewarded..",
         "icon": "EnneadTab.tab\\Manage.panel\\fix_warnings.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\fix_warnings.pushbutton\\fix_generic_warnings_script.py",
@@ -2719,7 +2575,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\load_family_from_link.pushbutton\\load_family_from_link_script.py": {
         "alias": "Load Family From Link",
-        "doc": "Load families out of a linked Revit model without ever opening the link.\n\nPick the link, pick the families, and they land in the current model. In-place\nand system families cannot travel this way, so they are skipped and listed with\nthe reason rather than failing quietly.\n\nUsage:\n1. Pick the linked model to pull from\n2. Pick one or more families to load\n3. Review the skipped list in the output window",
+        "doc": "Load family from linked revit file without open those links. Non-editable families (in-place and system) will be skipped.",
         "icon": "EnneadTab.tab\\Manage.panel\\load_family_from_link.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\load_family_from_link.pushbutton\\load_family_from_link_script.py",
@@ -2737,28 +2593,10 @@
     },
     "EnneadTab.tab\\Manage.panel\\remove not placed area.pushbutton\\remove not placed area_script.py": {
         "alias": "Remove Not Placed Area and Rooms",
-        "doc": "Delete unplaced rooms and areas, and flag the ones that need a second look.\n\nAnything not placed anywhere is deleted outright. Elements that are placed but\nunbounded or redundant are reported instead of deleted, because those are a\ndesign decision, not junk. Rooms are handled in the phase you pick; areas are\nhandled across every phase.\n\nUsage:\n1. Pick the phase whose rooms you want cleaned\n2. Review the deleted counts and the flagged list in the output window",
+        "doc": "This tool allows you to manage room and area accuracy by identifying and removing elements that are not properly placed in the project.\n\nFeatures:\n- Remove unplaced rooms and areas\n- Identify unbounded/redundant elements for review\n- Phase-specific room inspection\n- Find elements with negative areas or missing department assignments",
         "icon": "EnneadTab.tab\\Manage.panel\\remove not placed area.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\remove not placed area.pushbutton\\remove not placed area_script.py",
-        "tab": "Manage",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\Manage.panel\\revision.stack\\Remove Revision From Sheets.pushbutton\\script.py": {
-        "alias": "Remove Revision From Sheets",
-        "doc": "Remove one or more revisions from many sheets at once.\n\nPick the revisions, then pick the sheets to strip them from. A revision that a\nsheet picked up from a revision cloud cannot be removed this way; those sheets\nare listed on their own at the end so you can go find the clouds.\n\nUsage:\n1. Pick the revisions to remove\n2. Pick the target sheets\n3. Check the output window for sheets still carrying a cloud-driven revision",
-        "icon": "EnneadTab.tab\\Manage.panel\\revision.stack\\Remove Revision From Sheets.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Manage.panel\\revision.stack\\Remove Revision From Sheets.pushbutton\\script.py",
-        "tab": "Manage",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\Manage.panel\\revision.stack\\Set Revision On Sheets.pushbutton\\script.py": {
-        "alias": "Set Revision On Sheets",
-        "doc": "Add one or more revisions to many sheets at once.\n\nPick the revisions, then pick the sheets to stamp them on. Every sheet is updated\nin a single undo step, and each one is listed in the output window so you can\nconfirm the issue went where you meant it to.\n\nUsage:\n1. Pick the revisions to add\n2. Pick the target sheets\n3. Review the updated sheets in the output window",
-        "icon": "EnneadTab.tab\\Manage.panel\\revision.stack\\Set Revision On Sheets.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Manage.panel\\revision.stack\\Set Revision On Sheets.pushbutton\\script.py",
         "tab": "Manage",
         "tab_icon": null
     },
@@ -2773,7 +2611,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\track_detail_group.pushbutton\\track_detail_group_script.py": {
         "alias": "Track Detail Group",
-        "doc": "Track down where detail groups are used, searching by view or by group.\n\nThe search runs in both directions: list every view a given detail group appears\nin, or list every detail group living inside the views or sheets you pick. Worth\nrunning before you edit a shared group, or when hunting content nobody uses.\n\nUsage:\n1. Choose a search direction when the dialog opens\n2. Pick the views, the sheets, or the detail group to search on\n3. Review the results in the output window",
+        "doc": "Detail group detective that helps you track down where groups are used throughout your project. This bidirectional search tool allows you to find all instances of a specific detail group across views, or identify all detail groups used within selected views. Perfect for understanding dependencies before making changes to detail groups or when cleaning up unused content.",
         "icon": "EnneadTab.tab\\Manage.panel\\track_detail_group.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\track_detail_group.pushbutton\\track_detail_group_script.py",
@@ -2782,7 +2620,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\view_template_compare.pushbutton\\view_template_compare_script.py": {
         "alias": "View Template Compare",
-        "doc": "Compare view templates side by side and get an interactive report of the differences.\n\nPick the templates and a table opens with one column per template and one row per\nsetting that differs. Settings a template does not control are called out, since\nthose are the ones that quietly let views drift apart.\n\nFeatures:\n- Category visibility and overrides: halftone, line weight, color, and the rest\n- Workset visibility\n- Filters in use and the overrides they apply\n- View parameters, both the controlled ones and the ones left loose",
+        "doc": "Compare multiple view templates and generate an interactive HTML report showing differences.\nThis tool allows users to select multiple view templates and compares their settings including:\n- Category overrides (visibility, halftone, line weight, color, etc.)\n- Category visibility settings\n- Workset visibility\n- View parameters (controlled and uncontrolled)\n- Filter usage and graphic overrides\n\nThe output is an interactive HTML table where columns represent each template and rows show differences.\nUncontrolled parameters are highlighted as dangerous since they can cause inconsistencies.",
         "icon": "EnneadTab.tab\\Manage.panel\\view_template_compare.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Manage.panel\\view_template_compare.pushbutton\\view_template_compare_script.py",
@@ -2791,7 +2629,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\working_view_cleanup.pushbutton\\manage_working_view_script.py": {
         "alias": "Manage Working Views",
-        "doc": "Review and clean up the views that are not on any sheet, all from one window.\n\nEvery unsheeted view is listed with a thumbnail, so you can judge at a glance\nwhether it is someone's working view or dead weight. Delete the dead ones, or\nprefix names with their creator so ownership is obvious. Good housekeeping before\na submission or a phase change.\n\nFeatures:\n- Thumbnail preview of each working view\n- Filter the list by creator, view type, and name\n- Batch rename with a creator prefix, or delete in bulk",
+        "doc": "Powerful working view management system that helps maintain a clean project environment. This interactive interface allows you to quickly identify, review, and organize unsheeted views with intelligent filtering by creator, view type, and more. Features include thumbnail previews for rapid visual assessment, batch view name prefixing to identify creators, and direct view deletion capabilities - all without leaving the interface. Perfect for project cleanup before submissions or when transitioning between project phases.",
         "icon": "EnneadTab.tab\\Manage.panel\\working_view_cleanup.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\working_view_cleanup.pushbutton\\manage_working_view_script.py",
@@ -2800,7 +2638,7 @@
     },
     "EnneadTab.tab\\Manage.panel\\workset_fixer.pushbutton\\fix_workset_script.py": {
         "alias": "WorkSet Manager",
-        "doc": "Move elements onto the workset they belong on, in bulk.\n\nSay how each category should be assigned and the tool sweeps the model and\nreassigns everything sitting on the wrong workset. Elements inside design options\nare handled; elements inside groups are not, and are reported instead.\n\nFeatures:\n- Assign by category, by the host element's workset, or by element type\n- Report of everything that could not be moved, and why",
+        "doc": "Advanced workset organization tool that brings order to collaborative projects. This floating interface provides multiple ways to reassign elements to appropriate worksets - by category, by host element, or by type. Even handles elements inside design options (as long as they're not in groups). Perfect for cleaning up workset assignments after imports or when standardizing project collaboration structure.",
         "icon": "EnneadTab.tab\\Manage.panel\\workset_fixer.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Manage.panel\\workset_fixer.pushbutton\\fix_workset_script.py",
@@ -2809,7 +2647,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\ChatGPT.pushbutton\\ChatGPT_script.py": {
         "alias": "ChatGPT",
-        "doc": "Open a ChatGPT window inside Revit, without switching to a browser.\n\nAsk about a Revit workflow, a code question, or a design problem and keep the\nanswer next to the model you are working in. Nothing in the model is touched.",
+        "doc": "Integrated AI assistant that brings ChatGPT directly into your Revit environment. This powerful tool provides instant answers to Revit-related questions, code compliance inquiries, design challenges, or general information needs without leaving your modeling interface. Perfect for quickly solving problems or exploring design alternatives without disrupting your workflow.",
         "icon": "EnneadTab.tab\\Resource.panel\\ChatGPT.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\ChatGPT.pushbutton\\ChatGPT_script.py",
@@ -2818,7 +2656,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\EnneadTab_Setting_UI.pushbutton\\EnneadTab_Setting_UI_script.py": {
         "alias": "EnneadTab Setting",
-        "doc": "Personalize how EnneadTab looks and behaves, from one settings window.\n\nChoose which tabs and extensions show up on the ribbon, switch between the Lite\nand Pro tool sets, set colors and notification preferences, and decide how chatty\nthe duck gets. Your choices are remembered for next time.\n\nFeatures:\n- Show or hide individual EnneadTab tabs and extensions\n- Toggle between the Lite and Pro tool sets\n- Sound, notification, and duck behavior preferences",
+        "doc": "Personalization control center for your EnneadTab experience. This comprehensive settings manager allows you to customize tab visibility, color schemes, notification preferences, and duck behavior. Includes options to toggle between Lite and Pro versions, manage extension visibility, and fine-tune your workflow preferences to match your project needs.",
         "icon": "EnneadTab.tab\\Resource.panel\\EnneadTab_Setting_UI.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\EnneadTab_Setting_UI.pushbutton\\EnneadTab_Setting_UI_script.py",
@@ -2827,7 +2665,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\app_store.pushbutton\\app_store_script.py": {
         "alias": "App Store",
-        "doc": "Open the EnneadTab App Store to browse and install extra tools.\n\nShows the curated catalog of EnneadTab utilities and add-ons, with installing and\nupdating handled for you. Use it to pick up a tool you do not have yet, or to\nrefresh one that has a newer version waiting.",
+        "doc": "Launches the EnneadTab App Store, providing access to a curated collection of productivity tools, utilities, and extensions for Revit. Users can easily browse, install, and update plugins to enhance their workflow.",
         "icon": "EnneadTab.tab\\Resource.panel\\app_store.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\app_store.pushbutton\\app_store_script.py",
@@ -2836,7 +2674,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\beer_tab.pushbutton\\beer_tab_script.py": {
         "alias": "Beer Tab",
-        "doc": "Open a guide to the nearest places to get a beer.\n\nA one-click break button for the end of a long modeling session. Opens a\nneighborhood beer guide in your browser. Nothing in the model is touched.",
+        "doc": "Designer's break companion that helps you maintain proper work-life balance. This essential utility provides quick access to local refreshment options when you need a mental reset. Perfect for those moments when architectural inspiration requires a change of scenery and a cold beverage.",
         "icon": "EnneadTab.tab\\Resource.panel\\beer_tab.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\beer_tab.pushbutton\\beer_tab_script.py",
@@ -2845,7 +2683,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\check_error_log.pushbutton\\check_error_log_script.py": {
         "alias": "Check Error Log",
-        "doc": "Open the EnneadTab error log in your browser to see reported bugs and their status.\n\nEvery error EnneadTab catches is filed here. Use it to check whether the problem\nyou just hit is already known, to see what has been fixed, or to add detail to a\nreport you sent in.",
+        "doc": "Opens the EnneadTab error log Google Form in your default browser. This allows you to view and submit error reports, track known issues, and stay updated on bug fixes and improvements. Essential for troubleshooting and providing feedback to the EnneadTab development team.",
         "icon": "EnneadTab.tab\\Resource.panel\\check_error_log.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\check_error_log.pushbutton\\check_error_log_script.py",
@@ -2854,7 +2692,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\display_warning_history.pushbutton\\display_warning_history_script.py": {
         "alias": "Display Revit Warning History",
-        "doc": "Show how the warning count in a model has moved over time.\n\nEnneadTab quietly records the warning list for your models, so this button can\nreplay that history as a graph: whether warnings are creeping up, when a cleanup\nactually landed, and which ones came back.\n\nUsage:\n1. Choose the graph alone, or the graph plus the full warning detail\n2. Pick the models to report on\n3. Review the history in the output window",
+        "doc": "Doc string not set",
         "icon": "EnneadTab.tab\\Resource.panel\\display_warning_history.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\display_warning_history.pushbutton\\display_warning_history_script.py",
@@ -2872,7 +2710,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\mini_bank.pushbutton\\mini_bank_script.py": {
         "alias": "MiniBank",
-        "doc": "Check your EA coin balance and where you sit on the office leaderboard.\n\nQuacks add up as you use EnneadTab tools, clear model warnings, and wait your\nturn in the sync queue. The window shows your balance, your standing and your\nrecent transactions; nothing in the model changes.",
+        "doc": "Virtual achievement system that tracks your productivity and EnneadTab usage. This simple window displays your current MiniBank balance and leaderboard ranking, celebrating your contributions to the firm's digital ecosystem. Earn coins through regular tool usage, submitting bug reports, and helping colleagues. Perfect for encouraging healthy competition while building a culture of technology adoption.",
         "icon": "EnneadTab.tab\\Resource.panel\\mini_bank.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\mini_bank.pushbutton\\mini_bank_script.py",
@@ -2924,9 +2762,18 @@
         "tab": "Resource",
         "tab_icon": null
     },
+    "EnneadTab.tab\\Resource.panel\\revit_remote_server.pushbutton\\revit_remote_server_script.py": {
+        "alias": "Revit Remote Server",
+        "doc": "Standalone Remote Server Script (no EnneadTab/proDUCKtion dependency).",
+        "icon": "EnneadTab.tab\\Resource.panel\\revit_remote_server.pushbutton\\icon.png",
+        "is_popular": false,
+        "script": "EnneadTab.tab\\Resource.panel\\revit_remote_server.pushbutton\\revit_remote_server_script.py",
+        "tab": "Resource",
+        "tab_icon": null
+    },
     "EnneadTab.tab\\Resource.panel\\tell_me_version.pushbutton\\tell_me_version_script.py": {
         "alias": "Tell Me Version",
-        "doc": "Show which EnneadTab version you are on and when it last updated successfully.\n\nWorth checking when you file a bug, when you want to confirm a fix has reached\nyour machine, or when you and a teammate need to be sure you are running the\nsame build.",
+        "doc": "Version information utility that displays the current build details for all EnneadTab components. This diagnostic tool provides complete version numbers, build dates, and update status for your installation - essential for troubleshooting, submitting bug reports, or verifying you have the latest features. Perfect for confirming compatibility when working with team members or when communicating with EnneadTab support.",
         "icon": "EnneadTab.tab\\Resource.panel\\tell_me_version.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\tell_me_version.pushbutton\\tell_me_version_script.py",
@@ -2935,7 +2782,7 @@
     },
     "EnneadTab.tab\\Resource.panel\\unit_test.pushbutton\\unit_test_script.py": {
         "alias": "Unit Test",
-        "doc": "Run a self-check on the core EnneadTab services and report anything broken.\n\nReach for this when EnneadTab starts behaving strangely after an update. It\nexercises the shared services every other tool leans on and prints a pass or fail\nfor each one, which is worth pasting into a bug report.",
+        "doc": "Diagnostic validation tool that verifies core EnneadTab modules are functioning correctly. This utility runs a comprehensive series of tests on critical system components to ensure proper operation across the entire extension ecosystem. Perfect for troubleshooting after updates, when experiencing unexpected behavior, or when developing new functionality that depends on core services.",
         "icon": "EnneadTab.tab\\Resource.panel\\unit_test.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Resource.panel\\unit_test.pushbutton\\unit_test_script.py",
@@ -2944,19 +2791,10 @@
     },
     "EnneadTab.tab\\Tools.panel\\AlignScopebox.pushbutton\\alignscopbox_script.py": {
         "alias": "Orient Scopebox",
-        "doc": "Rotate selected scope boxes until they line up with a model line you pick.\n\nDraw a model line along the direction the building actually runs, and each scope\nbox is turned until its edges are parallel to it. Odd starting angles are handled,\nand it usually settles within a few passes.\n\nUsage:\n1. Draw or pick a model line to align to\n2. Pick the scope boxes to orient",
+        "doc": "Intelligent scopebox alignment tool that precisely orients view boundaries to match model geometry. Using reference model lines as guides, this utility automatically calculates and applies the optimal rotation angle to selected scopeboxes. The smart algorithm typically finds the correct orientation within three iterations, even with complex angles or unusual initial positions.",
         "icon": "EnneadTab.tab\\Tools.panel\\AlignScopebox.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\AlignScopebox.pushbutton\\alignscopbox_script.py",
-        "tab": "Tools",
-        "tab_icon": null
-    },
-    "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\Sync and Quit.pushbutton\\sync_and_quit_script.py": {
-        "alias": "Sync and Quit",
-        "doc": "Sync every open model with central, close them all, and shut Revit down.\n\nThe one-click end of the day: nothing left open, nothing left unsynced. Revit\ncloses itself once the last model has finished syncing, so you can walk away.",
-        "icon": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\Sync and Quit.pushbutton\\icon.png",
-        "is_popular": true,
-        "script": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\Sync and Quit.pushbutton\\sync_and_quit_script.py",
         "tab": "Tools",
         "tab_icon": null
     },
@@ -2971,34 +2809,34 @@
     },
     "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\sync all projects and close.pushbutton\\sycn all proj_script.py": {
         "alias": "Sync All Open Proj and Close",
-        "doc": "Sync every open model with central, then close them, leaving Revit running.\n\nUse it when you are switching projects or stepping away: all your work reaches the\ncentral files and the documents are closed behind you, but Revit stays open so you\ncan start something else.",
+        "doc": "End-of-day project synchronization tool that tidies up your work environment with one click. This utility automatically synchronizes all open project documents with their central files, then cleanly closes everything. Perfect for when you're heading home and want to make sure all your work is safely submitted to the central model.",
         "icon": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\sync all projects and close.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\sync all projects and close.pushbutton\\sycn all proj_script.py",
         "tab": "Tools",
         "tab_icon": null
     },
+    "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\Sync and Quit.pushbutton\\sync_and_quit_script.py": {
+        "alias": "Sync and Quit",
+        "doc": "Sync all open projects with central, then quit Revit. One-click end-of-day: sync every open document, close them, and exit Revit. Use when you are done for the day and want to leave nothing open.",
+        "icon": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\Sync and Quit.pushbutton\\icon.png",
+        "is_popular": true,
+        "script": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\Sync and Quit.pushbutton\\sync_and_quit_script.py",
+        "tab": "Tools",
+        "tab_icon": null
+    },
     "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\sync all projects.pushbutton\\sycn all proj_script.py": {
         "alias": "Sync All Open Proj",
-        "doc": "Sync every open model with central in one click and keep working.\n\nAll open documents are synchronized and left open, so your changes reach the team\nwithout interrupting what you are doing. Worth running regularly through the day\ninstead of hoarding a whole afternoon of work.",
+        "doc": "Project synchronization tool that keeps all your work up-to-date with a single click. This utility automatically synchronizes every open Revit project with its central file while keeping them open for continued work. Perfect for regular syncing throughout the day to prevent data loss and ensure changes are visible to your team.",
         "icon": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\sync all projects.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\Sync All.pulldown\\sync all projects.pushbutton\\sycn all proj_script.py",
         "tab": "Tools",
         "tab_icon": null
     },
-    "EnneadTab.tab\\Tools.panel\\ai_render.pushbutton\\ai_render_script.py": {
-        "alias": "AI Render",
-        "doc": "Render the current view through Ennead's in-house AI style library.\n\nQueue several renders at once and carry on modeling while they run. Your gallery\nfollows you between machines, so a render you start at one desk can be picked up\nat another.\n\nFeatures:\n- Style references pulled straight from the Ennead library\n- Prompt helpers from ennead-ai.com to sharpen a description\n- Queue multiple views and collect the results in one gallery",
-        "icon": "EnneadTab.tab\\Tools.panel\\ai_render.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Tools.panel\\ai_render.pushbutton\\ai_render_script.py",
-        "tab": "Tools",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\Tools.panel\\apply_panel_radius_UI.pushbutton\\apply_panel_radius_UI_script.py": {
         "alias": "Apply Panel Radius",
-        "doc": "Push the host curtain wall's radius into the panels sitting on it.\n\nCurved curtain walls are found for you and their radius is written into a\nparameter on every panel, so panel families bend to match the wall instead of\nbeing dialed in by hand one at a time. The facade stays consistent as the\ncurvature changes.\n\nUsage:\n1. Run the button to open the window\n2. Pick the panel type and the parameter that should receive the radius\n3. Apply, then check the count of updated panels",
+        "doc": "Advanced curtain panel radius management tool that automatically applies host wall curvature to panel elements. Intelligently identifies curved curtain walls and transfers radius values to panel parameters, ensuring consistent curvature throughout the facade system. Customizable parameter mapping allows for flexible implementation across different panel families.",
         "icon": "EnneadTab.tab\\Tools.panel\\apply_panel_radius_UI.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\apply_panel_radius_UI.pushbutton\\apply_panel_radius_UI_script.py",
@@ -3007,7 +2845,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\area2mass.pushbutton\\area2mass_script.py": {
         "alias": "Area2Mass",
-        "doc": "Turn area boundaries into solid mass families and place them back in the project.\n\nPick an area scheme and every area becomes its own loadable mass, extruded up to the\nnext level above and dropped exactly where the original area sits. Handy for zoning\ndiagrams, gross-area studies and quick massing pulled straight from your area plans.\n\nFeatures:\n- Choose which area scheme to convert\n- Each mass lands in place, so no repositioning is needed\n- Masses are ordinary families you can schedule, filter and color",
+        "doc": "Convert area/room boundaries into loadable Revit mass families by using boundary segment curve loops to build mass extrusions in mass family, then load into project using internal coordinates like Block2Family.",
         "icon": "EnneadTab.tab\\Tools.panel\\area2mass.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\area2mass.pushbutton\\area2mass_script.py",
@@ -3025,25 +2863,16 @@
     },
     "EnneadTab.tab\\Tools.panel\\color_design_option.pushbutton\\color_design_option_script.py": {
         "alias": "Color-Code Design Option",
-        "doc": "Color-code every element by the design option it belongs to, across the views you pick.\n\nAt a glance you can see which option each element lives in, so nothing gets reviewed or\npresented under the wrong assumption. Ideal for design reviews and pin-ups where several\nalternatives are in play at once.\n\nFeatures:\n- Each design option gets its own color\n- Applies to as many views as you select in one go\n- Colors are a view override, so the model itself is untouched",
+        "doc": "Visual design option manager that transforms how you work with alternatives. Automatically color-codes elements belonging to different design options across selected views, making it instantly clear which elements belong to which option. Perfect for presentations, design reviews, and maintaining clarity when working with complex option sets.",
         "icon": "EnneadTab.tab\\Tools.panel\\color_design_option.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\color_design_option.pushbutton\\color_design_option_script.py",
         "tab": "Tools",
         "tab_icon": null
     },
-    "EnneadTab.tab\\Tools.panel\\create_finish_floor_by_room.pushbutton\\create_finish_floor_by_room_script.py": {
-        "alias": "Finish Floor by Room",
-        "doc": "Create finish floors from picked Rooms.\n\nPick rooms in the model, choose a floor type (ranked by your recent usage,\nthen alphabetical), set a level offset (mm and inch are tied), then create\none finish floor per room. All floors land in a single undo step.\n\n- While picking, Rooms and Room Tags are temporarily isolated in the active\n  view so they are easy to select; the view is restored afterwards.\n- Uses each room's own Level; the offset is written to 'Height Offset From Level'.\n- Only the outer room boundary is used (solid finish floor, inner loops ignored).\n- Rooms already given a finish floor by this tool are skipped (no duplicates).\n- Rooms with no boundary / no level / bad geometry are skipped and reported.\n",
-        "icon": "EnneadTab.tab\\Tools.panel\\create_finish_floor_by_room.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Tools.panel\\create_finish_floor_by_room.pushbutton\\create_finish_floor_by_room_script.py",
-        "tab": "Tools",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\Tools.panel\\detail_line_from_excel.pushbutton\\detail_line_from_excel_script.py": {
         "alias": "Detail Line By Excel",
-        "doc": "Draw detail lines from survey coordinates listed in an Excel file.\n\nPoint data from the spreadsheet is placed at exact coordinates and chained into detail\nlines, then bundled into a group so the whole run can be moved as one piece. Built for\nproperty lines, site boundaries and any linework that has to land on surveyed points.\n\nUsage:\n1. Prepare an Excel file with the survey coordinates\n2. Run the button and point it at that file\n3. The lines are drawn in the current view as a single group",
+        "doc": "Precision detail line generator that imports survey point data directly from Excel spreadsheets. Automatically converts coordinate data into properly positioned Revit detail lines, creating grouped elements for easy manipulation. Ideal for property line creation, site boundaries, and other survey-based linework that requires exact positioning.",
         "icon": "EnneadTab.tab\\Tools.panel\\detail_line_from_excel.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\detail_line_from_excel.pushbutton\\detail_line_from_excel_script.py",
@@ -3052,7 +2881,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\dim_text_helper.pushbutton\\dim_text_script.py": {
         "alias": "Dim Text Helper",
-        "doc": "Add standard dimension text such as FOG, EOS or FTF to the dimensions you select.\n\nA small floating window stays open while you work, so you can keep selecting dimensions\nand stamping text on them without reopening anything. Choose where the text sits relative\nto the dimension value, and add your own phrases to the list for next time.\n\nFeatures:\n- Common annotations ready to click, plus your own custom entries\n- Control whether the text goes above, below, before or after the value\n- Your custom entries are remembered between sessions\n- Window stays open so you can work through many dimensions in a row",
+        "doc": "Floating dimension annotation assistant that enhances documentation productivity. Quickly add industry-standard dimension text (FOG, EOS, FTF, etc.) to selected dimensions with precise control over text positioning. Create custom annotations on-the-fly and save frequently used dimension texts for future use. Streamlines the tedious task of dimension annotation across your project.",
         "icon": "EnneadTab.tab\\Tools.panel\\dim_text_helper.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\dim_text_helper.pushbutton\\dim_text_script.py",
@@ -3061,7 +2890,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\disallow_wall_end_joins.pushbutton\\disallow_wall_end_joins_script.py": {
         "alias": "Disallow Wall End Joins",
-        "doc": "Disallow end joins on every wall of the wall types you choose.\n\nWalls of the selected types stop auto-joining at their endpoints, which keeps stacked or\nlayered wall assemblies from cleaning up into each other and ruining the intended graphic.\nRuns as a single undo step.\n\nFeatures:\n- Pick one or many wall types and treat every wall of that type at once\n- Both ends of each wall are handled\n- Summary of how many walls were changed",
+        "doc": "Disallows wall end joins by wall type. This tool allows you to select specific wall types and disable their end joins, preventing automatic joining behavior at wall endpoints.",
         "icon": "EnneadTab.tab\\Tools.panel\\disallow_wall_end_joins.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\disallow_wall_end_joins.pushbutton\\disallow_wall_end_joins_script.py",
@@ -3070,7 +2899,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\explode_axon.pushbutton\\explode_axon_script.py": {
         "alias": "Explode Axon",
-        "doc": "Build an exploded axon by lifting each level apart in a 3D view.\n\nElements are grouped by the level they sit on and pulled upward by a spacing you choose,\nso the building reads as separated floor plates. The displacement lives in the view only,\nso the model geometry never moves and you can reset or redo it at any time.\n\nUsage:\n1. Run the button from a 3D view\n2. Pick the categories you want to explode\n3. Enter the spacing in feet between levels",
+        "doc": "Create an exploded axon by displacing elements of a selected category per level grouping in a 3D view.",
         "icon": "EnneadTab.tab\\Tools.panel\\explode_axon.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\explode_axon.pushbutton\\explode_axon_script.py",
@@ -3079,7 +2908,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\general_renamer.pushbutton\\general_renamer_script.py": {
         "alias": "Super Renamer",
-        "doc": "Rename views, sheets and families in bulk from one window.\n\nKeeps naming consistent across the project without clicking through the project browser\none item at a time.\n\nFeatures:\n- Add or strip a prefix on the views you select\n- Push view and sheet names to uppercase\n- Rebuild view names from their detail number and sheet number\n- Rename families directly from the same window",
+        "doc": "A powerful simple window that provides efficient access to a comprehensive suite of renaming functions.\n    - Add or remove prefixes for selected views with a single click\n    - Convert Views and Sheets to uppercase for consistent documentation\n    - Format view names based on detail number and sheet number with customizable patterns\n    - Rename families directly without navigating through the project browser\n    - Toggle between different naming conventions with ease\n    \nThis tool streamlines the tedious process of maintaining naming consistency throughout your project.",
         "icon": "EnneadTab.tab\\Tools.panel\\general_renamer.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\general_renamer.pushbutton\\general_renamer_script.py",
@@ -3088,25 +2917,16 @@
     },
     "EnneadTab.tab\\Tools.panel\\generic_healthcare_tool.pushbutton\\generic_healthcare_tool_script.py": {
         "alias": "HealthCare Helper",
-        "doc": "Open the healthcare toolkit and pick the healthcare task you want to run.\n\nOne menu gathers everything a healthcare project needs, so you do not have to hunt for\nseparate buttons.\n\nFeatures:\n- Read the Ennead healthcare design outline\n- Set up a new healthcare project and edit or open its project data\n- Update the detailed DGSF chart\n- Refresh the department color palette from an Excel file",
+        "doc": "Your ultimate healthcare project companion! Provides a comprehensive suite of tools for managing healthcare projects in Revit - from design guidelines and project setup to DGSF chart management and color palette customization. Access all healthcare-related functionality from this centralized command center.",
         "icon": "EnneadTab.tab\\Tools.panel\\generic_healthcare_tool.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\generic_healthcare_tool.pushbutton\\generic_healthcare_tool_script.py",
         "tab": "Tools",
         "tab_icon": null
     },
-    "EnneadTab.tab\\Tools.panel\\get_inspired.pushbutton\\get_inspired_script.py": {
-        "alias": "GetInspired",
-        "doc": "Open e.AI rendering website for enhancing and refining your renders!\n\nThis tool opens the e.AI web application (https://enneadtab.com/rendering/home) that helps you:\n- Polish and enhance render outputs\n- Apply post-processing effects\n- Refine render quality and appearance\n- Streamline your rendering workflow\n\nPerfect for visualization specialists looking to take their renders to the next level.\n",
-        "icon": "EnneadTab.tab\\Tools.panel\\get_inspired.pushbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Tools.panel\\get_inspired.pushbutton\\get_inspired_script.py",
-        "tab": "Tools",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\Tools.panel\\inspect_cutter.pushbutton\\inspect_cutter_script.py": {
         "alias": "Reset Join/Cut",
-        "doc": "Strip every join and cut relationship from the elements you have selected.\n\nWhen geometry is fighting itself and you cannot tell which element is cutting or joining\nwhich, this gives you a clean slate to rebuild from. A report lists each relationship that\nwas found and removed.\n\nFeatures:\n- Handles both cutting and joining relationships\n- Reports what was undone, element by element\n- One undo step, so you can put it all back if needed",
+        "doc": "Troubleshooting utility for element join and cut relationships. Analyzes selected elements and removes all cutting and joining relationships, providing a detailed report of each operation. Perfect for resolving geometry conflicts or starting fresh with clean element connections.",
         "icon": "EnneadTab.tab\\Tools.panel\\inspect_cutter.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\inspect_cutter.pushbutton\\inspect_cutter_script.py",
@@ -3115,7 +2935,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\join_all_coln_floor.pushbutton\\join_all_coln_floor_script.py": {
         "alias": "Join Selected Elements",
-        "doc": "Join horizontal elements to vertical ones in bulk, such as floors into columns.\n\nInstead of picking pairs by hand, choose the two categories and every overlapping pair in\nthe model is joined in one pass. Cleans up the slab-to-column edges that otherwise show\nthrough in sections and elevations.\n\nUsage:\n1. Pick the horizontal category, for example Floors or Ceilings\n2. Pick the vertical category, for example Columns or Structural Columns\n3. Review the count of joins made in the output window",
+        "doc": "Automates the tedious task of joining vertical and horizontal elements throughout your model.\n\nThis utility now allows you to select which categories to join:\n- Horizontal elements: multi-pick from Floor, Ceiling\n- Vertical elements: multi-pick from Column, Structural Column\n\nThe tool will join all selected vertical elements to all selected horizontal elements, and provide a detailed completion report of successful and failed joins.",
         "icon": "EnneadTab.tab\\Tools.panel\\join_all_coln_floor.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\join_all_coln_floor.pushbutton\\join_all_coln_floor_script.py",
@@ -3124,25 +2944,16 @@
     },
     "EnneadTab.tab\\Tools.panel\\make_template_from_current_view.pushbutton\\make_template_from_current_view_script.py": {
         "alias": "Make Template From Current View",
-        "doc": "Save the current view's settings as a view template and apply it everywhere it belongs.\n\nUnlike the built-in Revit command, this also repairs a template that was created under the\nwrong view type, which is what makes templates show up in the wrong group in the browser.\nEvery view that used the old template is moved onto the new one and the old template is\nremoved, so you are not left with duplicates.\n\nUsage:\n1. Set up the view exactly how you want the template to look\n2. Run the button and name the template\n3. Reuse the existing name to replace the template the view is already on",
+        "doc": "The big different from the Revit version is that you can use this to fix the wrong view type template that was resulted from duplicating wrong view teyp and cause revit default type group to display wrongly.",
         "icon": "EnneadTab.tab\\Tools.panel\\make_template_from_current_view.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\make_template_from_current_view.pushbutton\\make_template_from_current_view_script.py",
         "tab": "Tools",
         "tab_icon": null
     },
-    "EnneadTab.tab\\Tools.panel\\mcp_server.smartbutton\\mcp_server_script.py": {
-        "alias": "MCP Server",
-        "doc": "Turn the EnneadTab AI bridge for this Revit session on or off.\n\nWhile it is on, an AI assistant can look at the open model and carry out changes for you in\nthis session. The button shows the current state, so one click starts the bridge and the\nnext click shuts it down again.\n\nFeatures:\n- Only the Revit session you started it from is exposed\n- The bridge stops as soon as you toggle it off or close Revit\n- pyRevit Routes must be enabled first, and you are told if it is not",
-        "icon": "EnneadTab.tab\\Tools.panel\\mcp_server.smartbutton\\icon.png",
-        "is_popular": false,
-        "script": "EnneadTab.tab\\Tools.panel\\mcp_server.smartbutton\\mcp_server_script.py",
-        "tab": "Tools",
-        "tab_icon": null
-    },
     "EnneadTab.tab\\Tools.panel\\move_curtain_grids.stack\\move_curtain_grid_hori.pushbutton\\move_curtain_grid_hori_script.py": {
         "alias": "Align H. Curtain Grid To Detail Lines/Levels(Elevation)",
-        "doc": "Snap horizontal curtain grids onto the detail lines or levels that cross them.\n\nDraw your intended grid heights as detail lines, or just use the levels already in the\nelevation, and the curtain grids move to match. Beats nudging each grid line by hand when a\nfacade rhythm changes.\n\nUsage:\n1. Open an elevation view of the curtain wall\n2. Run the button and pick the detail lines or levels to align to\n3. Pick the curtain grids that should move",
+        "doc": "Horizontal curtain grid alignment wizard that saves hours of manual adjustments. This tool automatically snaps horizontal curtain grids to the nearest intersecting detail lines or level datums in elevation views. Perfect for aligning mullions with floor levels or coordinating with other building elements for a cleaner, more integrated facade design.",
         "icon": "EnneadTab.tab\\Tools.panel\\move_curtain_grids.stack\\move_curtain_grid_hori.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\move_curtain_grids.stack\\move_curtain_grid_hori.pushbutton\\move_curtain_grid_hori_script.py",
@@ -3151,7 +2962,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\move_curtain_grids.stack\\move_curtain_grid_verti.pushbutton\\move_curtain_grid_verti_script.py": {
         "alias": "Align V. Curtain Grid To Detail Lines/Grids(Plan)",
-        "doc": "Snap vertical curtain grids onto the detail lines or column grids that cross them.\n\nDraw your intended mullion positions as detail lines, or just use the column grids already\nin the plan, and the curtain grids move to match. Beats nudging each grid line by hand when\na facade rhythm changes.\n\nUsage:\n1. Open a plan view showing the curtain wall\n2. Run the button and pick the detail lines or grids to align to\n3. Pick the curtain grids that should move",
+        "doc": "Precision curtain grid alignment tool that automatically snaps vertical curtain grids to intersecting detail lines and datum grids. Perfect for quickly coordinating facade layouts with architectural planning grids without tedious manual adjustments. Run this command in a plan view for best results.",
         "icon": "EnneadTab.tab\\Tools.panel\\move_curtain_grids.stack\\move_curtain_grid_verti.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\move_curtain_grids.stack\\move_curtain_grid_verti.pushbutton\\move_curtain_grid_verti_script.py",
@@ -3169,7 +2980,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\open_doc_silently.pushbutton\\open_doc_silently_script.py": {
         "alias": "Open Doc(s) Siliently",
-        "doc": "Open many Revit files in one go without stopping for warning dialogs.\n\nWarnings that would normally halt the queue are answered for you, so a batch of models can\nopen unattended while you do something else. A summary at the end says which files opened\nand which did not.\n\nFeatures:\n- Optional audit on open\n- Optional detached opening with no worksets loaded\n- Summary report of every file in the batch",
+        "doc": "Batch opener for Revit files with enhanced reliability. Opens multiple documents while automatically handling warnings that would normally interrupt the process. Includes support for audit mode and detached/no-workset opening options. A comprehensive summary report is provided upon completion.",
         "icon": "EnneadTab.tab\\Tools.panel\\open_doc_silently.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\open_doc_silently.pushbutton\\open_doc_silently_script.py",
@@ -3196,7 +3007,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\set_filled_region_border_line.pushbutton\\set_filled_region_border_line_script.py": {
         "alias": "Set FilledRegion Border Style",
-        "doc": "Set the border line style on all the filled regions you have selected.\n\nBrings a whole drawing's hatches onto the same graphic standard in one move instead of\nediting each region's boundary. Works on regions nested inside groups too, as long as you\ntab-select them.\n\nUsage:\n1. Select the filled regions, using Tab to reach any inside a group\n2. Run the button and pick the line style you want on their borders",
+        "doc": "Specialized filled region styling tool that allows precise control over border line appearance. Quickly apply consistent line styles to multiple filled regions simultaneously, enhancing drawing clarity and graphical standards. Works with individual selections even when regions are nested within groups by using tab-selection technique.",
         "icon": "EnneadTab.tab\\Tools.panel\\set_filled_region_border_line.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\set_filled_region_border_line.pushbutton\\set_filled_region_border_line_script.py",
@@ -3205,7 +3016,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\tag_align.pushbutton\\tag_align_script.py": {
         "alias": "Tag Aligner",
-        "doc": "Line up scattered tags horizontally or vertically against one reference tag.\n\nA small floating window stays open while you work, so you can keep selecting groups of tags\nand straightening them without reopening anything. Turns a messy sheet of hand-dragged tags\ninto clean, readable annotation.\n\nUsage:\n1. Select the tags you want to line up\n2. Click align horizontally or vertically in the floating window\n3. Repeat on the next group; the window stays open",
+        "doc": "Precision tag alignment assistant that brings order to your documentation. This floating interface allows you to quickly align multiple tags horizontally or vertically based on a reference tag. Perfect for creating clean, professional drawings with consistently aligned annotations that improve readability and presentation quality.",
         "icon": "EnneadTab.tab\\Tools.panel\\tag_align.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Tools.panel\\tag_align.pushbutton\\tag_align_script.py",
@@ -3214,7 +3025,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\toggle content_UI.pushbutton\\toggle content_UI_script.py": {
         "alias": "Toggle Contents",
-        "doc": "Pin, hide and tidy whole categories of content across many views from one window.\n\nEverything you normally toggle view by view is gathered in a single floating panel, so a\nsheet set can be cleaned up or locked down in a couple of clicks instead of a long crawl\nthrough the project browser.\n\nFeatures:\n- Pin or unpin dimensions, keynote tags, viewports and title blocks\n- Hide or show categories on the sheets you pick, permanently or as a temporary view state\n- Turn grid and level bubble heads on or off\n- Hide viewport borders for a clean pin-up",
+        "doc": "Master visibility controller for Revit elements. Efficiently manage pin/unpin status, visibility settings, and annotation bubble heads across multiple categories and views. Perfect for cleaning up views, preparing documentation, and enforcing standards across your project.",
         "icon": "EnneadTab.tab\\Tools.panel\\toggle content_UI.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\toggle content_UI.pushbutton\\toggle content_UI_script.py",
@@ -3223,7 +3034,7 @@
     },
     "EnneadTab.tab\\Tools.panel\\translate_AI.pushbutton\\AI_translate_script.py": {
         "alias": "AI Translate",
-        "doc": "Translate sheet and view names into another language, with a review step first.\n\nCovers 15 languages including Chinese, Japanese, Korean, Spanish, French, German, Arabic and\nHindi, and leans on each country's official AEC vocabulary so the wording reads the way a\nlocal consultant would write it, not the way a generic translator would.\n\nUsage:\n1. Pick the sheets or views to translate and the target language\n2. Review the proposed names side by side with the originals\n3. Approve, and only the names you accepted are written back",
+        "doc": "Intelligent translation assistant for your Revit project. Seamlessly translate sheet names, view names, and project text elements between languages. The AI-powered engine handles context-appropriate translations with approval workflow to ensure accuracy before implementation.",
         "icon": "EnneadTab.tab\\Tools.panel\\translate_AI.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\Tools.panel\\translate_AI.pushbutton\\AI_translate_script.py",
@@ -3232,7 +3043,7 @@
     },
     "EnneadTab.tab\\UI.panel\\BIM_Client.pushbutton\\bim_client_script.py": {
         "alias": "BIM Client",
-        "doc": "Print a health report for the EnneadTab environment inside this Revit session.\n\nUse it when something is misbehaving and you want to know whether the problem is your model\nor your setup. Nothing in the model is read or changed; the report simply appears in the\noutput window and can be pasted straight into a support message.\n\nFeatures:\n- Names the active document and how many elements it holds\n- Confirms the EnneadTab library and the Revit connection are alive\n- Checks that the AI service responds\n- Flags any missing component instead of failing quietly",
+        "doc": "BIM Client tool for managing BIM data and workflows. This tool provides a centralized interface for BIM operations and data management.",
         "icon": "EnneadTab.tab\\UI.panel\\BIM_Client.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\UI.panel\\BIM_Client.pushbutton\\bim_client_script.py",
@@ -3241,7 +3052,7 @@
     },
     "EnneadTab.tab\\UI.panel\\Search.pushbutton\\search_script.py": {
         "alias": "Search Command",
-        "doc": "Find any Revit or EnneadTab command by typing what you want to do.\n\nSearch by name or by what a tool does, and the best matches come back ranked. Faster than\nhunting through ribbon panels for a button whose exact name you cannot recall.\n\nFeatures:\n- Covers both EnneadTab tools and native Revit commands\n- Shows where on the ribbon each match lives\n- Run the tool straight from the results\n- Reads out the tool's description and links to further help",
+        "doc": "Intelligent command search engine for Revit. This powerful search utility helps you locate tools across both EnneadTab and native Revit interfaces with ranked results based on name and documentation matches. Features include visual previews of tool locations, direct activation capability, and detailed documentation display with links to help resources. Perfect for quickly accessing functions without navigating through ribbon panels or when you can't remember where tools are located.",
         "icon": "EnneadTab.tab\\UI.panel\\Search.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\UI.panel\\Search.pushbutton\\search_script.py",
@@ -3250,7 +3061,7 @@
     },
     "EnneadTab.tab\\UI.panel\\open_app_store.pushbutton\\open_app_store_script.py": {
         "alias": "Open App Store",
-        "doc": "Open the EnneadTab App Store to browse and install extra tools.\n\nOne place to discover what the office has built, add what you need, and keep what you\nalready have up to date.",
+        "doc": "Opens the EnneadTab App Store interface, allowing users to browse, install, and manage available add-ons and extensions for Revit. Provides a centralized location for discovering new tools and keeping existing ones up to date.",
         "icon": "EnneadTab.tab\\UI.panel\\open_app_store.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\UI.panel\\open_app_store.pushbutton\\open_app_store_script.py",
@@ -3259,7 +3070,7 @@
     },
     "EnneadTab.tab\\UI.panel\\ownership_inspect.pushbutton\\ownership_inspect_script.py": {
         "alias": "Ownership Inspect",
-        "doc": "See who created, owns and last changed every element in a workshared model.\n\nOne scan builds a searchable table so you know exactly whom to ask before you touch\nsomething, and which view an annotation actually lives in.\n\nFeatures:\n- Search bar, category filter and an owned-by-me-only toggle\n- Separate tab listing views and their owners\n- Select, zoom to, or open the host view straight from the table\n- Read-only: nothing in the model is changed",
+        "doc": "Element ownership detective that reveals who's controlling what in your model! This comprehensive scanner examines all categories of elements and reports which team members have ownership of various objects. Perfect for troubleshooting editing conflicts, identifying workset patterns, and understanding collaboration dynamics across your project.",
         "icon": "EnneadTab.tab\\UI.panel\\ownership_inspect.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\UI.panel\\ownership_inspect.pushbutton\\ownership_inspect_script.py",
@@ -3268,7 +3079,7 @@
     },
     "EnneadTab.tab\\UI.panel\\pick_absolute_similar.pushbutton\\pick_absolute_similar_script.py": {
         "alias": "Pick Absolute Similar",
-        "doc": "Find elements with matching parameters by comparing parameter values across elements.",
+        "doc": "Advanced element matching wizard that finds truly identical elements throughout your model. Unlike Revit's built-in selection tools, this utility performs deep parameter comparison to identify elements that are genuinely identical in all important aspects. Perfect for finding all instances that share specific parameter values when you need precise selection control.",
         "icon": "EnneadTab.tab\\UI.panel\\pick_absolute_similar.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\UI.panel\\pick_absolute_similar.pushbutton\\pick_absolute_similar_script.py",
@@ -3277,7 +3088,7 @@
     },
     "EnneadTab.tab\\UI.panel\\place_views_on_sheets.pushbutton\\place_views_on_sheets_script.py": {
         "alias": "Place Views On Sheets",
-        "doc": "Catch every newly created view and get it named, templated and onto a sheet.\n\nA floating window lists the views that appeared since you started, so nothing gets left\nunnamed or unplaced. Keep it open while you work and finish each view as it shows up.\n\nFeatures:\n- Rename a view, or accept the suggested name based on its sheet\n- Drop the view onto a sheet from the same window\n- Assign a scope box and a view template while you are there\n- Window stays open so Revit is still usable behind it",
+        "doc": "Monitor for new views in the project and allow quick renaming through a non-blocking interface.",
         "icon": "EnneadTab.tab\\UI.panel\\place_views_on_sheets.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\UI.panel\\place_views_on_sheets.pushbutton\\place_views_on_sheets_script.py",
@@ -3286,7 +3097,7 @@
     },
     "EnneadTab.tab\\UI.panel\\prefilter_selection.pushbutton\\prefilter_selection_script.py": {
         "alias": "Prefilter Selection",
-        "doc": "Limit what a window selection can pick up, so a crowded view stops fighting you.\n\nChoose the categories you care about first, then drag a window and only those categories\nare caught. Saves the usual dance of selecting everything and then filtering it back down.\n\nFeatures:\n- Turn on as many categories at once as you need\n- Works with normal window and crossing selection\n- Setting stays active until you clear it",
+        "doc": "Just like the prefilter selection in Rhino, this allow you to narrow down selection beofre heavy window selection and post filter.\nVery helpful when the drawing is very crowded.\n\nYou can enable multiple category at same time.\n\nLet Sen.Z know if you would like to add more to the category list.",
         "icon": "EnneadTab.tab\\UI.panel\\prefilter_selection.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\UI.panel\\prefilter_selection.pushbutton\\prefilter_selection_script.py",
@@ -3304,7 +3115,7 @@
     },
     "EnneadTab.tab\\UI.panel\\what_happened.pushbutton\\what_happened_script.py": {
         "alias": "What Happened?",
-        "doc": "Find out who made, who last edited and who owns whatever you have selected.\n\nAnswers the question you ask whenever something looks wrong: who did this, and can I touch\nit. Also reports the same for the view you are currently in.\n\nFeatures:\n- Creator, last editor and current owner for each selected element\n- Same information for the active view\n- Read-only: nothing in the model is changed",
+        "doc": "A simple window that give you information of the creator, editor and owner of selected elements and active view.",
         "icon": "EnneadTab.tab\\UI.panel\\what_happened.pushbutton\\icon.png",
         "is_popular": true,
         "script": "EnneadTab.tab\\UI.panel\\what_happened.pushbutton\\what_happened_script.py",

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editor - {{ filename }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <div class="app-layout">
+        <div class="doc-panel">
+            <div class="toolbar">
+                <a href="/" class="btn secondary">Back</a>
+                <span class="file-title">{{ filename }}</span>
+                <a href="/download/{{ filename }}" class="btn primary">Download</a>
+            </div>
+            <div id="doc-container" class="doc-content">
+                <div class="loading">Loading document...</div>
+            </div>
+        </div>
+        
+        <div class="chat-panel">
+            <div class="chat-header">
+                <h3>BIM Assistant</h3>
+                <small style="color: #ccc; font-size: 0.8em; display: block; margin-top: 5px;">
+                    Note: Assistant edits text only. Images are preserved but ignored.
+                </small>
+            </div>
+            <div id="chat-messages" class="chat-messages">
+                <div class="message ai">
+                    <p>Hello! I reviewed your BIM Execution Plan. I can help you fill in missing sections or refine the content.</p>
+                    <p>Some things that often need attention:</p>
+                    <ul>
+                        <li>Who is the Point Person?</li>
+                        <li>Live Link / ACC Bridge method?</li>
+                        <li>Publish Schedule?</li>
+                        <li>Delivery Format?</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <textarea id="chat-input" placeholder="Type here... (e.g., 'The point person is Alice')"></textarea>
+                <button id="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const currentFilename = "{{ filename }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

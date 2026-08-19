@@ -614,7 +614,8 @@ def merge_ost(doc):
         failed = total_all - total_ok
         NOTIFICATION.messenger(
             "Merge finished with {} failure(s).\n{}/{} families, {} project elements.".format(
-                failed, total_ok, total_all, proj_count))
+                failed, total_ok, total_all, proj_count),
+            sticky=True)
 
 
 ################## main code below #####################

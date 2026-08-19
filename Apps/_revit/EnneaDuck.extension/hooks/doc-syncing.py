@@ -1,6 +1,5 @@
 from pyrevit import EXEC_PARAMS
 from Autodesk.Revit import DB # pyright: ignore
-import io
 import os
 
 # pyRevit hook engines do not inherit the .lib search path that button scripts get,
@@ -9,7 +8,7 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "KingDuck.lib")))
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
-from EnneadTab import VERSION_CONTROL, ERROR_HANDLE, LOG, DATA_FILE, TIME, USER, DUCK, CONFIG, FOLDER, TIMESHEET, ENVIRONMENT, ARCADE, SYNC_SUMMARY, LEADER_BOARD
+from EnneadTab import VERSION_CONTROL, ERROR_HANDLE, LOG, USER, DUCK, CONFIG, TIMESHEET, ARCADE, SYNC_SUMMARY, LEADER_BOARD
 from EnneadTab.REVIT import REVIT_FORMS, REVIT_SELECTION, REVIT_EVENT, REVIT_SYNC
 
 __title__ = "Doc Syncing Hook"
@@ -19,8 +18,6 @@ DOC = EXEC_PARAMS.event_args.Document
 SYNC_QUEUE_IGNORE_LIST = [
     "SPARC_A_EA_CUNY_Building",
 ]
-
-QUEUE_EXPIRY_MINUTES = 30
 
 QUEUE_DIALOG_FOOTER = "\n\nWhen There are no other people on the list, or you are the first on the wait list you can sync normally.\nRecord older than 30mins will be removed from the queue to avoid holding line too long."
 
@@ -55,6 +52,17 @@ def _open_sync_dashboard(doc):
         ERROR_HANDLE.print_note("Could not open sync dashboard '{}': {}".format(url, str(e)))
 
 
+def _watch_sync_turn(doc, dashboard_url=None):
+    try:
+        from EnneadTab import SYNC_TURN_WATCH, USER
+        from EnneadTab.REVIT import REVIT_SYNC
+        guid = REVIT_SYNC.get_model_guid(doc)
+        SYNC_TURN_WATCH.add_watch(
+            guid, doc.Title, USER.USER_NAME, dashboard_url)
+    except Exception as err:
+        ERROR_HANDLE.print_note("sync-turn watch add failed: {}".format(err))
+
+
 # Helper functions for sync queue management
 
 def _is_project_ignored(doc_title, ignore_list):
@@ -78,98 +86,11 @@ def _is_project_ignored(doc_title, ignore_list):
     return False
 
 
-def _cleanup_old_queue_records(queue):
-    """Remove queue records older than QUEUE_EXPIRY_MINUTES.
-    
-    Args:
-        queue: List of queue records in format "[timestamp]username"
-        
-    Returns:
-        list: Cleaned queue with old records removed
-    """
-    cleaned_queue = []
-    for existing_item in queue:
-        try:
-            record_unix_time = existing_item.split("]")[0].split("_")[1]
-        except (IndexError, ValueError):
-            # Keep records we can't parse
-            cleaned_queue.append(existing_item)
-            continue
-        
-        # Check if record has expired (default 30 mins)
-        if TIME.time_has_passed_too_long(record_unix_time):
-            ERROR_HANDLE.print_note("Removing record that is older than {} minutes so it is not holding queue: {}".format(QUEUE_EXPIRY_MINUTES, existing_item))
-        else:
-            cleaned_queue.append(existing_item)
-    
-    return cleaned_queue
-
-
-def _add_user_to_queue_if_needed(queue, user_name, timestamp):
-    """Add user to queue if not already present.
-    
-    Args:
-        queue: List of queue records
-        user_name: Username to add
-        timestamp: Formatted timestamp
-        
-    Returns:
-        tuple: (modified_queue, was_added) - Updated queue and boolean indicating if user was added
-    """
-    # Check if user is already in queue
-    for existing_item in queue:
-        if user_name in existing_item:
-            return queue, False
-    
-    # Add user to end of queue
-    data = "[{}]{}".format(timestamp, user_name)
-    queue.append(data)
-    return queue, True
-
-
-def _build_queue_dialog_text(queue):
-    """Build dialog text showing current queue status.
-    
-    Args:
-        queue: List of queue records
-        
-    Returns:
-        str: Formatted queue display text
-    """
-    queue_header = "Current Sync Queue:\n"
-    queue_items = ["\n  -" + item for item in queue]
-    return queue_header + "".join(queue_items) + QUEUE_DIALOG_FOOTER
-
-
-def _get_or_create_queue_file(log_file):
-    """Ensure queue file exists and is accessible.
-    
-    Args:
-        log_file: Path to queue log file
-        
-    Returns:
-        bool: True if file is accessible, False otherwise
-    """
-    try:
-        with io.open(log_file, "r", encoding="utf-8"):
-            pass
-    except IOError:
-        try:
-            with io.open(log_file, "w+", encoding="utf-8"):
-                pass
-        except IOError as e:
-            ERROR_HANDLE.print_note("Warning: Cannot access queue file: {}".format(str(e)))
-            return False
-    return True
-
-
 def check_sync_queue(doc):
     """Check if document sync should proceed based on queue status.
 
-    Priority order:
-    1. EnneadTab-DB API (primary) - if reachable, drives all decisions
-    2. File-based queue (fallback) - only if API fails AND L drive is available
-    3. Allow sync (no enforcement) - if both API and L drive are unavailable
+    The office L: drive is retired. enneadtab.com/sync is the only queue.
+    If the API is unreachable, allow the sync rather than writing a dead share.
 
     Args:
         doc: Revit Document object to check sync status for
@@ -189,7 +110,6 @@ def check_sync_queue(doc):
 
     user_name = USER.USER_NAME
 
-    # === PRIMARY: EnneadTab-DB API ===
     api_result = None
     try:
         api_result = REVIT_SYNC.api_request_sync(doc)
@@ -200,13 +120,16 @@ def check_sync_queue(doc):
         ERROR_HANDLE.print_note("Sync queue API responded: allowed={}".format(api_result.get("allowed")))
         return _check_sync_queue_api_based(doc, user_name, api_result)
 
-    # === FALLBACK: File-based queue (only if L drive is available) ===
-    ERROR_HANDLE.print_note("Sync queue API unreachable, checking fallback...")
-    if ENVIRONMENT.IS_OFFLINE_MODE:
-        ERROR_HANDLE.print_note("L drive unavailable, no queue enforcement possible. Allowing sync.")
-        return True
-
-    return _check_sync_queue_file_based(doc, user_name)
+    ERROR_HANDLE.print_note(
+        "Sync queue API unreachable; L: fallback is retired. Allowing sync.")
+    try:
+        ERROR_HANDLE.report_infra_warning_to_error_dump_async(
+            "revit-sync /request unreachable; file-based L: fallback is retired",
+            "doc-syncing.check_sync_queue",
+            throttle_key="sync_queue_api_request_unreachable")
+    except Exception:
+        pass
+    return True
 
 
 def _check_sync_queue_api_based(doc, user_name, api_result):
@@ -259,6 +182,7 @@ def _check_sync_queue_api_based(doc, user_name, api_result):
     # the dialog -- the name is already on the list). Honor the opt-in checkbox
     # to open the dashboard so the user can watch the queue while they wait.
     LEADER_BOARD.report_sync_queue_waited(doc.Title)
+    _watch_sync_turn(doc, api_result.get("dashboard_url"))
     if open_dashboard:
         _open_sync_dashboard(doc)
 
@@ -275,78 +199,6 @@ def _check_sync_queue_api_based(doc, user_name, api_result):
     except Exception as e:
         ERROR_HANDLE.print_note("Warning: Could not save local copy: {}".format(str(e)))
     return False
-
-
-def _check_sync_queue_file_based(doc, user_name):
-    """Original file-based sync queue check (fallback path).
-
-    Args:
-        doc: Revit Document object
-        user_name: Current username
-
-    Returns:
-        bool: True if sync can proceed, False if cancelled
-    """
-    log_file = FOLDER.get_shared_dump_folder_file("SYNC_QUEUE_{}".format(doc.Title))
-    if not _get_or_create_queue_file(log_file):
-        ERROR_HANDLE.print_note("Cannot access sync queue file, allowing sync to proceed")
-        return True
-
-    try:
-        queue = DATA_FILE.get_list(log_file)
-    except Exception as e:
-        ERROR_HANDLE.print_note("Error reading queue file: {}".format(str(e)))
-        return True
-
-    wait_num = len(queue)
-    queue = _cleanup_old_queue_records(queue)
-
-    timestamp = TIME.get_formatted_current_time()
-    queue, was_added = _add_user_to_queue_if_needed(queue, user_name, timestamp)
-
-    if was_added:
-        try:
-            DATA_FILE.set_list(queue, log_file)
-        except Exception as e:
-            ERROR_HANDLE.print_note("Warning: Cannot write to queue file: {}".format(str(e)))
-            return True
-
-    if wait_num == 0 or user_name in queue[0]:
-        return True
-
-    current_queue = _build_queue_dialog_text(queue)
-    opts = [
-        ["I will join the waitlist and sync later.(Click 'Close' when you see Revit Sync Fail on next step, it just means the sync has been cancelled. You still hold position on the waitlist.)", "Resume working and try syncing later. (Earns EA Coins)"],
-        ["I don't care! Sync me now!", "Jump in line will make other people who are syncing has to wait longer. (Costs EA Coins)"]
-    ]
-    res = REVIT_FORMS.dialogue(
-        main_text="There are other people queuing before you, do you want to resume working and try sync later?\n\nYour name has been added to the wait list even if you cancel current sync.\n\n[You are also welcomed to save local while waiting.]",
-        sub_text=current_queue,
-        options=opts
-    )
-
-    if res == opts[1][0]:
-        LEADER_BOARD.report_sync_queue_cut(doc.Title)
-        return True
-
-    LEADER_BOARD.report_sync_queue_waited(doc.Title)
-
-    # Arm doc-synced's guard BEFORE cancelling: the doc-synced hook still fires
-    # after this cancel, and without this flag its update_sync_queue() would drop
-    # us from the queue (losing our waitlisted spot) and pop "[person ahead]
-    # should sync next" -- the very thing the user chose to wait to avoid.
-    REVIT_EVENT.set_sync_cancelled(True)
-    EXEC_PARAMS.event_args.Cancel()
-    if CONFIG.get_setting("toggle_bt_is_duck_allowed", False):
-        DUCK.quack()
-    try:
-        doc.Save()
-    except Exception as e:
-        ERROR_HANDLE.print_note("Warning: Could not save local copy: {}".format(str(e)))
-    return False
-
-
-
 
 
 @ERROR_HANDLE.try_catch_error(is_pass=True)
@@ -391,6 +243,21 @@ def doc_syncing(doc):
     fill_drafter_info(doc)
 
     TIMESHEET.update_timesheet(doc.Title)
+
+    # OS: Snapshot in doc-syncing for model change log
+    try:
+        from pyrevit.coreutils import envvars
+        from EnneadTab.SESSION_STATS import count_warnings
+        # Snapshot warning count
+        warn_count = count_warnings(doc)
+        if warn_count is not None:
+            envvars.set_pyrevit_env_var("EA_SYNC_WARNINGS_BEFORE", str(warn_count))
+        # Snapshot document version (Revit 2023+)
+        if hasattr(DB.Document, "GetDocumentVersion"):
+            version_guid = DB.Document.GetDocumentVersion(doc).VersionGUID
+            envvars.set_pyrevit_env_var("EA_SYNC_START_VERSION_GUID", str(version_guid))
+    except Exception as e:
+        ERROR_HANDLE.print_note("Could not take sync snapshot: {}".format(e))
 
     # Everything below runs microseconds before the UI thread freezes, so it must stay
     # local-only: no network, no element collection, no filesystem walk.

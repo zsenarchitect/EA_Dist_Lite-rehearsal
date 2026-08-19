@@ -9,11 +9,10 @@ lib half and the extension half came from the same publish.
 
 WHY THIS EXISTS
 ---------------
-The updater (VERSION_CONTROL.updater_for_shanghai / the installer exe) copies the
-new distribution file-by-file straight into the LIVE EA_Dist folder. Any mid-way
-failure -- Revit holding a .py or .dll open, a network blip on the L drive, a
-permission denial -- stops the copy partway and leaves a TORN install: some files
-from the new publish, some from the old one.
+The installer exe copies the new distribution file-by-file straight into the
+LIVE EA_Dist folder. Any mid-way failure -- Revit holding a .py or .dll open,
+a network blip, a permission denial -- stops the copy partway and leaves a
+TORN install: some files from the new publish, some from the old one.
 
 A torn install is invisible to every static check in this repo. The repo itself is
 internally consistent (a helper and its caller land in the same commit), so
@@ -279,7 +278,8 @@ def report_torn_install(skewed, source, root=None, notify_user=True):
             NOTIFICATION.messenger(
                 "Your EnneadTab install is INCOMPLETE or OUT OF DATE.\n"
                 "Some files updated, some did not.\n"
-                "Please re-run the EnneadTab installer to repair it.")
+                "Please re-run the EnneadTab installer to repair it.",
+                sticky=True)
         except Exception:
             pass
 

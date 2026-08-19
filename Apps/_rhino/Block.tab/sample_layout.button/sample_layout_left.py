@@ -456,7 +456,7 @@ class SampleBlockDialog(Eto.Forms.Form):
 
             count = round(rs.CurveLength(seg) / self.width)
             if count > 500:
-                NOTIFICATION.messenger(main_text = "Too many segments for this block size...\nAre you sure the division width is in correct unit?")
+                NOTIFICATION.messenger(main_text = "Too many segments for this block size...\nAre you sure the division width is in correct unit?", sticky=True)
                 rs.DeleteObjects(crv_segs)
                 break
 

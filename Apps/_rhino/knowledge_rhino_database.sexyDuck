@@ -75,7 +75,16 @@
         "script": "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py",
         "icon": "EnneadTab.menu\\mcp_server.button\\icon.png",
         "alias": "MCPServer",
-        "doc": "Start the EnneadTab AI bridge for this Rhino session.\n\nWhile it is running, an AI assistant can look at the open model and carry out changes for\nyou in this session. Only the Rhino session you started it from is exposed, and the bridge\nstops when you close Rhino.",
+        "doc": "Start the EnneadTab MCP Server for Rhino. When running, Claude Code can query and control this Rhino session via MCP protocol.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\monitor_drive_connection.button\\monitor_drive_connection_left.py": {
+        "script": "EnneadTab.menu\\monitor_drive_connection.button\\monitor_drive_connection_left.py",
+        "icon": "EnneadTab.menu\\monitor_drive_connection.button\\icon.png",
+        "alias": "MonitorDriveConnection",
+        "doc": "Launches the MonitorDrive application to track and manage network drive connections.\nThis tool provides real-time monitoring of network drive status and connection health.",
         "tab": "EnneadTab.menu",
         "tab_icon": "EnneadTab.menu\\icon.png",
         "is_popular": false
@@ -147,7 +156,7 @@
         "script": "EnneadTab.menu\\self_repair.button\\self_repair_left.py",
         "icon": "EnneadTab.menu\\self_repair.button\\icon.png",
         "alias": "SelfRepair",
-        "doc": "Repair a stale EnneadTab installation and pull the latest version.\n\nRun it when buttons are missing, point at the wrong tool, or still carry an old name.\nThe toolbars are checked for out-of-date entries and, if any are found, the newest\nEnneadTab is fetched and installed for you.\n\nFeatures:\n- Spots toolbars left over from an older EnneadTab release\n- Fetches and installs the current version automatically\n- Nothing happens if your installation is already current",
+        "doc": "Automatically repair and update EnneadTab installation.\n\nKey Features:\n- Legacy RUI detection and repair\n- Automatic version updates\n- System path verification\n- Component synchronization\n- Installation validation",
         "tab": "EnneadTab.menu",
         "tab_icon": "EnneadTab.menu\\icon.png",
         "is_popular": false
@@ -321,7 +330,7 @@
         "script": "Block.tab\\simplify_blocks.button\\simplify_blocks_left.py",
         "icon": "Block.tab\\simplify_blocks.button\\icon.png",
         "alias": "SimplifyBlocks",
-        "doc": "Lighten a heavy model by reducing the mesh density inside block definitions.\n\nPick the blocks and set how much of the original mesh to keep with a slider. Each unique\nblock definition is simplified once, and every instance of it in the model gets lighter at\nthe same time.\n\nFeatures:\n- Slider control over how much detail is kept\n- Reduction happens once per definition, not once per instance\n- Placement, scale and rotation of every instance are preserved",
+        "doc": "This button does SimplifyBlocks when left click",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
@@ -330,7 +339,7 @@
         "script": "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py",
         "icon": "Block.tab\\toggle_block_color_display.button\\icon.png",
         "alias": "ToggleBlockColorDisplay",
-        "doc": "Give every block type its own display color so you can tell them apart at a glance.\n\nUseful when a model is full of near-identical block variations and you need to see which is\nwhich. Run it again to switch the coloring back off and restore the normal display.",
+        "doc": "Toggle on/off for highlighting the different block type. Very helpful when you have many block variation.",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": true
@@ -348,7 +357,7 @@
         "script": "Block.tab\\uniform_transform_geos.button\\uniform_transform_geos_left.py",
         "icon": "Block.tab\\uniform_transform_geos.button\\icon.png",
         "alias": "UniformTransformGeos",
-        "doc": "Rotate or uniformly scale many objects at once, each about its own center.\n\nEvery selected block or object turns and resizes in place rather than orbiting a shared\norigin, so a street full of cars can all be spun or shrunk together without drifting out of\nposition.\n\nUsage:\n1. Select the blocks or geometry to change\n2. Enter the rotation angle, the scale factor, or both",
+        "doc": "Apply the same rotation and/or uniform scale to blocks or geometries. Helpful when reorienting or resizing many instances, such as changing direction or size of cars on a street.",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
@@ -393,7 +402,7 @@
         "script": "Drafting.tab\\color_picker.button\\color_picker_left.py",
         "icon": "Drafting.tab\\color_picker.button\\icon.png",
         "alias": "ColorPicker",
-        "doc": "Open an online color palette generator in your browser for scheme inspiration.\n\nStarts you off on a preset EnneadTab palette that you can shuffle and lock until the mix\nfeels right, then take the codes back into Rhino, Revit or a presentation.",
+        "doc": "Opens Coolors.co color palette generator in default web browser for color scheme inspiration",
         "tab": "Drafting.tab",
         "tab_icon": "Drafting.tab\\icon.png",
         "is_popular": false
@@ -564,7 +573,7 @@
         "script": "Knowledge.tab\\china_code_ref.button\\china_code_ref_left.py",
         "icon": "Knowledge.tab\\china_code_ref.button\\icon.png",
         "alias": "ChinaCodeRef",
-        "doc": "Open a China building code reference PDF without leaving Rhino.\n\nPick a document from the list and it opens straight away, or jump to the folder to drop in\ncodes that are not there yet. The folder is created for you the first time you run it.\n\nUsage:\n1. Run the button and pick a code document from the list\n2. Choose to open the folder instead if you want to add more PDFs",
+        "doc": "This button does ChinaCodeRef when left click",
         "tab": "Knowledge.tab",
         "tab_icon": "Knowledge.tab\\icon.png",
         "is_popular": false
@@ -604,7 +613,7 @@
         "script": "Knowledge.tab\\slope_calculator.button\\slope_calculator_left.py",
         "icon": "Knowledge.tab\\slope_calculator.button\\icon.png",
         "alias": "SlopeCalculator",
-        "doc": "Open an online slope calculator in your browser.\n\nConverts between slope angle, percentage and ratio, which is the conversion you want when\nchecking a ramp against accessibility limits or working out a road or roof pitch.",
+        "doc": "This button does SlopeCalculator when left click",
         "tab": "Knowledge.tab",
         "tab_icon": "Knowledge.tab\\icon.png",
         "is_popular": false
@@ -622,7 +631,7 @@
         "script": "Lab.tab\\anything.button\\anything_left.py",
         "icon": "Lab.tab\\anything.button\\icon.png",
         "alias": "Anything",
-        "doc": "Run the EnneadTab Lab scratch script, a sandbox for trying out ideas in Rhino.\n\nKept as a testing ground for behavior that is still being explored, so it does not read or\nchange anything in your model. Whatever it does is reported on the Rhino command line.",
+        "doc": "A sandbox utility for quick testing and prototyping in Rhino. Use this button to run experimental code snippets, debug features, or validate new ideas without creating a dedicated tool.",
         "tab": "Lab.tab",
         "tab_icon": "Lab.tab\\icon.png",
         "is_popular": false
@@ -649,7 +658,7 @@
         "script": "Lab.tab\\text2script.button\\text2script_right.py",
         "icon": "Lab.tab\\text2script.button\\icon.png",
         "alias": "Text2ScriptSetting",
-        "doc": "Report the current settings of the Text2Script generator on the Rhino command line.\n\nRight-click companion to Text2Script, the tool that turns a plain-English request into a\nrunnable Rhino script. Nothing in your model is read or changed.",
+        "doc": "Opens the settings panel for the Text2Script tool, allowing users to configure AI model preferences, API keys, and script generation options for converting natural language to Python scripts in Rhino.",
         "tab": "Lab.tab",
         "tab_icon": "Lab.tab\\icon.png",
         "is_popular": false
@@ -663,20 +672,11 @@
         "tab_icon": "Lab.tab\\icon.png",
         "is_popular": false
     },
-    "Layer.tab\\apply_color_book.button\\apply_color_book_left.py": {
-        "script": "Layer.tab\\apply_color_book.button\\apply_color_book_left.py",
-        "icon": "Layer.tab\\apply_color_book.button\\icon.png",
-        "alias": "ApplyColorBook",
-        "doc": "Apply the office Color Book to Rhino layer colors - no Excel needed.\n\nPulls the project's resolved color book from enneadtab.com (Department + Program swatches) and\nrecolors every layer whose name or abbreviation matches a swatch. Sign in once when prompted.\n\nKey Features:\n- Online source: colors live at enneadtab.com/color-book, not a scattered Excel\n- Matches layers by name OR abbreviation (case-insensitive, exact)\n- Reports how many layers were recolored\n- Same office standard the Revit ColorScheme tool uses (shared COLOR library)",
-        "tab": "Layer.tab",
-        "tab_icon": "Layer.tab\\icon.png",
-        "is_popular": true
-    },
     "Layer.tab\\destroy_layer.button\\destroy_layer_left.py": {
         "script": "Layer.tab\\destroy_layer.button\\destroy_layer_left.py",
         "icon": "Layer.tab\\destroy_layer.button\\icon.png",
         "alias": "DestroyLayer",
-        "doc": "Delete layers outright, even when they still hold objects.\n\nRhino normally refuses to remove a layer that is in use, especially when a block definition\nis holding it hostage. This clears the objects out and takes the layer with them, so a\nbloated layer tree can finally be pruned.\n\nUsage:\n1. Run the button and pick the layers to remove\n2. The layers and everything on them are gone once you confirm",
+        "doc": "Delete selected layers, even if there are objs in it. Helpful when layer tree is constrainted by block usage.",
         "tab": "Layer.tab",
         "tab_icon": "Layer.tab\\icon.png",
         "is_popular": false
@@ -874,7 +874,7 @@
         "script": "Modify.tab\\offset_floor_border.button\\offset_floor_border_left.py",
         "icon": "Modify.tab\\offset_floor_border.button\\icon.png",
         "alias": "OffsetFloorBorder",
-        "doc": "Shrink or expand the outline of a floor plate by the distance you type.\n\nFeed it flat surfaces or solid slabs and the edge moves in or out, which is how you rough\nout a setback, a balcony line or a shaved core without redrawing the boundary. Solid slabs\nkeep their thickness.\n\nUsage:\n1. Select the floor surfaces or solids\n2. Enter the offset distance; a negative value pulls the edge inward",
+        "doc": "Shrink/Expand the border of floor for input srf or polysrfs. The thickness is retained if using polysrf.",
         "tab": "Modify.tab",
         "tab_icon": "Modify.tab\\icon.png",
         "is_popular": true
@@ -919,7 +919,7 @@
         "script": "Render.tab\\ai_render.button\\view2render_left.py",
         "icon": "Render.tab\\ai_render.button\\icon.png",
         "alias": "AiRenderingFromView",
-        "doc": "View rendering for Rhino through Ennead's in-house style library.\n\nCapture the active viewport, queue prompts, and see your full cloud Gallery\nacross every device (Revit, Rhino, mobile web, desktop web - same items).\n\nAll features call the live ennead-ai.com web API. No local fallbacks: when\nthe web product improves, this dialog improves automatically.\n",
+        "doc": "Renders Rhino views using Gemini AI via EnneaDuck.\n\nCaptures current viewport, sends it with a style prompt to ennead-ai.com,\nand returns a polished architectural rendering. No local GPU required.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -928,7 +928,7 @@
         "script": "Render.tab\\ai_render.button\\render_upscale_right.py",
         "icon": "Render.tab\\ai_render.button\\icon.png",
         "alias": "AiRenderUpscale",
-        "doc": "Upscale tool is being rebuilt - see in-app message for status.",
+        "doc": "Upscale AI generated images.",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -946,7 +946,7 @@
         "script": "Render.tab\\d5_asset_locator.button\\d5_asset_locator_left.py",
         "icon": "Render.tab\\d5_asset_locator.button\\icon.png",
         "alias": "D5AssetLocator",
-        "doc": "Open the Render Asset Editor - the EnneadTab app for D5 and Enscape assets.\n\nThis tool has moved out of EnneadTab into its own standalone, auto-updating application, so it can\nship fixes without waiting on an EnneadTab release. It now covers D5 AND Enscape in one place. This\nbutton opens its page in your browser; install it once and it keeps itself up to date from then on.\n\nWhat it does:\n- Locate hidden D5 asset folders across your system\n- Access and modify materials on D5 objects\n- Customize properties of those beautiful D5 trees, furniture and people\n- Save hours of searching through obscure file directories\n\nhttps://enneadtab.com/render-asset-editor\n",
+        "doc": "Your personal detective for hunting down elusive D5 assets!\n\nThis handy tool launches the D5AssetChanger application that helps you:\n- Locate hidden D5 asset folders across your system\n- Access and modify materials on D5 objects\n- Customize properties of those beautiful D5 trees, furniture and people\n- Save hours of searching through obscure file directories\n\nPerfect for visualization specialists who need precise control over their D5 assets.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
@@ -955,7 +955,7 @@
         "script": "Render.tab\\enscape_asset_locator.button\\enscape_asset_locator_left.py",
         "icon": "Render.tab\\enscape_asset_locator.button\\icon.png",
         "alias": "EnscapeAssetLocator",
-        "doc": "Open the Render Asset Editor - the EnneadTab app for Enscape and D5 assets.\n\nThis tool has moved out of EnneadTab into its own standalone, auto-updating application, so it can\nship fixes without waiting on an EnneadTab release. It now covers Enscape AND D5 in one place. This\nbutton opens its page in your browser; install it once and it keeps itself up to date from then on.\n\nWhat it does:\n- Locate hidden Enscape asset folders across your system\n- Access and modify materials on Enscape objects\n- Customize properties of those beautiful Enscape trees, furniture and people\n- Save hours of searching through obscure file directories\n\nhttps://enneadtab.com/render-asset-editor\n",
+        "doc": "Your personal detective for hunting down elusive Enscape assets!\n\nThis handy tool launches the EnscapeAssetChanger application that helps you:\n- Locate hidden Enscape asset folders across your system\n- Access and modify materials on Enscape objects\n- Customize properties of those beautiful Enscape trees, furniture and people\n- Save hours of searching through obscure file directories\n\nPerfect for visualization specialists who need precise control over their Enscape assets.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
@@ -964,7 +964,16 @@
         "script": "Render.tab\\get_google_earth_model.button\\get_google_earth_model_left.py",
         "icon": "Render.tab\\get_google_earth_model.button\\icon.png",
         "alias": "GetGoogleEarthModel",
-        "doc": "Open the video tutorial on pulling a Google Earth 3D context model into Rhino.\n\nWalks you through capturing the surrounding city in Blender and bringing it across, which\nis the quickest way to get a real site context around your massing. A companion Blender\nscript sits in this button's folder and tidies up the imported materials first.",
+        "doc": "This button does GetGoogleEarthModel when left click",
+        "tab": "Render.tab",
+        "tab_icon": "Render.tab\\icon.png",
+        "is_popular": false
+    },
+    "Render.tab\\get_inspired.button\\get_inspired_left.py": {
+        "script": "Render.tab\\get_inspired.button\\get_inspired_left.py",
+        "icon": "Render.tab\\get_inspired.button\\icon.png",
+        "alias": "GetInspired",
+        "doc": "Opens e.AI rendering website (https://enneadtab.com/rendering/home) in the default browser",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -1000,7 +1009,7 @@
         "script": "Render.tab\\make_crv_pipe.button\\make_crv_pipe_left.py",
         "icon": "Render.tab\\make_crv_pipe.button\\icon.png",
         "alias": "MakeCrvPipe",
-        "doc": "Draw thin pipes along the curves on your [EDGE] layers so Enscape renders the edge.\n\nEnscape will not show a line where two coplanar faces meet, which flattens joints and reveals\nseams that should read as crisp. A slim pipe on the curve gives it something solid to shade.\n\nUsage:\n1. Put the curves you want to read as edges on a layer with [EDGE] in its name\n2. Run the button; existing pipes are rebuilt rather than duplicated",
+        "doc": "Make/Update a small pipe along crvs in layers that has '[EDGE]' in it. So coplanar face in enscape can show edge.",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -1009,7 +1018,7 @@
         "script": "Render.tab\\material_shop.button\\material_shop_left.py",
         "icon": "Render.tab\\material_shop.button\\icon.png",
         "alias": "MaterialShop",
-        "doc": "Open AmbientCG in your browser, a free library of rendering materials.\n\nHundreds of ready-to-use textures, HDRI skies and props, all free to download and drop into\na Rhino or Enscape scene. Good first stop when a render needs a convincing surface.",
+        "doc": "Your gateway to a treasure trove of high-quality materials! Opens AmbientCG, a fantastic resource offering hundreds of free PBR materials perfect for architectural visualization. Quickly find textures, HDRIs, and 3D models to elevate your renderings without spending a penny.",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -1027,7 +1036,7 @@
         "script": "Render.tab\\render_polisher.button\\render_polisher_left.py",
         "icon": "Render.tab\\render_polisher.button\\icon.png",
         "alias": "EnneaDuckRenderStudio",
-        "doc": "Open e.AI \u2014 EnneaDuck's rendering studio.\n\nAI-powered rendering and video generation for architectural visualization:\n- Multi-style image generation (Gemini + Imagen)\n- Image editing and style transfer\n- Video generation from stills\n- Iterative conversational refinement\n\nOpens ennead-ai.com in your default browser.\n",
+        "doc": "Open e.AI \u00e2\u20ac\u201d EnneaDuck's rendering studio.\n\nAI-powered rendering and video generation for architectural visualization:\n- Multi-style image generation (Gemini + Imagen)\n- Image editing and style transfer\n- Video generation from stills\n- Iterative conversational refinement\n\nOpens ennead-ai.com in your default browser.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
@@ -1036,7 +1045,7 @@
         "script": "Revit.tab\\block2family.button\\block2family_left.py",
         "icon": "Revit.tab\\block2family.button\\icon.png",
         "alias": "Block2Family",
-        "doc": "Turn Rhino blocks into Revit families and place them in the project.\n\nUnlike the standard Rhino-to-Revit route, you never have to build or manage the families\nyourself, and a whole selection of blocks can cross over in one batch. Each block definition\nbecomes one family, so repeated instances stay lightweight in Revit.\n\nUsage:\n1. Select the blocks you want to send over\n2. Run the button and let it batch the conversion\n3. Pick up the families on the Revit side",
+        "doc": "Convert rhino blocks to revit families and place them in project. This tool different from standard Rhino2Revit because you do not need to manage family creation and it can batch process.",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": true
@@ -1054,7 +1063,7 @@
         "script": "Revit.tab\\draft_insulation_batting.button\\draft_insulation_batting_left.py",
         "icon": "Revit.tab\\draft_insulation_batting.button\\icon.png",
         "alias": "DraftInsulationBatting",
-        "doc": "Draw the zig-zag insulation batting graphic along any curve you give it.\n\nUnlike a straight hatch, the batting follows a curved or irregular path, so a detail can\nshow insulation wrapping a corner or a rounded edge and still read correctly.\n\nUsage:\n1. Select the base curves the batting should follow\n2. Enter the batting thickness",
+        "doc": "Given base crvs and thickness, it makes a 2D insulation batting graphic that can be any shape. ",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1108,7 +1117,7 @@
         "script": "Revit.tab\\live_selection.button\\live_selection_left.py",
         "icon": "Revit.tab\\live_selection.button\\icon.png",
         "alias": "LiveSelection",
-        "doc": "Mirror your Rhino selection over to Revit so both models highlight the same thing.\n\nSaves hunting for the Revit counterpart of an object by hand when you are coordinating\nbetween the two, which is where most cross-platform mistakes creep in.",
+        "doc": "Enables real-time selection synchronization between Rhino and Revit. Allows users to select objects in Rhino and have the selection reflected in Revit, streamlining cross-platform workflows and coordination.",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1117,7 +1126,7 @@
         "script": "Revit.tab\\map_block_transform.button\\map_block_transform_left.py",
         "icon": "Revit.tab\\map_block_transform.button\\icon.png",
         "alias": "MapBlockTransform",
-        "doc": "Send the position and orientation of your Rhino blocks over to Revit.\n\nRevit families cannot normally be tilted freely in three dimensions. Handing the block\ntransforms to an adaptive family on the Revit side is the one route that gets true free 3D\norientation, so a panel or louvre can sit at any angle it does in Rhino.\n\nUsage:\n1. Select the blocks whose placement you want to carry over\n2. Run the button, then pick the transforms up from the Revit side",
+        "doc": "Send the transformation of the blocks to Revit to be used by space adaptive family. This is the only known way of doing true free 3D orientation in Revit.",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1126,7 +1135,7 @@
         "script": "Revit.tab\\map_revit_subc_material.button\\map_revit_subc_material_left.py",
         "icon": "Revit.tab\\map_revit_subc_material.button\\icon.png",
         "alias": "MapRevitSubCategoryMaterial",
-        "doc": "Give your Rhino layers the materials that the matching Revit subcategories use.\n\nExport the subcategory material table from Revit first, then run this. Any layer whose name\nappears in that table gets the corresponding material created and assigned, so a model\nbrought over from Revit shades the way it does there instead of arriving flat and grey.\n\nUsage:\n1. On the Revit side, run Export SubCategory Material Table\n2. Run this button; layers that match a name in the table are mapped",
+        "doc": "Work with ExportSubCategoryMaterialTable on revit side. After you export the OST mapping there, this button help you create and map layer material based on layer name, if found in the OST mapping",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1153,7 +1162,7 @@
         "script": "Revit.tab\\shape2revit.button\\shape2revit_left.py",
         "icon": "Revit.tab\\shape2revit.button\\icon.png",
         "alias": "Shape2Revit",
-        "doc": "Send loose Rhino geometry to Revit, turning each object into its own family.\n\nFor one-off shapes that were never organised into blocks. Every selected surface, solid or\nmesh becomes a separate Revit family, so use it sparingly or the Revit file ends up carrying\nhundreds of them. When your geometry is already blocked, reach for Block2Family instead: it\nreuses one family per definition and keeps the Revit model far lighter.\n\nFeatures:\n- Works with surfaces, polysurfaces and meshes\n- Original shape and placement are preserved\n- Your Rhino model is left exactly as you had it",
+        "doc": "Convert EACH and EVERY selected geometry to INDIVIDUAL Revit families via temporary blocks.\nNot to be confused with the block2family button, which exports better defined blocks to Revit families and is much more memory efficient.\nOnly use this button sparingly so you do not introduce too many families to Revit.\n\nFeatures:\n- Converts surfaces, polysurfaces and meshes to blocks\n- Creates temporary blocks with unique names\n- Exports blocks to Revit families\n- Cleans up temporary blocks after export\n- Maintains original geometry properties",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1198,7 +1207,7 @@
         "script": "Tailor.tab\\2425_replace_blocks.button\\2425_replace_blocks_left.py",
         "icon": "Tailor.tab\\2425_replace_blocks.button\\icon.png",
         "alias": "2425ReplaceBlocks",
-        "doc": "Block Replacement Tool for 2425 Project\n\nReplaces blocks between Twinmotion and Enscape versions based on Excel mapping data.\nFeatures:\n- Supports bidirectional block replacement (Twinmotion \u2194 Enscape)\n- Uses Excel mapping file for block name relationships\n- Processes entire document with progress tracking\n- Maintains block transformations and properties\n- Provides user selection for replacement direction\n- Automatically redraws viewport after replacement\n\nReplacement Options:\n1. Twinmotion block \u2192 Enscape block\n2. Enscape block \u2192 Twinmotion block\n\nExcel Mapping:\n- Reads from 'enscape_twinmotion_block_mapping.xlsx'\n- Uses 'EnneadTab Helper' worksheet\n- Maps block names in columns A and B\n- Supports multiple block mappings\n\nWorkflow:\n1. User selects replacement direction\n2. Reads block mapping from Excel file\n3. Iterates through mapping data\n4. Replaces blocks using RHINO_BLOCK utility\n5. Redraws viewport to show changes\n\nUsage:\n- Select replacement direction when prompted\n- Tool processes all mapped blocks automatically\n- Maintains block positions and transformations\n- Provides completion feedback",
+        "doc": "Block Replacement Tool for 2425 Project\n\nReplaces blocks between Twinmotion and Enscape versions based on Excel mapping data.\nFeatures:\n- Supports bidirectional block replacement (Twinmotion \u00e2\u2020\u201d Enscape)\n- Uses Excel mapping file for block name relationships\n- Processes entire document with progress tracking\n- Maintains block transformations and properties\n- Provides user selection for replacement direction\n- Automatically redraws viewport after replacement\n\nReplacement Options:\n1. Twinmotion block \u00e2\u2020\u2019 Enscape block\n2. Enscape block \u00e2\u2020\u2019 Twinmotion block\n\nExcel Mapping:\n- Reads from 'enscape_twinmotion_block_mapping.xlsx'\n- Uses 'EnneadTab Helper' worksheet\n- Maps block names in columns A and B\n- Supports multiple block mappings\n\nWorkflow:\n1. User selects replacement direction\n2. Reads block mapping from Excel file\n3. Iterates through mapping data\n4. Replaces blocks using RHINO_BLOCK utility\n5. Redraws viewport to show changes\n\nUsage:\n- Select replacement direction when prompted\n- Tool processes all mapped blocks automatically\n- Maintains block positions and transformations\n- Provides completion feedback",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1216,7 +1225,7 @@
         "script": "Tailor.tab\\export_without_crv.button\\export_without_crv_left.py",
         "icon": "Tailor.tab\\export_without_crv.button\\icon.png",
         "alias": "ExportWithoutCrv_1643",
-        "doc": "Export Tool for 1643 Project - Solids Only\n\nExports Rhino file as DWG with all blocks exploded and curves removed.\nFeatures:\n- Explodes all block instances to individual geometry\n- Removes all curve objects from export\n- Keeps only solid geometry for CAD export\n- Handles nested block instances automatically\n- Provides progress tracking for large files\n- Supports project-specific file naming\n\nWorkflow:\n1. Collects all block instances in the document\n2. Explodes blocks to individual geometry objects\n3. Filters out curves and block references\n4. Selects only solid geometry for export\n5. Exports as DWG with \"2007 Solids\" scheme\n6. Cleans up temporary exploded geometry\n\nFile Naming:\n- MotherBabyLobby.3dm \u2192 TempStudy_MotherBabyLobby.dwg\n- Other files \u2192 TempStudy.dwg\n\nUsage:\n- Run tool to prepare geometry for CAD export\n- Only solid geometry will be exported\n- Curves and blocks are automatically removed\n- Provides completion notification",
+        "doc": "Export Tool for 1643 Project - Solids Only\n\nExports Rhino file as DWG with all blocks exploded and curves removed.\nFeatures:\n- Explodes all block instances to individual geometry\n- Removes all curve objects from export\n- Keeps only solid geometry for CAD export\n- Handles nested block instances automatically\n- Provides progress tracking for large files\n- Supports project-specific file naming\n\nWorkflow:\n1. Collects all block instances in the document\n2. Explodes blocks to individual geometry objects\n3. Filters out curves and block references\n4. Selects only solid geometry for export\n5. Exports as DWG with \"2007 Solids\" scheme\n6. Cleans up temporary exploded geometry\n\nFile Naming:\n- MotherBabyLobby.3dm \u00e2\u2020\u2019 TempStudy_MotherBabyLobby.dwg\n- Other files \u00e2\u2020\u2019 TempStudy.dwg\n\nUsage:\n- Run tool to prepare geometry for CAD export\n- Only solid geometry will be exported\n- Curves and blocks are automatically removed\n- Provides completion notification",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1252,7 +1261,7 @@
         "script": "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py",
         "icon": "Tailor.tab\\SAIF_panel_mapping.button\\icon.png",
         "alias": "SaifPanelMapping",
-        "doc": "Read the SAIF curtain wall panel names and work out which Revit family each one needs.\n\nPanel blocks named to the SAIF convention are decoded into their tower or podium family,\ntheir pier width and any special condition such as a fire rescue window or a corner. The\nresult is handed to the Revit side so the panels come across already sorted.\n\nFeatures:\n- Handles both the tower and the podium panel families\n- Pulls the pier width straight out of the panel name\n- Flags special panels such as fire rescue windows, piers and corners",
+        "doc": "Maps SAIF panels using new naming convention CW01_SOLID X_YYYY_ZZZZ and CW06_SOLID X_YYYY_ZZZZ, extracting pier width (X) as-is",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1279,7 +1288,7 @@
         "script": "Tailor.tab\\xiong_an_facade_hori.button\\xiong_an_facade_hori_left.py",
         "icon": "Tailor.tab\\xiong_an_facade_hori.button\\icon.png",
         "alias": "2419_FacadeMove",
-        "doc": "Find the anchor points that drive the facade panel movement on the Xiong'an study.\n\nRuns inside Grasshopper. Feed it the facade curve sets and it hands back a point set part\nway along each curve, which is what the facade panels are shifted from. Rerun it whenever\nthe curves change and the panels follow.\n\nUsage:\n1. Wire the two facade curve sets into the Grasshopper component\n2. Take the returned points as the move anchors for the panels",
+        "doc": "Xiong'an Facade Movement Tool\n\nProcesses facade curves to extract specific points for facade movement operations.\nFeatures:\n- Works with Grasshopper input/output for facade geometry\n- Extracts points at 20% and 80% along curve domains\n- Handles curve parameterization for facade manipulation\n- Supports multiple curve sets for batch processing\n- Designed for Xiong'an project facade studies\n\nUsage:\n- Input: Two sets of curves (crv_set_1, crv_set_2)\n- Output: Points at 20% and 80% positions along curves\n- Designed for facade movement and positioning workflows",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1369,7 +1378,7 @@
         "script": "View.tab\\view_block_diagram.button\\view_block_diagram_left.py",
         "icon": "View.tab\\view_block_diagram.button\\icon.png",
         "alias": "ViewBlockDiagram",
-        "doc": "Draw the view fan from a chosen viewpoint, showing what is visible and what is blocked.\n\nSight lines are traced outward from the viewer and stopped wherever a building or other\nobstacle gets in the way. The clear sweeps come back as surfaces you can present, so a\nwindow, a terrace or a public space can be argued for on the strength of what it actually\nsees.\n\nUsage:\n1. Set the sweep resolution and how far the view should reach\n2. Select the objects that block the view\n3. Pick the viewer point; the visible fans are drawn for you",
+        "doc": "Generate view block diagrams by casting rays from a viewer point to identify unobstructed view areas.\n\nThis tool creates 3D surfaces representing the visible areas from a specified viewer point, \ntaking into account obstacles that block the view rays. Perfect for:\n- Site analysis and view studies\n- Building massing and urban planning\n- Landscape design and sightline analysis\n- Solar access and shadow studies\n\nThe process involves:\n1. Configuring ray casting parameters (resolution and ray length)\n2. Selecting obstacle objects that block the view\n3. Picking a viewer point location\n4. Automatic generation of view block surfaces\n\nThe tool automatically groups consecutive unobstructed rays and creates \nbounded surfaces using arcs and radius lines for accurate representation.",
         "tab": "View.tab",
         "tab_icon": "View.tab\\icon.png",
         "is_popular": false
@@ -1378,7 +1387,7 @@
         "script": "View.tab\\view_toggle.button\\view_toggle_left.py",
         "icon": "View.tab\\view_toggle.button\\icon.png",
         "alias": "ViewToggle",
-        "doc": "Flip the active viewport between Top and Perspective with one click.\n\nSaves reaching for the viewport tabs every time you want to check a plan relationship and\nthen get back to the model. Running it also binds the F4 key to the same toggle, so from\nthen on you can switch with the keyboard alone.",
+        "doc": "Quick view navigation tool for Rhino.\n\nFeatures:\n- Toggles between Top and Perspective views\n- Left click to switch between views\n- Keyboard shortcut: {KEY}\n- Optimizes modeling workflow with rapid view changes\n\nUsage:\nClick button to toggle between views.",
         "tab": "View.tab",
         "tab_icon": "View.tab\\icon.png",
         "is_popular": false
@@ -1405,7 +1414,7 @@
         "script": "startup.py",
         "icon": null,
         "alias": "EnneadTab_Startup",
-        "doc": "Get EnneadTab ready the moment a new Rhino session opens.\n\nRuns by itself in the background, so every tool, command alias and shortcut is in place\nbefore you start modeling and you never have to load anything by hand.\n\nFeatures:\n- Registers the EnneadTab command aliases you can type on the command line\n- Checks whether a newer EnneadTab is available\n- Wires up the background helpers the tools rely on",
+        "doc": "The friendly welcome wagon for EnneadTab in Rhino! This startup script springs into action with each new Rhino session, quietly setting up your environment with all the EnneadTab goodness. It registers aliases, checks for updates, sets up event hooks, and ensures all your favorite tools are ready to use - so you can focus on creating amazing designs.",
         "tab": null,
         "tab_icon": null,
         "is_popular": false

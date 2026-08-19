@@ -107,7 +107,7 @@ def export_elements_to_rhino(doc, selected_instances):
         NOTIFICATION.messenger(success_message)
         return export_result
     else:
-        NOTIFICATION.messenger("Export failed. Check log for details.\nTotal time: {}".format(time_str))
+        NOTIFICATION.messenger("Export failed. Check log for details.\nTotal time: {}".format(time_str), sticky=True)
         return None
 
 

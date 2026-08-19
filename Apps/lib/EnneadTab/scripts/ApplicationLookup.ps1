@@ -5,7 +5,7 @@
 <#
     Script:    ApplicationLookup.ps1
     Purpose:   Collect installed application versions for Revit, Rhino and Enscape,
-               then dump them to the shared network path in a file named
+               then dump them to the local EnneadTab Dump folder in a file named
                "APPVERSIONLOOKUP_[PC NAME].json".
                - No elevation required (read-only registry access).
                - Show progress for all users.
@@ -30,16 +30,19 @@ function Write-Log {
 }
 
 # ------------------------------------------------------------
-# Helper – Get EnneadTab DB folder path (#2360).
-# Mirrors ENVIRONMENT._resolve_shared_root precedence:
-#   EA_SHARED_ROOT env var > per-user shared_root.json > EA_Dist shared_root.json
-#   > legacy L: path.
-function Get-EnneadTabDBFolder {
-    if ($env:EA_SHARED_ROOT -and $env:EA_SHARED_ROOT.Trim() -and $env:EA_SHARED_ROOT.Trim().ToUpper() -ne "OFFLINE") {
-        return (Join-Path $env:EA_SHARED_ROOT.Trim() "05_EnneadTab-DB")
+# Helper – local dump folder. The office L: drive is retired; never last-resort to L:.
+function Get-EnneadTabDumpFolder {
+    $ecoSys = Join-Path $env:USERPROFILE "Documents\EnneadTab Ecosystem"
+    $localDump = Join-Path $ecoSys "Dump"
+
+    if ($env:EA_SHARED_ROOT -and $env:EA_SHARED_ROOT.Trim()) {
+        $root = $env:EA_SHARED_ROOT.Trim()
+        if ($root.ToUpper() -eq "OFFLINE" -or $root -match '^[Ll]:') {
+            return $localDump
+        }
+        return (Join-Path $root "05_EnneadTab-DB\Shared Data Dump")
     }
 
-    $ecoSys = Join-Path $env:USERPROFILE "Documents\EnneadTab Ecosystem"
     $candidates = @(
         (Join-Path $ecoSys "shared_root.json"),
         (Join-Path $ecoSys "EA_Dist\Apps\lib\EnneadTab\shared_root.json")
@@ -48,14 +51,19 @@ function Get-EnneadTabDBFolder {
         if (-not (Test-Path $candidate)) { continue }
         try {
             $config = Get-Content $candidate -Raw | ConvertFrom-Json
-            if ($config.db_folder) { return $config.db_folder }
-            if ($config.shared_root) { return (Join-Path $config.shared_root "05_EnneadTab-DB") }
+            if ($config.offline -eq $true) { return $localDump }
+            if ($config.db_folder -and $config.db_folder -notmatch '^[Ll]:') {
+                return (Join-Path $config.db_folder "Shared Data Dump")
+            }
+            if ($config.shared_root -and $config.shared_root -notmatch '^[Ll]:') {
+                return (Join-Path $config.shared_root "05_EnneadTab-DB\Shared Data Dump")
+            }
         } catch {
             continue
         }
     }
 
-    return "L:\4b_Design Technology\05_EnneadTab-DB"
+    return $localDump
 }
 
 # ------------------------------------------------------------
@@ -207,9 +215,8 @@ $result = [PSCustomObject]@{
 }
 
 # ------------------------------------------------------------
-# Write to network share
-$shareRoot = Get-EnneadTabDBFolder
-$sharedDumpFolder = Join-Path -Path $shareRoot -ChildPath "Shared Data Dump"
+# Write to local dump (office L: share is retired)
+$sharedDumpFolder = Get-EnneadTabDumpFolder
 $targetFile = Join-Path -Path $sharedDumpFolder -ChildPath ("APPVERSIONLOOKUP_{0}.json" -f $env:COMPUTERNAME)
 
 try {

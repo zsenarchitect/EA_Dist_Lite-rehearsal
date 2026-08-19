@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .btn { padding: 10px 20px; background-color: #4CAF50; color: white; 
+               border: none; cursor: pointer; }
+        .btn:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+        <!-- Dynamic form will be generated here -->
+    </div>
+    <button class="btn" onclick="saveForm()">Save Changes</button>
+
+    <script>
+        // Initialize form with data
+        const formData = {{ data|tojson|safe }};
+        
+        function generateForm() {
+            const container = document.getElementById('formContainer');
+            for (const [row, cols] of Object.entries(formData)) {
+                for (const [col, value] of Object.entries(cols)) {
+                    const div = document.createElement('div');
+                    div.className = 'form-group';
+                    div.innerHTML = `
+                        <label>${row} - ${col}:</label>
+                        <input type="text" value="${value}" 
+                               data-row="${row}" data-col="${col}">
+                    `;
+                    container.appendChild(div);
+                }
+            }
+        }
+
+        function saveForm() {
+            const inputs = document.querySelectorAll('input');
+            const newData = {};
+            
+            inputs.forEach(input => {
+                const row = input.dataset.row;
+                const col = input.dataset.col;
+                if (!newData[row]) newData[row] = {};
+                newData[row][col] = input.value;
+            });
+
+            fetch('/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Changes saved successfully!');
+                }
+            });
+        }
+
+        // Generate form when page loads
+        generateForm();
+    </script>
+</body>
+</html>
+            

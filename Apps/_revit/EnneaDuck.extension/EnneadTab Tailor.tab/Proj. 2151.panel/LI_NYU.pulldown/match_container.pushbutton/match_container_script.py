@@ -207,7 +207,7 @@ def match_container():
     for family_doc in REVIT_APPLICATION.get_all_family_docs():
         family_doc.Close(False)
 
-    NOTIFICATION.messenger("Comparision Done!\nView your report in browser.")
+    NOTIFICATION.messenger("Comparision Done!\nView your report in browser.", sticky=True)
     REVIT_EVENT.set_family_load_hook_stage(stage=True)
 
 

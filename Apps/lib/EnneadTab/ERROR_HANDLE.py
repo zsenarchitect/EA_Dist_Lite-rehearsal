@@ -30,12 +30,6 @@ except Exception as e:
     WEB_GUARD = None
 
 try:
-    import EMAIL
-except Exception as e:
-    print("Error importing EMAIL in ERROR_HANDLE.py: {}".format(traceback.format_exc()))
-    EMAIL = None
-
-try:
     import USER
 except Exception as e:
     print("Error importing USER in ERROR_HANDLE.py: {}".format(traceback.format_exc()))
@@ -376,14 +370,9 @@ def try_catch_error(is_silent=False, is_pass = False):
 
                 # Safely get plugin name with fallback
                 plugin_name = get_plugin_name()
-                
-                subject_line = plugin_name + " Auto Error Log"
-                if is_silent:
-                    subject_line += "(Silent)"
-                try:
-                    EMAIL.email_error(error_time + error, func.__name__, USER.USER_NAME, subject_line=subject_line)
-                except Exception as e:
-                    print_note("Cannot send email: {}".format(get_alternative_traceback()))
+                # Crash traces do not go to Resend. A storm on this wrapper
+                # would consume the shared team rate limit and take every
+                # identity dark. ErrorDump below is the remaining report.
 
                 try:
                     send_error_to_error_dump(

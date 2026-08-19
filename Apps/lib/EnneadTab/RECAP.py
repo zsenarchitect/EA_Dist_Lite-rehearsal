@@ -152,7 +152,7 @@ def show_pending_digest():
     kwargs = {
         "main_text": data.get("surface_text"),
         "level": "info",
-        "animation_stay_duration": 12,
+        "sticky": True,
     }
     actions = _build_actions(data)
     if actions:

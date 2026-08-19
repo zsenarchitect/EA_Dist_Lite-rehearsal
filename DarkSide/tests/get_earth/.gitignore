@@ -1,0 +1,22 @@
+# Harness OUTPUTS, not harness code. The scripts are tracked so anyone can run
+# them; their results are per-run artifacts and must never be committed.
+#
+# (These were being written straight into this tracked folder, against the
+# dev-mode plan's own rule that outputs belong in DEBUG/output/get_earth/.
+# Ignoring them here is the narrower fix -- it keeps the driver scripts
+# self-contained instead of splitting each run across two trees.)
+l3_*_result.json
+l3_*_capture.png
+*.part
+__pycache__/
+
+# Re-include pytest files. The REPO-ROOT .gitignore line 218 is a bare
+# `test_*.py`, which silently excludes every pytest-convention test file
+# anywhere in the tree -- these two suites staged as nothing at all until
+# `git check-ignore -v` named the rule. A nested negation is the scoped fix; it
+# does not touch shared repo-wide config.
+#
+# The root rule is worth revisiting on its own (it makes a conventional test
+# suite unaddable anywhere in this repo), but that is a separate, deliberate
+# change -- not a signoff-time edit.
+!test_*.py

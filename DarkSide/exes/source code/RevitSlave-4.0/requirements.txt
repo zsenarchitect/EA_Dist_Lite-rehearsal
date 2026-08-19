@@ -1,0 +1,10 @@
+# RevitSlave4 Dependencies
+# Python 3.9+
+
+# HTTP requests for APS API
+requests>=2.31.0
+olefile>=0.46  # For version fallback detection from local ACC files
+
+# Optional: Better console output
+colorama>=0.4.6
+

@@ -592,7 +592,7 @@ class FinishFloorByRoomForm(WPFWindow):
                 table_data=table,
                 columns=["Status", "Room", "Floor Id / Reason"])
         if aborted:
-            NOTIFICATION.messenger("Batch aborted - nothing created. See report.")
+            NOTIFICATION.messenger("Batch aborted - nothing created. See report.", sticky=True)
         else:
             NOTIFICATION.messenger("Created {} finish floor(s).".format(created))
 

@@ -12,9 +12,11 @@ from pyrevit import script #
 
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
+import os
 import sys
 
-sys.path.append(r'L:\4b_Applied Computing\01_Revit\04_Tools\08_EA Extensions\Published\ENNEAD.extension\EnneadTab.tab\Tailor Shop.panel\misc1.stack\Proj 2135 Part3.pulldown\68_stair_end_with_riser.pushbutton')
+_sibling = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "68_stair_end_with_riser.pushbutton"))
+sys.path.append(_sibling)
 import stair_end_with_riser_script as STAIR_CHECKER
 from Autodesk.Revit import DB # pyright: ignore 
 #from Autodesk.Revit import UI # pyright: ignore

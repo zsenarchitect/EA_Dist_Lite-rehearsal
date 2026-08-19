@@ -1,0 +1,4149 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>EnneadTab-For-Rhino Knowledge - EnneadTabWiki</title>
+  <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+
+<div class='wiki-header-row'>
+  <h1 class='hero-title'>EnneadTab-For-Rhino Wiki</h1>
+  <a class='return-home-btn' href='index.html'>Return to Home</a>
+                </div>
+<div class='knowledge-container'>
+  <button class='sidebar-toggle' id='sidebarToggle' aria-label='Toggle Sidebar'>&#9776;</button>
+        <div class='sidebar' id='sidebar'><a href='#Block_tab'>Block.tab</a><a href='#Create_tab'>Create.tab</a><a href='#Drafting_tab'>Drafting.tab</a><a href='#EnneadTab_menu'>EnneadTab.menu</a><a href='#File_tab'>File.tab</a><a href='#Fun_tab'>Fun.tab</a><a href='#Knowledge_tab'>Knowledge.tab</a><a href='#Lab_tab'>Lab.tab</a><a href='#Layer_tab'>Layer.tab</a><a href='#Material_tab'>Material.tab</a><a href='#Modify_tab'>Modify.tab</a><a href='#Other'>Other</a><a href='#Render_tab'>Render.tab</a><a href='#Revit_tab'>Revit.tab</a><a href='#Selection_tab'>Selection.tab</a><a href='#Tailor_tab'>Tailor.tab</a><a href='#View_tab'>View.tab</a><a href='#Web_tab'>Web.tab</a></div>
+  <div style='flex:1;min-width:0;'>
+    <div class='search-bar sticky'>
+      <input type='text' id='searchInput' placeholder='Search tools...'>
+      <button class='clear-btn' id='clearSearch' aria-label='Clear'>&times;</button>
+            </div>
+    <section class='tab-section' id='Block_tab'><div class='tab-title'>Block.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='batchrenameblocks' data-doc='block name batch editing utility for rhino.
+
+features:
+- interactive table interface for block renaming
+- real-time block preview in viewport
+- double-click to isolate and inspect blocks
+- validates name conflicts automatically
+- preserves block definitions during renaming
+
+usage:
+1. edit desired names in the 'new name' column
+2. double-click entries to preview blocks
+3. click 'update block names' to apply changes' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_batch_rename_blocks_button_icon.png' class='tool-icon' alt='BatchRenameBlocks icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>BatchRenameBlocks</h3>
+                                </header>
+        <p class='tool-description'>Block name batch editing utility for Rhino.
+
+Features:
+- Interactive table interface for block renaming
+- Real-time block preview in viewport
+- Double-click to isolate and inspect blocks
+- Validates name conflicts automatically
+- Preserves block definitions during renaming
+
+Usage:
+1. Edit desired names in the 'New Name' column
+2. Double-click entries to preview blocks
+3. Click 'Update Block Names' to apply changes</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='editdistortedblock' data-doc='block editing utility for distorted instances.
+
+features:
+- creates editable copy of distorted block
+- maintains block definition relationships
+- automatic camera positioning for editing
+- temporary isolation of edited block
+- right-click to restore previous view' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_edit_distorted_block_button_icon.png' class='tool-icon' alt='EditDistortedBlock icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>EditDistortedBlock</h3>
+                                </header>
+        <p class='tool-description'>Block editing utility for distorted instances.
+
+Features:
+- Creates editable copy of distorted block
+- Maintains block definition relationships
+- Automatic camera positioning for editing
+- Temporary isolation of edited block
+- Right-click to restore previous view</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='editdistortedblockrestoreview' data-doc='restore view after block editing.
+
+features:
+- restores previous camera position
+- shows all hidden objects
+- cleans up temporary editing blocks' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_edit_distorted_block_button_icon.png' class='tool-icon' alt='EditDistortedBlockRestoreView icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>EditDistortedBlockRestoreView</h3>
+                                </header>
+        <p class='tool-description'>Restore view after block editing.
+
+Features:
+- Restores previous camera position
+- Shows all hidden objects
+- Cleans up temporary editing blocks</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='fallgeosongeo' data-doc='project objects onto target geometry.
+
+features:
+- projects blocks using insertion points
+- projects other objects using bounding box centers
+- supports both top and bottom face projections
+- works with surfaces, polysurfaces and meshes
+- maintains object properties during projection' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_fall_geos_on_geo_button_icon.png' class='tool-icon' alt='FallGeosOnGeo icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>FallGeosOnGeo</h3>
+                                </header>
+        <p class='tool-description'>Project objects onto target geometry.
+
+Features:
+- Projects blocks using insertion points
+- Projects other objects using bounding box centers
+- Supports both top and bottom face projections
+- Works with surfaces, polysurfaces and meshes
+- Maintains object properties during projection</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='filterblockbyname' data-doc='smart block selection utility.
+
+features:
+- filter blocks by name patterns
+- multi-select support for block names
+- sorted block name display
+- real-time search filtering
+- automatic selection of matching instances' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_filter_block_by_name_button_icon.png' class='tool-icon' alt='FilterBlockByName icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>FilterBlockByName</h3>
+                                </header>
+        <p class='tool-description'>Smart block selection utility.
+
+Features:
+- Filter blocks by name patterns
+- Multi-select support for block names
+- Sorted block name display
+- Real-time search filtering
+- Automatic selection of matching instances</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='makeblockunique, mbu' data-doc='create unique block definitions.
+
+features:
+- creates independent block definitions
+- optional name tagging with creator info
+- preserves block transformations
+- handles nested block structures
+- maintains layer assignments' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_make_block_unique_button_icon.png' class='tool-icon' alt='['MakeBlockUnique', 'MBU'] icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MakeBlockUnique, MBU</h3>
+                                </header>
+        <p class='tool-description'>Create unique block definitions.
+
+Features:
+- Creates independent block definitions
+- Optional name tagging with creator info
+- Preserves block transformations
+- Handles nested block structures
+- Maintains layer assignments</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='makeblockuniquetoone' data-doc='consolidate blocks into single definition.
+
+features:
+- merges multiple block types into one
+- creates new unified block definition
+- preserves instance positions
+- maintains transformation data' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_make_block_unique_button_icon.png' class='tool-icon' alt='MakeBlockUniqueToOne icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MakeBlockUniqueToOne</h3>
+                                </header>
+        <p class='tool-description'>Consolidate blocks into single definition.
+
+Features:
+- Merges multiple block types into one
+- Creates new unified block definition
+- Preserves instance positions
+- Maintains transformation data</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='matchtexturemappinginblock' data-doc='copy texture mapping between blocks.
+
+features:
+- transfers texture mapping from source block
+- matches by layer correspondence
+- preserves mapping parameters
+- supports multiple target blocks
+- layer-specific texture application' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_match_texture_mapping_in_block_button_icon.png' class='tool-icon' alt='MatchTextureMappingInBlock icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MatchTextureMappingInBlock</h3>
+                                </header>
+        <p class='tool-description'>Copy texture mapping between blocks.
+
+Features:
+- Transfers texture mapping from source block
+- Matches by layer correspondence
+- Preserves mapping parameters
+- Supports multiple target blocks
+- Layer-specific texture application</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='packageblocklayer' data-doc='organize block content layers.
+
+features:
+- creates unified layer structure
+- optional layer flattening
+- preserves layer colors and materials
+- handles nested block hierarchies
+- streamlines material testing workflow' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_package_block_layer_button_icon.png' class='tool-icon' alt='PackageBlockLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>PackageBlockLayer</h3>
+                                </header>
+        <p class='tool-description'>Organize block content layers.
+
+Features:
+- Creates unified layer structure
+- Optional layer flattening
+- Preserves layer colors and materials
+- Handles nested block hierarchies
+- Streamlines material testing workflow</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomizeblocktransformation' data-doc='randomly transform block transformation for rotation and scale.
+
+features:
+- rotates blocks randomly
+- scales blocks 1d height softly or taller
+- scales 3d dimensions evenly
+- animates transformation process' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_randomize_block_transformation_button_icon.png' class='tool-icon' alt='RandomizeBlockTransformation icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomizeBlockTransformation</h3>
+                                </header>
+        <p class='tool-description'>Randomly transform block transformation for rotation and scale.
+
+Features:
+- Rotates blocks randomly
+- Scales blocks 1D height softly or taller
+- Scales 3D dimensions evenly
+- Animates transformation process</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomblocksonsrfs' data-doc='advanced block distribution utility for surfaces.
+
+features:
+- distributes blocks randomly across target surfaces
+- configurable edge distance and spacing controls
+- optional edge-guided or curve-guided placement
+- real-time preview of block placement
+- supports multiple distribution patterns:
+  - random interior placement
+  - edge-aligned placement
+  - even edge distribution
+
+usage:
+1. select target surfaces and sample blocks
+2. configure placement parameters
+3. choose distribution pattern
+4. preview and adjust as needed' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_random_blocks_on_srfs_button_icon.png' class='tool-icon' alt='RandomBlocksOnSrfs icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomBlocksOnSrfs</h3>
+                                </header>
+        <p class='tool-description'>Advanced block distribution utility for surfaces.
+
+Features:
+- Distributes blocks randomly across target surfaces
+- Configurable edge distance and spacing controls
+- Optional edge-guided or curve-guided placement
+- Real-time preview of block placement
+- Supports multiple distribution patterns:
+  - Random interior placement
+  - Edge-aligned placement
+  - Even edge distribution
+
+Usage:
+1. Select target surfaces and sample blocks
+2. Configure placement parameters
+3. Choose distribution pattern
+4. Preview and adjust as needed</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='samplelayout' data-doc='create sample block layout along crvs to quickly visualize design.
+
+features:
+- quick block layout visualization
+- flexible block size configuration
+- multiple layout modes:
+  - panel mode: blocks span between divider points
+  - post mode: blocks oriented to local coordinate of divider points
+- user-friendly interface with clear step-by-step instructions
+- real-time preview of block placement
+- supports both open and closed curves
+- automatically handles curve segmentation for accurate block placement' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_sample_layout_button_icon.png' class='tool-icon' alt='SampleLayout icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SampleLayout</h3>
+                                </header>
+        <p class='tool-description'>Create sample block layout along crvs to quickly visualize design.
+
+Features:
+- Quick block layout visualization
+- Flexible block size configuration
+- Multiple layout modes:
+  - Panel mode: Blocks span between divider points
+  - Post mode: Blocks oriented to local coordinate of divider points
+- User-friendly interface with clear step-by-step instructions
+- Real-time preview of block placement
+- Supports both open and closed curves
+- Automatically handles curve segmentation for accurate block placement</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='selectsimilarblocks' data-doc='selects all block instances that share the same block definition as the selected blocks.
+
+usage:
+    1. pre-select block instances (optional)
+    2. run the command
+    3. select additional blocks if none were pre-selected
+    
+notes:
+    - works with multiple block definitions at once
+    - automatically filters for block objects only
+' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_similar_blocks_button_icon.png' class='tool-icon' alt='SelectSimilarBlocks icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SelectSimilarBlocks</h3>
+                                </header>
+        <p class='tool-description'>Selects all block instances that share the same block definition as the selected blocks.
+
+Usage:
+    1. Pre-select block instances (optional)
+    2. Run the command
+    3. Select additional blocks if none were pre-selected
+    
+Notes:
+    - Works with multiple block definitions at once
+    - Automatically filters for block objects only
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='isolatesimilarblocks' data-doc='isolate blocks of similar definitions from the selected blocks.
+
+features:
+- automatically identifies and isolates blocks with identical definitions
+- supports multiple block definitions at once
+- maintains original selection state
+- keeps other objects visible and unchanged' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_similar_blocks_button_icon.png' class='tool-icon' alt='IsolateSimilarBlocks icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>IsolateSimilarBlocks</h3>
+                                </header>
+        <p class='tool-description'>Isolate blocks of similar definitions from the selected blocks.
+
+Features:
+- Automatically identifies and isolates blocks with identical definitions
+- Supports multiple block definitions at once
+- Maintains original selection state
+- Keeps other objects visible and unchanged</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='simplifyblocks' data-doc='this button does simplifyblocks when left click' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SimplifyBlocks</h3>
+                                </header>
+        <p class='tool-description'>This button does SimplifyBlocks when left click</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='toggleblockcolordisplay' data-doc='toggle on/off for highlighting the different block type. very helpful when you have many block variation.' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_toggle_block_color_display_button_icon.png' class='tool-icon' alt='ToggleBlockColorDisplay icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ToggleBlockColorDisplay</h3>
+                                </header>
+        <p class='tool-description'>Toggle on/off for highlighting the different block type. Very helpful when you have many block variation.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='toggleblockcolordisplay_setting' data-doc='toggle the on/off of block names.' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_toggle_block_color_display_button_icon.png' class='tool-icon' alt='ToggleBlockColorDisplay_Setting icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ToggleBlockColorDisplay_Setting</h3>
+                                </header>
+        <p class='tool-description'>Toggle the on/off of block names.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='uniformtransformgeos' data-doc='apply the same rotation and/or uniform scale to blocks or geometries. helpful when reorienting or resizing many instances, such as changing direction or size of cars on a street.' data-tab='Block.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Block_tab_uniform_transform_geos_button_icon.png' class='tool-icon' alt='UniformTransformGeos icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>UniformTransformGeos</h3>
+                                </header>
+        <p class='tool-description'>Apply the same rotation and/or uniform scale to blocks or geometries. Helpful when reorienting or resizing many instances, such as changing direction or size of cars on a street.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Create_tab'><div class='tab-title'>Create.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='quickmassing' data-doc='create parametric massing models with advanced level editor interface.
+
+features:
+- interactive level editor table with reorder, add, remove functionality
+- dedicated surface picker with surface filter
+- real-time elevation calculations
+- persistent settings storage
+- visual level management interface
+
+usage:
+1. left-click to activate the quickmassing tool
+2. use the level editor to configure building levels
+3. pick surfaces for massing creation
+4. generate massing model based on your specifications
+
+note: all settings are saved between sessions for convenience.' data-tab='Create.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Create_tab_quick_massing_button_icon.png' class='tool-icon' alt='QuickMassing icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>QuickMassing</h3>
+                                </header>
+        <p class='tool-description'>Create parametric massing models with advanced level editor interface.
+
+Features:
+- Interactive level editor table with reorder, add, remove functionality
+- Dedicated surface picker with surface filter
+- Real-time elevation calculations
+- Persistent settings storage
+- Visual level management interface
+
+Usage:
+1. Left-click to activate the QuickMassing tool
+2. Use the level editor to configure building levels
+3. Pick surfaces for massing creation
+4. Generate massing model based on your specifications
+
+Note: All settings are saved between sessions for convenience.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='slabedge' data-doc='create custom slab edges by sweeping a profile block along selected edges.
+
+features:
+- multiple selection methods:
+  * individual edge selection
+  * edge loop selection
+  * curve selection
+- profile block customization:
+  * select from existing blocks
+  * preview profile orientation
+  * flip profile direction
+- interactive preview:
+  * real-time visualization
+  * adjust before finalizing
+  * cancel and retry options
+
+usage:
+1. choose selection method
+2. select edges or curves
+3. pick profile block
+4. preview and adjust
+5. confirm to create
+
+note: preview objects are automatically cleaned up after use.' data-tab='Create.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Create_tab_slab_edge_button_icon.png' class='tool-icon' alt='SlabEdge icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SlabEdge</h3>
+                                </header>
+        <p class='tool-description'>Create custom slab edges by sweeping a profile block along selected edges.
+
+Features:
+- Multiple selection methods:
+  * Individual edge selection
+  * Edge loop selection
+  * Curve selection
+- Profile block customization:
+  * Select from existing blocks
+  * Preview profile orientation
+  * Flip profile direction
+- Interactive preview:
+  * Real-time visualization
+  * Adjust before finalizing
+  * Cancel and retry options
+
+Usage:
+1. Choose selection method
+2. Select edges or curves
+3. Pick profile block
+4. Preview and adjust
+5. Confirm to create
+
+Note: Preview objects are automatically cleaned up after use.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='stairmaker' data-doc='create parametric linear stairs with interactive controls and real-time preview.
+
+features:
+- dynamic stair creation with live preview
+- customizable parameters:
+  * riser height
+  * tread width
+  * stair width
+  * landing configuration
+- automatic step count calculation based on height
+- intelligent error handling for invalid inputs
+- support for multiple stair configurations
+- interactive point selection for precise placement
+
+usage:
+1. select start point for stair base
+2. define stair direction and height
+3. adjust width using flip point
+4. preview and confirm stair creation
+
+note: all parameters are validated in real-time to ensure code compliance.' data-tab='Create.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Create_tab_stair_maker_button_icon.png' class='tool-icon' alt='StairMaker icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>StairMaker</h3>
+                                </header>
+        <p class='tool-description'>Create parametric linear stairs with interactive controls and real-time preview.
+
+Features:
+- Dynamic stair creation with live preview
+- Customizable parameters:
+  * Riser height
+  * Tread width
+  * Stair width
+  * Landing configuration
+- Automatic step count calculation based on height
+- Intelligent error handling for invalid inputs
+- Support for multiple stair configurations
+- Interactive point selection for precise placement
+
+Usage:
+1. Select start point for stair base
+2. Define stair direction and height
+3. Adjust width using flip point
+4. Preview and confirm stair creation
+
+Note: All parameters are validated in real-time to ensure code compliance.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='stairmakerspiral' data-doc='interactively create spiral stairs in rhino.
+
+key features:
+- dynamic spiral stair creation with preview
+- customizable riser height and tread width
+- adjustable spiral radius and rotation
+- automatic step count calculation
+- support for clockwise and counter-clockwise rotation' data-tab='Create.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Create_tab_stair_maker_button_icon.png' class='tool-icon' alt='StairMakerSpiral icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>StairMakerSpiral</h3>
+                                </header>
+        <p class='tool-description'>Interactively create spiral stairs in Rhino.
+
+Key Features:
+- Dynamic spiral stair creation with preview
+- Customizable riser height and tread width
+- Adjustable spiral radius and rotation
+- Automatic step count calculation
+- Support for clockwise and counter-clockwise rotation</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Drafting_tab'><div class='tab-title'>Drafting.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='colorpicker' data-doc='opens coolors.co color palette generator in default web browser for color scheme inspiration' data-tab='Drafting.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Drafting_tab_color_picker_button_icon.png' class='tool-icon' alt='ColorPicker icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ColorPicker</h3>
+                                </header>
+        <p class='tool-description'>Opens Coolors.co color palette generator in default web browser for color scheme inspiration</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='duplicatelayout' data-doc='duplicate layouts with customizable viewport offsets.
+
+key features:
+- maintain layout settings and properties
+- adjust viewport positions with x-y offsets
+- capture different model space views
+- preserve viewport scales and display settings
+- support for multiple layout selection' data-tab='Drafting.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Drafting_tab_duplicate_layout_button_icon.png' class='tool-icon' alt='DuplicateLayout icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>DuplicateLayout</h3>
+                                </header>
+        <p class='tool-description'>Duplicate layouts with customizable viewport offsets.
+
+Key Features:
+- Maintain layout settings and properties
+- Adjust viewport positions with X-Y offsets
+- Capture different model space views
+- Preserve viewport scales and display settings
+- Support for multiple layout selection</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='exportselectedlayout' data-doc='export selected layouts to pdf format.
+
+key features:
+- multiple layout selection support
+- customizable output location
+- maintains print settings and quality
+- optional automatic pdf opening
+- batch processing capability' data-tab='Drafting.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Drafting_tab_export_selected_pages_button_icon.png' class='tool-icon' alt='ExportSelectedLayout icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExportSelectedLayout</h3>
+                                </header>
+        <p class='tool-description'>Export selected layouts to PDF format.
+
+Key Features:
+- Multiple layout selection support
+- Customizable output location
+- Maintains print settings and quality
+- Optional automatic PDF opening
+- Batch processing capability</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='sectioncrowd' data-doc='create section view crowd representations.
+
+key features:
+- interactive crowd placement in top view
+- customizable people spacing and density
+- random variations for natural appearance
+- support for multiple crowd patterns
+- automatic group creation for easy management' data-tab='Drafting.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Drafting_tab_section_crowd_button_icon.png' class='tool-icon' alt='SectionCrowd icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SectionCrowd</h3>
+                                </header>
+        <p class='tool-description'>Create section view crowd representations.
+
+Key Features:
+- Interactive crowd placement in TOP view
+- Customizable people spacing and density
+- Random variations for natural appearance
+- Support for multiple crowd patterns
+- Automatic group creation for easy management</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='visualizeexcel' data-doc='convert excel data into visual diagrams.
+
+key features:
+- multiple shape options (circles, squares, bars)
+- customizable colors and sizes
+- automatic area calculations
+- support for grouped data visualization
+- dynamic layout adjustments.' data-tab='Drafting.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Drafting_tab_visualize_excel_button_icon.png' class='tool-icon' alt='VisualizeExcel icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>VisualizeExcel</h3>
+                                </header>
+        <p class='tool-description'>Convert Excel data into visual diagrams.
+
+Key Features:
+- Multiple shape options (circles, squares, bars)
+- Customizable colors and sizes
+- Automatic area calculations
+- Support for grouped data visualization
+- Dynamic layout adjustments.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='opensampleexcel' data-doc='access sample excel template for area visualization.
+
+key features:
+- pre-formatted excel template
+- example data structure
+- color coding guidelines
+- area calculation formulas
+- category organization samples' data-tab='Drafting.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Drafting_tab_visualize_excel_button_icon.png' class='tool-icon' alt='OpenSampleExcel icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>OpenSampleExcel</h3>
+                                </header>
+        <p class='tool-description'>Access sample Excel template for area visualization.
+
+Key Features:
+- Pre-formatted Excel template
+- Example data structure
+- Color coding guidelines
+- Area calculation formulas
+- Category organization samples</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='EnneadTab_menu'><div class='tab-title'>EnneadTab.menu</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='activateenneadtab' data-doc='restore enneadtab functionality.
+
+key features:
+- system path verification
+- component activation
+- path configuration
+- startup script setup' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_activate_enneadtab_button_icon.png' class='tool-icon' alt='ActivateEnneadTab icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ActivateEnneadTab</h3>
+                                </header>
+        <p class='tool-description'>Restore EnneadTab functionality.
+
+Key Features:
+- System path verification
+- Component activation
+- Path configuration
+- Startup script setup</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='appstore' data-doc='access enneadtab's centralized tool repository.
+
+key features:
+- complete tool collection
+- category organization
+- installation management
+- update notifications
+- tool documentation access' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_app_store_button_icon.png' class='tool-icon' alt='AppStore icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>AppStore</h3>
+                                </header>
+        <p class='tool-description'>Access EnneadTab's centralized tool repository.
+
+Key Features:
+- Complete tool collection
+- Category organization
+- Installation management
+- Update notifications
+- Tool documentation access</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='checkerrorlog' data-doc='opens the google error log url in the default browser' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>CheckErrorLog</h3>
+                                </header>
+        <p class='tool-description'>Opens the Google error log URL in the default browser</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='makeanewbutton' data-doc='create new enneadtab button components.
+
+key features:
+- interactive button creation
+- template generation
+- file structure setup
+- icon integration support
+- documentation templates' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_create_new_button_button_icon.png' class='tool-icon' alt='MakeANewButton icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MakeANewButton</h3>
+                                </header>
+        <p class='tool-description'>Create new EnneadTab button components.
+
+Key Features:
+- Interactive button creation
+- Template generation
+- File structure setup
+- Icon integration support
+- Documentation templates</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='extractpreviewimages' data-doc='extract preview images from rhino files.
+
+key features:
+- batch image extraction
+- multiple file support
+- automatic naming convention
+- progress tracking' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_extract_preview_images_button_icon.png' class='tool-icon' alt='ExtractPreviewImages icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExtractPreviewImages</h3>
+                                </header>
+        <p class='tool-description'>Extract preview images from Rhino files.
+
+Key Features:
+- Batch image extraction
+- Multiple file support
+- Automatic naming convention
+- Progress tracking</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='getengine' data-doc='ensure that you have a localized python engine installed' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_get_engine_button_icon.png' class='tool-icon' alt='GetEngine icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>GetEngine</h3>
+                                </header>
+        <p class='tool-description'>Ensure that you have a localized Python engine installed</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='getlatest' data-doc='update enneadtab to latest version.
+
+key features:
+- automatic version detection
+- core module updates
+- system path configuration
+- component synchronization
+- installation verification' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_get_latest_button_icon.png' class='tool-icon' alt='GetLatest icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>GetLatest</h3>
+                                </header>
+        <p class='tool-description'>Update EnneadTab to latest version.
+
+Key Features:
+- Automatic version detection
+- Core module updates
+- System path configuration
+- Component synchronization
+- Installation verification</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='howtoinstall' data-doc='access enneadtab installation documentation.
+
+key features:
+- step-by-step installation guide
+- system requirements
+- troubleshooting tips
+- configuration instructions
+- team deployment guidance' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_how_to_install_button_icon.png' class='tool-icon' alt='HowToInstall icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>HowToInstall</h3>
+                                </header>
+        <p class='tool-description'>Access EnneadTab installation documentation.
+
+Key Features:
+- Step-by-step installation guide
+- System requirements
+- Troubleshooting tips
+- Configuration instructions
+- Team deployment guidance</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='monitordriveconnection' data-doc='launches the monitordrive application to track and manage network drive connections.
+this tool provides real-time monitoring of network drive status and connection health.' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_monitor_drive_connection_button_icon.png' class='tool-icon' alt='MonitorDriveConnection icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MonitorDriveConnection</h3>
+                                </header>
+        <p class='tool-description'>Launches the MonitorDrive application to track and manage network drive connections.
+This tool provides real-time monitoring of network drive status and connection health.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='openautosavefolder' data-doc='open the rhino autosave folder lcoations.' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_open_autosave_folder_button_icon.png' class='tool-icon' alt='OpenAutosaveFolder icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>OpenAutosaveFolder</h3>
+                                </header>
+        <p class='tool-description'>Open the Rhino autosave folder lcoations.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='openecosystemfolder' data-doc='access the enneadtab ecosystem directory.
+
+key features:
+- direct folder access
+- system file management
+- resource exploration
+- configuration access
+- template management' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_open_ecosystem_folder_button_icon.png' class='tool-icon' alt='OpenEcosystemFolder icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>OpenEcosystemFolder</h3>
+                                </header>
+        <p class='tool-description'>Access the EnneadTab Ecosystem directory.
+
+Key Features:
+- Direct folder access
+- System file management
+- Resource exploration
+- Configuration access
+- Template management</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='reloadengine' data-doc='reload all enneadtab modules to ensure latest changes are applied.
+
+this script will:
+1. import all enneadtab modules
+2. reload each module to apply latest changes
+3. handle any import errors gracefully' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_reload_engine_button_icon.png' class='tool-icon' alt='ReloadEngine icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ReloadEngine</h3>
+                                </header>
+        <p class='tool-description'>Reload all EnneadTab modules to ensure latest changes are applied.
+
+This script will:
+1. Import all EnneadTab modules
+2. Reload each module to apply latest changes
+3. Handle any import errors gracefully</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='remotefixcode' data-doc='launches vs code dev for emergency remote code editing and debugging' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_remote_fix_code_button_icon.png' class='tool-icon' alt='RemoteFixCode icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RemoteFixCode</h3>
+                                </header>
+        <p class='tool-description'>Launches VS Code Dev for emergency remote code editing and debugging</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='resetallconduit' data-doc='reset all display conduits to default state.
+
+key features:
+- complete conduit cleanup
+- memory optimization
+- display pipeline reset
+- system performance improvement
+- debug assistance' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_reset_all_conduit_button_icon.png' class='tool-icon' alt='ResetAllConduit icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ResetAllConduit</h3>
+                                </header>
+        <p class='tool-description'>Reset all display conduits to default state.
+
+Key Features:
+- Complete conduit cleanup
+- Memory optimization
+- Display pipeline reset
+- System performance improvement
+- Debug assistance</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='restartrhino' data-doc='restart rhino to apply core updates.
+
+key features:
+- safe application restart
+- update implementation
+- session state preservation
+- automatic core reloading
+- system verification' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_restart_rhino_button_icon.png' class='tool-icon' alt='RestartRhino icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RestartRhino</h3>
+                                </header>
+        <p class='tool-description'>Restart Rhino to apply core updates.
+
+Key Features:
+- Safe application restart
+- Update implementation
+- Session state preservation
+- Automatic core reloading
+- System verification</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='secretkeybinding' data-doc='setup some secrete shortcut based on sen's preference.' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_secret_key_binding_button_icon.png' class='tool-icon' alt='SecretKeyBinding icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SecretKeyBinding</h3>
+                                </header>
+        <p class='tool-description'>Setup some secrete shortcut based on Sen's preference.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='selfrepair' data-doc='automatically repair and update enneadtab installation.
+
+key features:
+- legacy rui detection and repair
+- automatic version updates
+- system path verification
+- component synchronization
+- installation validation' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_self_repair_button_icon.png' class='tool-icon' alt='SelfRepair icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SelfRepair</h3>
+                                </header>
+        <p class='tool-description'>Automatically repair and update EnneadTab installation.
+
+Key Features:
+- Legacy RUI detection and repair
+- Automatic version updates
+- System path verification
+- Component synchronization
+- Installation validation</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='tellmeversion' data-doc='display current enneadtab rhino version.
+
+key features:
+- version number display
+- update status information
+- installation verification
+- component compatibility check
+- release notes access' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_tell_me_version_button_icon.png' class='tool-icon' alt='TellMeVersion icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>TellMeVersion</h3>
+                                </header>
+        <p class='tool-description'>Display current EnneadTab Rhino version.
+
+Key Features:
+- Version number display
+- Update status information
+- Installation verification
+- Component compatibility check
+- Release notes access</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='uninstall enneadtab' data-doc='completely uninstall enneadtab from the system' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_Uninstall_button_icon.png' class='tool-icon' alt='Uninstall EnneadTab icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Uninstall EnneadTab</h3>
+                                </header>
+        <p class='tool-description'>Completely uninstall EnneadTab from the system</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='unittest' data-doc='execute unit tests for enneadtab components.
+
+key features:
+- comprehensive module testing
+- automated error detection
+- system integrity verification
+- performance validation' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_unit_test_button_icon.png' class='tool-icon' alt='UnitTest icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>UnitTest</h3>
+                                </header>
+        <p class='tool-description'>Execute unit tests for EnneadTab components.
+
+Key Features:
+- Comprehensive module testing
+- Automated error detection
+- System integrity verification
+- Performance validation</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='youtubeplaylist' data-doc='access enneadtab's video tutorial library.
+
+opens the official enneadtab youtube playlist containing tutorials, 
+demonstrations and workflow guides.' data-tab='EnneadTab.menu'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_EnneadTab_menu_youtube_playlist_button_icon.png' class='tool-icon' alt='YoutubePlaylist icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>YoutubePlaylist</h3>
+                                </header>
+        <p class='tool-description'>Access EnneadTab's video tutorial library.
+
+Opens the official EnneadTab YouTube playlist containing tutorials, 
+demonstrations and workflow guides.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='File_tab'><div class='tab-title'>File.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='archivefile' data-doc='archive files with customizable date prefixes.
+
+key features:
+- multiple date format options
+- batch file processing
+- custom destination selection
+- file opening options
+- automatic naming convention' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_archive_file_button_icon.png' class='tool-icon' alt='ArchiveFile icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ArchiveFile</h3>
+                                </header>
+        <p class='tool-description'>Archive files with customizable date prefixes.
+
+Key Features:
+- Multiple date format options
+- Batch file processing
+- Custom destination selection
+- File opening options
+- Automatic naming convention</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='bindworksession' data-doc='convert worksession to single file with organized layers.
+
+key features:
+- automatic layer organization
+- file hierarchy preservation
+- progress tracking
+- resource cleanup
+- email notification support' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_bind_worksession_button_icon.png' class='tool-icon' alt='BindWorksession icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>BindWorksession</h3>
+                                </header>
+        <p class='tool-description'>Convert worksession to single file with organized layers.
+
+Key Features:
+- Automatic layer organization
+- File hierarchy preservation
+- Progress tracking
+- Resource cleanup
+- Email notification support</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='createworksession' data-doc='create multi-file rhino worksession.
+
+key features:
+- multiple file selection support
+- custom session naming
+- automatic file linking
+- performance optimization
+- batch file processing' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_create_worksession_button_icon.png' class='tool-icon' alt='CreateWorksession icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>CreateWorksession</h3>
+                                </header>
+        <p class='tool-description'>Create multi-file Rhino worksession.
+
+Key Features:
+- Multiple file selection support
+- Custom session naming
+- Automatic file linking
+- Performance optimization
+- Batch file processing</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='docdata' data-doc='demonstrates usage of rhino_proj_data module for document data management.
+
+this script showcases how to:
+- inspect existing document data
+- set preferred grasshopper file path
+- store structured grasshopper input parameters
+- handle various data types (bool, int, float)
+
+example usage:
+    - left-click to run the demonstration
+    - view results in rhino command line
+' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_doc_data_button_icon.png' class='tool-icon' alt='DocData icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>DocData</h3>
+                                </header>
+        <p class='tool-description'>Demonstrates usage of RHINO_PROJ_DATA module for document data management.
+
+This script showcases how to:
+- Inspect existing document data
+- Set preferred Grasshopper file path
+- Store structured Grasshopper input parameters
+- Handle various data types (bool, int, float)
+
+Example Usage:
+    - Left-click to run the demonstration
+    - View results in Rhino command line
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='externaltrimmer' data-doc='manage external file trimming operations.
+
+key features:
+- external file linking and updating
+- boolean trimming operations
+- layer-based filtering
+- block instance management
+- automatic file synchronization' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_external_trimmer_button_icon.png' class='tool-icon' alt='ExternalTrimmer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExternalTrimmer</h3>
+                                </header>
+        <p class='tool-description'>Manage external file trimming operations.
+
+Key Features:
+- External file linking and updating
+- Boolean trimming operations
+- Layer-based filtering
+- Block instance management
+- Automatic file synchronization</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='externaltrimmer' data-doc='update external linked references.
+
+key features:
+- external block updating
+- link synchronization
+- reference management
+- file dependency tracking
+- automatic refresh handling' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_external_trimmer_button_icon.png' class='tool-icon' alt='ExternalTrimmer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExternalTrimmer</h3>
+                                </header>
+        <p class='tool-description'>Update external linked references.
+
+Key Features:
+- External block updating
+- Link synchronization
+- Reference management
+- File dependency tracking
+- Automatic refresh handling</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='rebasefile' data-doc='rebase file geometry and views to new origin point with x-axis orientation.
+
+key features:
+- interactive base point and x-axis reference point selection
+- automatic object transformation with coordinate system reorientation
+- view camera adjustment
+- named view preservation
+- comprehensive coordinate system update
+- eto form interface with clear instructions
+
+instructions:
+- every object, including those in locked and hidden layers, will be processed
+- all views will be processed
+- to avoid certain objects being rebased, put "rebase_ignore" in the object's name
+- to avoid certain cameras being rebased, put "rebase_ignore" in the camera name' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_rebase_file_button_icon.png' class='tool-icon' alt='RebaseFile icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RebaseFile</h3>
+                                </header>
+        <p class='tool-description'>Rebase file geometry and views to new origin point with X-axis orientation.
+
+Key Features:
+- Interactive base point and X-axis reference point selection
+- Automatic object transformation with coordinate system reorientation
+- View camera adjustment
+- Named view preservation
+- Comprehensive coordinate system update
+- ETO form interface with clear instructions
+
+Instructions:
+- Every object, including those in locked and hidden layers, will be processed
+- All views will be processed
+- To avoid certain objects being rebased, put "REBASE_IGNORE" in the object's name
+- To avoid certain cameras being rebased, put "REBASE_IGNORE" in the camera name</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='savesmallandclose' data-doc='save optimized file and close document.
+
+key features:
+- automatic resource cleanup
+- material purging
+- block definition optimization
+- layer cleanup
+- quick document closure' data-tab='File.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_File_tab_save_small_and_close_button_icon.png' class='tool-icon' alt='SaveSmallAndClose icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SaveSmallAndClose</h3>
+                                </header>
+        <p class='tool-description'>Save optimized file and close document.
+
+Key Features:
+- Automatic resource cleanup
+- Material purging
+- Block definition optimization
+- Layer cleanup
+- Quick document closure</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Fun_tab'><div class='tab-title'>Fun.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='dvd' data-doc='classic dvd screensaver animation for rhino.
+
+a nostalgic entertainment feature that recreates the 
+bouncing dvd logo animation within rhino viewport.' data-tab='Fun.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Fun_tab_dvd_button_icon.png' class='tool-icon' alt='DVD icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>DVD</h3>
+                                </header>
+        <p class='tool-description'>Classic DVD screensaver animation for Rhino.
+
+A nostalgic entertainment feature that recreates the 
+bouncing DVD logo animation within Rhino viewport.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='enneadcity' data-doc='work on your plot - gui interface' data-tab='Fun.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Fun_tab_ennead_city_button_icon.png' class='tool-icon' alt='EnneadCity icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>EnneadCity</h3>
+                                </header>
+        <p class='tool-description'>Work on your plot - GUI Interface</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='enneadcity' data-doc='enneadcity gui interface' data-tab='Fun.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Fun_tab_ennead_city_button_icon.png' class='tool-icon' alt='EnneadCity icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>EnneadCity</h3>
+                                </header>
+        <p class='tool-description'>EnneadCity GUI Interface</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='petduck' data-doc='
+duckitect - ai architecture assistant
+------------------------------------
+
+a desktop companion that combines architectural expertise with ai capabilities.
+
+features:
+- ai-powered chat and analysis
+- architecture tools and code library
+- rhino/grasshopper integration
+- professional documentation support
+
+usage: left click to activate
+' data-tab='Fun.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Fun_tab_pet_duck_button_icon.png' class='tool-icon' alt='PetDuck icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>PetDuck</h3>
+                                </header>
+        <p class='tool-description'>
+DuckiTect - AI Architecture Assistant
+------------------------------------
+
+A desktop companion that combines architectural expertise with AI capabilities.
+
+Features:
+- AI-powered chat and analysis
+- Architecture tools and code library
+- Rhino/Grasshopper integration
+- Professional documentation support
+
+Usage: Left click to activate
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='redalert' data-doc='command & conquer inspired game mode for rhino.
+
+features:
+- real-time audio feedback for modeling operations
+- classic rts game sound effects
+- dynamic response to object creation/deletion
+- nostalgic gaming atmosphere while modeling' data-tab='Fun.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Fun_tab_red_alert_button_icon.png' class='tool-icon' alt='RedAlert icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RedAlert</h3>
+                                </header>
+        <p class='tool-description'>Command & Conquer inspired game mode for Rhino.
+
+Features:
+- Real-time audio feedback for modeling operations
+- Classic RTS game sound effects
+- Dynamic response to object creation/deletion
+- Nostalgic gaming atmosphere while modeling</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Knowledge_tab'><div class='tab-title'>Knowledge.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='chinacoderef' data-doc='this button does chinacoderef when left click' data-tab='Knowledge.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Knowledge_tab_china_code_ref_button_icon.png' class='tool-icon' alt='ChinaCodeRef icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ChinaCodeRef</h3>
+                                </header>
+        <p class='tool-description'>This button does ChinaCodeRef when left click</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='perforationratio' data-doc='find out how to calculate your perforation panel with precise opening ratio.' data-tab='Knowledge.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Knowledge_tab_perforation_ratio_button_icon.png' class='tool-icon' alt='PerforationRatio icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>PerforationRatio</h3>
+                                </header>
+        <p class='tool-description'>Find out how to calculate your perforation panel with precise opening ratio.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='placeasset' data-doc='place asset from asset library' data-tab='Knowledge.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Knowledge_tab_place_asset_button_icon.png' class='tool-icon' alt='PlaceAsset icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>PlaceAsset</h3>
+                                </header>
+        <p class='tool-description'>Place Asset from asset library</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='searchcommand, learnenneadtabforrhino, commandlist' data-doc='search and learn enneadtab commands.
+
+key features:
+- interactive command search
+- function documentation
+- command aliases
+- tool location finder
+- visual command preview' data-tab='Knowledge.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Knowledge_tab_search_command_button_icon.png' class='tool-icon' alt='['SearchCommand', 'LearnEnneadTabForRhino', 'CommandList'] icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SearchCommand, LearnEnneadTabForRhino, CommandList</h3>
+                                </header>
+        <p class='tool-description'>Search and learn EnneadTab commands.
+
+Key Features:
+- Interactive command search
+- Function documentation
+- Command aliases
+- Tool location finder
+- Visual command preview</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='slopecalculator' data-doc='this button does slopecalculator when left click' data-tab='Knowledge.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Knowledge_tab_slope_calculator_button_icon.png' class='tool-icon' alt='SlopeCalculator icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SlopeCalculator</h3>
+                                </header>
+        <p class='tool-description'>This button does SlopeCalculator when left click</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='tutorial' data-doc='enneadtab learning resources hub.
+
+features:
+- access to comprehensive gh tutorials
+- local documentation and pdf guides
+- video tutorials via youtube playlist
+- quick reference materials for common workflows' data-tab='Knowledge.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Knowledge_tab_turtorial_button_icon.png' class='tool-icon' alt='Tutorial icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Tutorial</h3>
+                                </header>
+        <p class='tool-description'>EnneadTab learning resources hub.
+
+Features:
+- Access to comprehensive GH tutorials
+- Local documentation and PDF guides
+- Video tutorials via YouTube playlist
+- Quick reference materials for common workflows</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Lab_tab'><div class='tab-title'>Lab.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='anything' data-doc='a sandbox utility for quick testing and prototyping in rhino. use this button to run experimental code snippets, debug features, or validate new ideas without creating a dedicated tool.' data-tab='Lab.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Lab_tab_anything_button_icon.png' class='tool-icon' alt='Anything icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Anything</h3>
+                                </header>
+        <p class='tool-description'>A sandbox utility for quick testing and prototyping in Rhino. Use this button to run experimental code snippets, debug features, or validate new ideas without creating a dedicated tool.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='dockpane' data-doc='a dockable panel that attaches to the side of rhino window' data-tab='Lab.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Lab_tab_dockpane_button_icon.png' class='tool-icon' alt='Dockpane icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Dockpane</h3>
+                                </header>
+        <p class='tool-description'>A dockable panel that attaches to the side of Rhino window</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='text2script' data-doc='utility script to convert text to script using ai.
+
+note: this is rhino 8 only.
+
+features:
+- converts natural language to executable python script
+- integrated with rhino's rhinoscriptsyntax
+- maximum 5 refinement attempts for optimal results
+- always uses main() as the entry function
+- modern error handling and user feedback
+' data-tab='Lab.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Lab_tab_text2script_button_icon.png' class='tool-icon' alt='Text2Script icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Text2Script</h3>
+                                </header>
+        <p class='tool-description'>Utility script to convert text to script using AI.
+
+Note: This is Rhino 8 only.
+
+Features:
+- Converts natural language to executable Python script
+- Integrated with Rhino's rhinoscriptsyntax
+- Maximum 5 refinement attempts for optimal results
+- Always uses main() as the entry function
+- Modern error handling and user feedback
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='text2scriptsetting' data-doc='opens the settings panel for the text2script tool, allowing users to configure ai model preferences, api keys, and script generation options for converting natural language to python scripts in rhino.' data-tab='Lab.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Lab_tab_text2script_button_icon.png' class='tool-icon' alt='Text2ScriptSetting icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Text2ScriptSetting</h3>
+                                </header>
+        <p class='tool-description'>Opens the settings panel for the Text2Script tool, allowing users to configure AI model preferences, API keys, and script generation options for converting natural language to Python scripts in Rhino.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='viewprettifier' data-doc='generate ai renderings from architectural images.
+features:
+- processes existing architectural images
+- detects edges in the image to preserve model structure
+- allows use of style reference images
+- modern dark-themed gui for configuration
+- model and controlnet selection
+- progress tracking with step indicators
+- generates ai renderings using stable diffusion with controlnet
+- shows real-time progress during generation
+- automatically installs required dependencies
+- monitors for stalled processes and provides diagnostics
+' data-tab='Lab.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Lab_tab_view_prettifier_button_icon.png' class='tool-icon' alt='ViewPrettifier icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ViewPrettifier</h3>
+                                </header>
+        <p class='tool-description'>Generate AI renderings from architectural images.
+Features:
+- Processes existing architectural images
+- Detects edges in the image to preserve model structure
+- Allows use of style reference images
+- Modern dark-themed GUI for configuration
+- Model and ControlNet selection
+- Progress tracking with step indicators
+- Generates AI renderings using Stable Diffusion with ControlNet
+- Shows real-time progress during generation
+- Automatically installs required dependencies
+- Monitors for stalled processes and provides diagnostics
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Layer_tab'><div class='tab-title'>Layer.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='destroylayer' data-doc='delete selected layers, even if there are objs in it. helpful when layer tree is constrainted by block usage.' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_destroy_layer_button_icon.png' class='tool-icon' alt='DestroyLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>DestroyLayer</h3>
+                                </header>
+        <p class='tool-description'>Delete selected layers, even if there are objs in it. Helpful when layer tree is constrainted by block usage.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='findlayerinfiles' data-doc='search for layers across multiple files.
+
+key features:
+- multi-file layer search
+- case-insensitive matching
+- progress tracking
+- search result summary
+- file origin tracking' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_find_layer_in_files_button_icon.png' class='tool-icon' alt='FindLayerInFiles icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>FindLayerInFiles</h3>
+                                </header>
+        <p class='tool-description'>Search for layers across multiple files.
+
+Key Features:
+- Multi-file layer search
+- Case-insensitive matching
+- Progress tracking
+- Search result summary
+- File origin tracking</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='forcelayerpackage' data-doc='detach selected geometry and blocks to a chosen system_ layer.
+
+workflow:
+1. detect or create system_xx root layers.
+2. ask user to choose the target system_ layer through a list-box.
+3. migrate non-block geometry first, preserving any sub-layer structure.
+4. make each block definition in the selection unique so that edits do not
+   affect instances outside the selection.
+5. update every object (including objects inside the new block definitions)
+   so that their layers live under the chosen system_ layer.
+
+the implementation is written as a group of small helper functions for
+future reuse.' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ForceLayerPackage</h3>
+                                </header>
+        <p class='tool-description'>Detach selected geometry and blocks to a chosen SYSTEM_ layer.
+
+Workflow:
+1. Detect or create SYSTEM_XX root layers.
+2. Ask user to choose the target SYSTEM_ layer through a list-box.
+3. Migrate non-block geometry first, preserving any sub-layer structure.
+4. Make each block definition in the selection unique so that edits do not
+   affect instances outside the selection.
+5. Update every object (including objects inside the new block definitions)
+   so that their layers live under the chosen SYSTEM_ layer.
+
+The implementation is written as a group of small helper functions for
+future reuse.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='initiatelayers' data-doc='create standardized layer structures.
+
+key features:
+- predefined layer schemes
+- color-coded organization
+- program-based grouping
+- material-based grouping
+- customizable hierarchy' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_initiate_layers_button_icon.png' class='tool-icon' alt='InitiateLayers icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>InitiateLayers</h3>
+                                </header>
+        <p class='tool-description'>Create standardized layer structures.
+
+Key Features:
+- Predefined layer schemes
+- Color-coded organization
+- Program-based grouping
+- Material-based grouping
+- Customizable hierarchy</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='isolatelayerbyselection' data-doc='show only objects on selected layers.
+
+key features:
+- selection-based isolation
+- layer visibility control
+- quick view focusing
+- multiple layer support
+- view organization' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_isolate_layer_by_selection_button_icon.png' class='tool-icon' alt='IsolateLayerBySelection icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>IsolateLayerBySelection</h3>
+                                </header>
+        <p class='tool-description'>Show only objects on selected layers.
+
+Key Features:
+- Selection-based isolation
+- Layer visibility control
+- Quick view focusing
+- Multiple layer support
+- View organization</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='selectobjectsonsimilarlayer' data-doc='selection objects on the similar layers.' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_isolate_layer_by_selection_button_icon.png' class='tool-icon' alt='SelectObjectsOnSimilarLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SelectObjectsOnSimilarLayer</h3>
+                                </header>
+        <p class='tool-description'>Selection objects on the similar layers.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='layernameformat' data-doc='standardize layer naming conventions.
+
+key features:
+- multiple format options
+- case formatting
+- pattern preservation
+- batch renaming
+- protected name handling' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_layer_name_format_button_icon.png' class='tool-icon' alt='LayerNameFormat icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>LayerNameFormat</h3>
+                                </header>
+        <p class='tool-description'>Standardize layer naming conventions.
+
+Key Features:
+- Multiple format options
+- Case formatting
+- Pattern preservation
+- Batch renaming
+- Protected name handling</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='mergelayer' data-doc='combine multiple layers into one.
+
+key features:
+- layer consolidation
+- block-aware merging
+- property preservation
+- layer cleanup
+- batch processing' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_merge_layer_button_icon.png' class='tool-icon' alt='MergeLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MergeLayer</h3>
+                                </header>
+        <p class='tool-description'>Combine multiple layers into one.
+
+Key Features:
+- Layer consolidation
+- Block-aware merging
+- Property preservation
+- Layer cleanup
+- Batch processing</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='nestlayer' data-doc='organize layers in hierarchical structure.
+
+key features:
+- layer nesting automation
+- block-aware processing
+- duplicate name handling
+- layer hierarchy preservation
+- batch layer organization' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_nest_layer_button_icon.png' class='tool-icon' alt='NestLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>NestLayer</h3>
+                                </header>
+        <p class='tool-description'>Organize layers in hierarchical structure.
+
+Key Features:
+- Layer nesting automation
+- Block-aware processing
+- Duplicate name handling
+- Layer hierarchy preservation
+- Batch layer organization</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomlayercolor' data-doc='assign random colors to layers.
+
+key features:
+- smart color assignment
+- context-aware coloring
+- desaturated color option
+- color scheme preservation
+- batch processing support' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_random_layer_color_button_icon.png' class='tool-icon' alt='RandomLayerColor icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomLayerColor</h3>
+                                </header>
+        <p class='tool-description'>Assign random colors to layers.
+
+Key Features:
+- Smart color assignment
+- Context-aware coloring
+- Desaturated color option
+- Color scheme preservation
+- Batch processing support</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomlayercolorsetting' data-doc='change the setting of color style.' data-tab='Layer.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Layer_tab_random_layer_color_button_icon.png' class='tool-icon' alt='RandomLayerColorSetting icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomLayerColorSetting</h3>
+                                </header>
+        <p class='tool-description'>Change the setting of color style.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Material_tab'><div class='tab-title'>Material.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='assignemptymaterialtolayer' data-doc='same as ea_assignemptymaterial' data-tab='Material.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Material_tab_assign_empty_material_to_layer_button_icon.png' class='tool-icon' alt='AssignEmptyMaterialToLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>AssignEmptyMaterialToLayer</h3>
+                                </header>
+        <p class='tool-description'>Same as EA_AssignEmptyMaterial</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='importselectedmaterial' data-doc='import materials from external files.
+
+key features:
+- selective material import
+- property preservation
+- material preview
+- name conflict handling
+- multi-select support' data-tab='Material.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Material_tab_import_selected_material_button_icon.png' class='tool-icon' alt='ImportSelectedMaterial icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ImportSelectedMaterial</h3>
+                                </header>
+        <p class='tool-description'>Import materials from external files.
+
+Key Features:
+- Selective material import
+- Property preservation
+- Material preview
+- Name conflict handling
+- Multi-select support</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='materialprefix' data-doc='add file-specific prefixes to materials.
+
+key features:
+- automatic prefix generation
+- session compatibility
+- name conflict resolution
+- batch processing
+- material tracking' data-tab='Material.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Material_tab_material_prefix_button_icon.png' class='tool-icon' alt='MaterialPrefix icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MaterialPrefix</h3>
+                                </header>
+        <p class='tool-description'>Add file-specific prefixes to materials.
+
+Key Features:
+- Automatic prefix generation
+- Session compatibility
+- Name conflict resolution
+- Batch processing
+- Material tracking</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='mergematerials' data-doc='consolidate multiple materials into one.
+
+key features:
+- material consolidation
+- block-aware processing
+- layer material handling
+- object material updating
+- automatic cleanup.' data-tab='Material.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Material_tab_merge_materials_button_icon.png' class='tool-icon' alt='MergeMaterials icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MergeMaterials</h3>
+                                </header>
+        <p class='tool-description'>Consolidate multiple materials into one.
+
+Key Features:
+- Material consolidation
+- Block-aware processing
+- Layer material handling
+- Object material updating
+- Automatic cleanup.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomtexturewalk' data-doc='randomize texture mapping positions.
+
+key features:
+- texture offset randomization
+- mapping preservation
+- customizable range
+- batch processing
+- pattern variation' data-tab='Material.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Material_tab_random_texture_walk_button_icon.png' class='tool-icon' alt='RandomTextureWalk icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomTextureWalk</h3>
+                                </header>
+        <p class='tool-description'>Randomize texture mapping positions.
+
+Key Features:
+- Texture offset randomization
+- Mapping preservation
+- Customizable range
+- Batch processing
+- Pattern variation</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='removestringinmaterialname' data-doc='remove the specific string in material name. handy if trying to remove file name prefix.' data-tab='Material.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Material_tab_remove_string_in_material_name_button_icon.png' class='tool-icon' alt='RemoveStringInMaterialName icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RemoveStringInMaterialName</h3>
+                                </header>
+        <p class='tool-description'>Remove the specific string in material name. Handy if trying to remove file name prefix.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Modify_tab'><div class='tab-title'>Modify.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='flattenmeshface' data-doc='try to flatten the mesh face so there is no bump' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_flatten_mesh_face_button_icon.png' class='tool-icon' alt='FlattenMeshFace icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>FlattenMeshFace</h3>
+                                </header>
+        <p class='tool-description'>Try to flatten the mesh face so there is no bump</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='makevoidseam' data-doc='creates void cut polysurfaces based on layer name configuration.
+
+the script processes layers containing seam definitions to generate corresponding void cuts.
+layer names should include width parameters in square brackets (e.g. 'seam[12]').
+' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_make_void_seam_button_icon.png' class='tool-icon' alt='MakeVoidSeam icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MakeVoidSeam</h3>
+                                </header>
+        <p class='tool-description'>Creates void cut polysurfaces based on layer name configuration.
+
+The script processes layers containing seam definitions to generate corresponding void cuts.
+Layer names should include width parameters in square brackets (e.g. 'seam[12]').
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='matchcrvdir' data-doc='match multiple crvs direction.' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_match_crv_dir_button_icon.png' class='tool-icon' alt='MatchCrvDir icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MatchCrvDir</h3>
+                                </header>
+        <p class='tool-description'>Match multiple crvs direction.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='measure3d' data-doc='display 3d measurements between two points.
+
+shows total distance with a curve, and displays x, y, z differences as color-coded curves:
+- x difference in red
+- y difference in green
+- z difference in blue
+
+measurements remain on screen until a new measurement is started.
+' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_measure_3d_button_icon.png' class='tool-icon' alt='Measure3D icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Measure3D</h3>
+                                </header>
+        <p class='tool-description'>Display 3D measurements between two points.
+
+Shows total distance with a curve, and displays X, Y, Z differences as color-coded curves:
+- X difference in red
+- Y difference in green
+- Z difference in blue
+
+Measurements remain on screen until a new measurement is started.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='movefixeddist' data-doc='move selected objects a fixed distance in 6 directions.
+
+features:
+- simple modeless interface with 6 directional buttons
+- persistent distance value between sessions
+- input validation for numeric values
+- north/south/east/west/up/down movement
+- allows full interaction with rhino while dialog is open
+- gamepad-style button layout
+- zoom to selected function
+- measure3d function for quick measurements
+- choice between view cplane and world cplane coordinate systems' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_move_fixed_dist_button_icon.png' class='tool-icon' alt='MoveFixedDist icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MoveFixedDist</h3>
+                                </header>
+        <p class='tool-description'>Move selected objects a fixed distance in 6 directions.
+
+Features:
+- Simple modeless interface with 6 directional buttons
+- Persistent distance value between sessions
+- Input validation for numeric values
+- North/South/East/West/Up/Down movement
+- Allows full interaction with Rhino while dialog is open
+- Gamepad-style button layout
+- Zoom to selected function
+- Measure3D function for quick measurements
+- Choice between View CPlane and World CPlane coordinate systems</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='offsetfloorborder' data-doc='shrink/expand the border of floor for input srf or polysrfs. the thickness is retained if using polysrf.' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_offset_floor_border_button_icon.png' class='tool-icon' alt='OffsetFloorBorder icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>OffsetFloorBorder</h3>
+                                </header>
+        <p class='tool-description'>Shrink/Expand the border of floor for input srf or polysrfs. The thickness is retained if using polysrf.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='pushglassin' data-doc='creates recessed glass surfaces from selected surfaces.
+
+generates inset glass surfaces with surrounding frame geometry.
+useful for creating window/curtainwall details with depth.
+' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_push_glass_in_button_icon.png' class='tool-icon' alt='PushGlassIn icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>PushGlassIn</h3>
+                                </header>
+        <p class='tool-description'>Creates recessed glass surfaces from selected surfaces.
+
+Generates inset glass surfaces with surrounding frame geometry.
+Useful for creating window/curtainwall details with depth.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='shapemapper' data-doc='maps complex designs over target surfaces.
+
+advanced surface mapping utility that provides enhanced control compared to flowalongsurface.
+allows mapping of curves, surfaces and polysurfaces while maintaining design intent.
+' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_shape_mapper_button_icon.png' class='tool-icon' alt='ShapeMapper icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ShapeMapper</h3>
+                                </header>
+        <p class='tool-description'>Maps complex designs over target surfaces.
+
+Advanced surface mapping utility that provides enhanced control compared to FlowAlongSurface.
+Allows mapping of curves, surfaces and polysurfaces while maintaining design intent.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='srftopanel' data-doc='advanced surface panelization utility.
+
+features:
+- converts surfaces to detailed panel geometry
+- configurable panel thickness and joint reveals
+- automatic edge detail generation
+- maintains design intent while adding construction detail' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_srf_to_panel_button_icon.png' class='tool-icon' alt='SrfToPanel icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SrfToPanel</h3>
+                                </header>
+        <p class='tool-description'>Advanced surface panelization utility.
+
+Features:
+- Converts surfaces to detailed panel geometry
+- Configurable panel thickness and joint reveals
+- Automatic edge detail generation
+- Maintains design intent while adding construction detail</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='timetravel' data-doc='selective undo tool for rhino objects.
+
+features:
+- undo history for selected objects only
+- maintains other objects' current state
+- precise history control for specific elements' data-tab='Modify.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Modify_tab_time_travel_button_icon.png' class='tool-icon' alt='TimeTravel icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>TimeTravel</h3>
+                                </header>
+        <p class='tool-description'>Selective undo tool for Rhino objects.
+
+Features:
+- Undo history for selected objects only
+- Maintains other objects' current state
+- Precise history control for specific elements</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Other'><div class='tab-title'>Other</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='enneadtab_startup' data-doc='the friendly welcome wagon for enneadtab in rhino! this startup script springs into action with each new rhino session, quietly setting up your environment with all the enneadtab goodness. it registers aliases, checks for updates, sets up event hooks, and ensures all your favorite tools are ready to use - so you can focus on creating amazing designs.' data-tab='Other'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>EnneadTab_Startup</h3>
+                                </header>
+        <p class='tool-description'>The friendly welcome wagon for EnneadTab in Rhino! This startup script springs into action with each new Rhino session, quietly setting up your environment with all the EnneadTab goodness. It registers aliases, checks for updates, sets up event hooks, and ensures all your favorite tools are ready to use - so you can focus on creating amazing designs.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Render_tab'><div class='tab-title'>Render.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='airenderingfromview' data-doc='renders rhino views using stable diffusion ai.
+
+captures current viewport and processes it through selected ai models.
+provides extensive control over rendering style, mood, and architectural context.
+' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_ai_render_button_icon.png' class='tool-icon' alt='AiRenderingFromView icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>AiRenderingFromView</h3>
+                                </header>
+        <p class='tool-description'>Renders Rhino views using Stable Diffusion AI.
+
+Captures current viewport and processes it through selected AI models.
+Provides extensive control over rendering style, mood, and architectural context.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='airenderupscale' data-doc='upscale ai generated images.' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_ai_render_button_icon.png' class='tool-icon' alt='AiRenderUpscale icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>AiRenderUpscale</h3>
+                                </header>
+        <p class='tool-description'>Upscale AI generated images.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='assignemptymaterial' data-doc='assigns unique materials to layers without assigned materials.
+
+key features:
+- creates a unique material for each layer without materials
+- material names based on layer hierarchy (including parent layers)
+- makes d5 material editing workflow more efficient
+- use the layer color as the material diffuse color
+' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_assign_empty_material_button_icon.png' class='tool-icon' alt='AssignEmptyMaterial icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>AssignEmptyMaterial</h3>
+                                </header>
+        <p class='tool-description'>Assigns unique materials to layers without assigned materials.
+
+Key Features:
+- Creates a unique material for each layer without materials
+- Material names based on layer hierarchy (including parent layers)
+- Makes D5 material editing workflow more efficient
+- Use the layer color as the material diffuse color
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='d5assetlocator' data-doc='your personal detective for hunting down elusive d5 assets!
+
+this handy tool launches the d5assetchanger application that helps you:
+- locate hidden d5 asset folders across your system
+- access and modify materials on d5 objects
+- customize properties of those beautiful d5 trees, furniture and people
+- save hours of searching through obscure file directories
+
+perfect for visualization specialists who need precise control over their d5 assets.
+' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>D5AssetLocator</h3>
+                                </header>
+        <p class='tool-description'>Your personal detective for hunting down elusive D5 assets!
+
+This handy tool launches the D5AssetChanger application that helps you:
+- Locate hidden D5 asset folders across your system
+- Access and modify materials on D5 objects
+- Customize properties of those beautiful D5 trees, furniture and people
+- Save hours of searching through obscure file directories
+
+Perfect for visualization specialists who need precise control over their D5 assets.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='enscapeassetlocator' data-doc='your personal detective for hunting down elusive enscape assets!
+
+this handy tool launches the enscapeassetchanger application that helps you:
+- locate hidden enscape asset folders across your system
+- access and modify materials on enscape objects
+- customize properties of those beautiful enscape trees, furniture and people
+- save hours of searching through obscure file directories
+
+perfect for visualization specialists who need precise control over their enscape assets.
+' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_enscape_asset_locator_button_icon.png' class='tool-icon' alt='EnscapeAssetLocator icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>EnscapeAssetLocator</h3>
+                                </header>
+        <p class='tool-description'>Your personal detective for hunting down elusive Enscape assets!
+
+This handy tool launches the EnscapeAssetChanger application that helps you:
+- Locate hidden Enscape asset folders across your system
+- Access and modify materials on Enscape objects
+- Customize properties of those beautiful Enscape trees, furniture and people
+- Save hours of searching through obscure file directories
+
+Perfect for visualization specialists who need precise control over their Enscape assets.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='getgoogleearthmodel' data-doc='this button does getgoogleearthmodel when left click' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_get_google_earth_model_button_icon.png' class='tool-icon' alt='GetGoogleEarthModel icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>GetGoogleEarthModel</h3>
+                                </header>
+        <p class='tool-description'>This button does GetGoogleEarthModel when left click</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='getinspired' data-doc='opens render polisher website (https://render-polisher.vercel.app/) in the default browser' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_get_inspired_button_icon.png' class='tool-icon' alt='GetInspired icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>GetInspired</h3>
+                                </header>
+        <p class='tool-description'>Opens Render Polisher website (https://render-polisher.vercel.app/) in the default browser</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='importselectedcamera' data-doc='import seleced camera from another file.' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_import_selected_camera_button_icon.png' class='tool-icon' alt='ImportSelectedCamera icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ImportSelectedCamera</h3>
+                                </header>
+        <p class='tool-description'>Import seleced camera from another file.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='inspectenscapesetting' data-doc='inspect and compare enscape setting files for differences' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_inspect_enscape_setting_button_icon.png' class='tool-icon' alt='InspectEnscapeSetting icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>InspectEnscapeSetting</h3>
+                                </header>
+        <p class='tool-description'>Inspect and compare Enscape setting files for differences</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='loadenscapetopsd' data-doc='load related enscape image to photoshop' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_load_enscape_to_psd_button_icon.png' class='tool-icon' alt='LoadEnscapeToPsd icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>LoadEnscapeToPsd</h3>
+                                </header>
+        <p class='tool-description'>Load related Enscape image to Photoshop</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='makecrvpipe' data-doc='make/update a small pipe along crvs in layers that has '[edge]' in it. so coplanar face in enscape can show edge.' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_make_crv_pipe_button_icon.png' class='tool-icon' alt='MakeCrvPipe icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MakeCrvPipe</h3>
+                                </header>
+        <p class='tool-description'>Make/Update a small pipe along crvs in layers that has '[EDGE]' in it. So coplanar face in enscape can show edge.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='materialshop' data-doc='your gateway to a treasure trove of high-quality materials! opens ambientcg, a fantastic resource offering hundreds of free pbr materials perfect for architectural visualization. quickly find textures, hdris, and 3d models to elevate your renderings without spending a penny.' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_material_shop_button_icon.png' class='tool-icon' alt='MaterialShop icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MaterialShop</h3>
+                                </header>
+        <p class='tool-description'>Your gateway to a treasure trove of high-quality materials! Opens AmbientCG, a fantastic resource offering hundreds of free PBR materials perfect for architectural visualization. Quickly find textures, HDRIs, and 3D models to elevate your renderings without spending a penny.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='renameenscapefiles' data-doc='rename the output of enscape files to remove the long bit.' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Render_tab_rename_enscape_files_button_icon.png' class='tool-icon' alt='RenameEnscapeFiles icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RenameEnscapeFiles</h3>
+                                </header>
+        <p class='tool-description'>Rename the output of Enscape files to remove the long bit.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='renderpolisher' data-doc='launch the render polisher application for enhancing and refining your renders!
+
+this tool opens the renderpolisher.exe application that helps you:
+- polish and enhance render outputs
+- apply post-processing effects
+- refine render quality and appearance
+- streamline your rendering workflow
+
+perfect for visualization specialists looking to take their renders to the next level.
+' data-tab='Render.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RenderPolisher</h3>
+                                </header>
+        <p class='tool-description'>Launch the Render Polisher application for enhancing and refining your renders!
+
+This tool opens the RenderPolisher.exe application that helps you:
+- Polish and enhance render outputs
+- Apply post-processing effects
+- Refine render quality and appearance
+- Streamline your rendering workflow
+
+Perfect for visualization specialists looking to take their renders to the next level.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Revit_tab'><div class='tab-title'>Revit.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='block2family' data-doc='convert rhino blocks to revit families and place them in project. this tool different from standard rhino2revit because you do not need to manage family creation and it can batch process.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_block2family_button_icon.png' class='tool-icon' alt='Block2Family icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Block2Family</h3>
+                                </header>
+        <p class='tool-description'>Convert rhino blocks to revit families and place them in project. This tool different from standard Rhino2Revit because you do not need to manage family creation and it can batch process.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='breptomass' data-doc='using faces of the brep to recreate a freeform mass in revit.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_brep_to_mass_button_icon.png' class='tool-icon' alt='BrepToMass icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>BrepToMass</h3>
+                                </header>
+        <p class='tool-description'>Using faces of the brep to recreate a freeform mass in Revit.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='draftinsulationbatting' data-doc='given base crvs and thickness, it makes a 2d insulation batting graphic that can be any shape. ' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_draft_insulation_batting_button_icon.png' class='tool-icon' alt='DraftInsulationBatting icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>DraftInsulationBatting</h3>
+                                </header>
+        <p class='tool-description'>Given base crvs and thickness, it makes a 2D insulation batting graphic that can be any shape. </p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='exportcameratorevit' data-doc='you can recreate same 3d camera in revit by exporting cameras from rhino here first.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_export_camera_to_revit_button_icon.png' class='tool-icon' alt='ExportCameraToRevit icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExportCameraToRevit</h3>
+                                </header>
+        <p class='tool-description'>You can recreate same 3D camera in Revit by exporting cameras from Rhino here first.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='rhino2revit' data-doc='export layer contents to 3dm and dwg for rhino2revit in enneadtab for revit.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_export_for_rhino2revit_button_icon.png' class='tool-icon' alt='Rhino2Revit icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Rhino2Revit</h3>
+                                </header>
+        <p class='tool-description'>Export Layer Contents to 3dm and dwg for Rhino2Revit in EnneadTab for Revit.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='exportmaterialbylayer' data-doc='export material definitions for each layer using legal file names as dictionary keys.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_export_material_by_layer_button_icon.png' class='tool-icon' alt='ExportMaterialByLayer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExportMaterialByLayer</h3>
+                                </header>
+        <p class='tool-description'>Export material definitions for each layer using legal file names as dictionary keys.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='floordrafter' data-doc='convert brep to floor data so in revit it can be used as floor creation base.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_floor_drafter_button_icon.png' class='tool-icon' alt='FloorDrafter icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>FloorDrafter</h3>
+                                </header>
+        <p class='tool-description'>Convert brep to floor data so in Revit it can be used as floor creation base.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='importrevitcollection' data-doc='organize dwgs export from revit to readable rhino layer tree.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_import_revit_collection_button_icon.png' class='tool-icon' alt='ImportRevitCollection icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ImportRevitCollection</h3>
+                                </header>
+        <p class='tool-description'>Organize dwgs export from Revit to readable Rhino layer tree.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='liveselection' data-doc='enables real-time selection synchronization between rhino and revit. allows users to select objects in rhino and have the selection reflected in revit, streamlining cross-platform workflows and coordination.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_live_selection_button_icon.png' class='tool-icon' alt='LiveSelection icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>LiveSelection</h3>
+                                </header>
+        <p class='tool-description'>Enables real-time selection synchronization between Rhino and Revit. Allows users to select objects in Rhino and have the selection reflected in Revit, streamlining cross-platform workflows and coordination.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='mapblocktransform' data-doc='send the transformation of the blocks to revit to be used by space adaptive family. this is the only known way of doing true free 3d orientation in revit.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_map_block_transform_button_icon.png' class='tool-icon' alt='MapBlockTransform icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MapBlockTransform</h3>
+                                </header>
+        <p class='tool-description'>Send the transformation of the blocks to Revit to be used by space adaptive family. This is the only known way of doing true free 3D orientation in Revit.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='maprevitsubcategorymaterial' data-doc='work with exportsubcategorymaterialtable on revit side. after you export the ost mapping there, this button help you create and map layer material based on layer name, if found in the ost mapping' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_map_revit_subc_material_button_icon.png' class='tool-icon' alt='MapRevitSubCategoryMaterial icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MapRevitSubCategoryMaterial</h3>
+                                </header>
+        <p class='tool-description'>Work with ExportSubCategoryMaterialTable on revit side. After you export the OST mapping there, this button help you create and map layer material based on layer name, if found in the OST mapping</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='revitdrafterimport' data-doc='imports drafting content from revit.
+
+features:
+- sets up layer structure for line styles
+- supports filled region types
+- maintains layer organization
+- preserves object properties
+
+usage:
+1. export content from revit
+2. run command to import
+3. content organized in layer tree' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_revit_drafter_button_icon.png' class='tool-icon' alt='RevitDrafterImport icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RevitDrafterImport</h3>
+                                </header>
+        <p class='tool-description'>Imports drafting content from Revit.
+
+Features:
+- Sets up layer structure for line styles
+- Supports filled region types
+- Maintains layer organization
+- Preserves object properties
+
+Usage:
+1. Export content from Revit
+2. Run command to import
+3. Content organized in layer tree</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='revitdrafterexport' data-doc='exports drafting content to revit.
+
+features:
+- processes curves and filled regions
+- maintains layer organization
+- supports multiple geometry types
+- preserves object properties
+
+usage:
+1. create content in out layers
+2. run command to export
+3. import in revit using companion tool' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_revit_drafter_button_icon.png' class='tool-icon' alt='RevitDrafterExport icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RevitDrafterExport</h3>
+                                </header>
+        <p class='tool-description'>Exports drafting content to Revit.
+
+Features:
+- Processes curves and filled regions
+- Maintains layer organization
+- Supports multiple geometry types
+- Preserves object properties
+
+Usage:
+1. Create content in OUT layers
+2. Run command to export
+3. Import in Revit using companion tool</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='shape2revit' data-doc='convert each and every selected geometry to individual revit families via temporary blocks.
+not to be confused with the block2family button, which exports better defined blocks to revit families and is much more memory efficient.
+only use this button sparingly so you do not introduce too many families to revit.
+
+features:
+- converts surfaces, polysurfaces and meshes to blocks
+- creates temporary blocks with unique names
+- exports blocks to revit families
+- cleans up temporary blocks after export
+- maintains original geometry properties' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_shape2revit_button_icon.png' class='tool-icon' alt='Shape2Revit icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Shape2Revit</h3>
+                                </header>
+        <p class='tool-description'>Convert EACH and EVERY selected geometry to INDIVIDUAL Revit families via temporary blocks.
+Not to be confused with the block2family button, which exports better defined blocks to Revit families and is much more memory efficient.
+Only use this button sparingly so you do not introduce too many families to Revit.
+
+Features:
+- Converts surfaces, polysurfaces and meshes to blocks
+- Creates temporary blocks with unique names
+- Exports blocks to Revit families
+- Cleans up temporary blocks after export
+- Maintains original geometry properties</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='surfacetoadaptivecomponent' data-doc='use the corners of the input surfs as the marker for the adaptive pts in revit.' data-tab='Revit.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Revit_tab_surface_to_adaptive_component_button_icon.png' class='tool-icon' alt='SurfaceToAdaptiveComponent icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SurfaceToAdaptiveComponent</h3>
+                                </header>
+        <p class='tool-description'>Use the corners of the input surfs as the marker for the adaptive pts in Revit.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Selection_tab'><div class='tab-title'>Selection.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='randomdeselect' data-doc='randomly deselects objects based on percentage.
+
+features:
+- deselects random subset of selected objects
+- percentage-based deselection (1-99%)
+- remembers last used percentage
+- maintains object relationships
+
+usage:
+1. select objects
+2. enter deselection percentage
+3. random subset will be deselected' data-tab='Selection.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Selection_tab_random_deselect_button_icon.png' class='tool-icon' alt='RandomDeselect icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomDeselect</h3>
+                                </header>
+        <p class='tool-description'>Randomly deselects objects based on percentage.
+
+Features:
+- Deselects random subset of selected objects
+- Percentage-based deselection (1-99%)
+- Remembers last used percentage
+- Maintains object relationships
+
+Usage:
+1. Select objects
+2. Enter deselection percentage
+3. Random subset will be deselected</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomdeselectbydist' data-doc='randomly deselects blocks based on their distance from a curve.
+
+the probability of keeping a block is proportional to its distance from the curve.
+blocks closer to the curve have higher chance of being kept.
+distance clamping is available to control the influence range.
+
+usage:
+1. pre-select blocks or select when prompted
+2. select a base curve as attractor
+3. adjust distance clamps in the dialog
+4. click "select" to apply random deselection
+5. keep clicking "select" to get different random results
+6. adjust clamp values and click "select" again to refine results
+7. click "close" when satisfied with the selection
+
+features:
+- interactive eto form with dedicated pick buttons
+- real-time distance range calculation
+- persistent settings (remembers last clamp values)
+- dynamic visualization (circles/pipes) that updates with each selection
+- iterative workflow - keep trying until you get the desired result
+' data-tab='Selection.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Selection_tab_random_deselect_by_dist_button_icon.png' class='tool-icon' alt='RandomDeselectByDist icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomDeselectByDist</h3>
+                                </header>
+        <p class='tool-description'>Randomly deselects blocks based on their distance from a curve.
+
+The probability of keeping a block is proportional to its distance from the curve.
+Blocks closer to the curve have higher chance of being kept.
+Distance clamping is available to control the influence range.
+
+Usage:
+1. Pre-select blocks or select when prompted
+2. Select a base curve as attractor
+3. Adjust distance clamps in the dialog
+4. Click "Select" to apply random deselection
+5. Keep clicking "Select" to get different random results
+6. Adjust clamp values and click "Select" again to refine results
+7. Click "Close" when satisfied with the selection
+
+Features:
+- Interactive Eto form with dedicated pick buttons
+- Real-time distance range calculation
+- Persistent settings (remembers last clamp values)
+- Dynamic visualization (circles/pipes) that updates with each selection
+- Iterative workflow - keep trying until you get the desired result
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='randomselectiontogroup' data-doc='randomly distributes selected objects into groups.
+
+features:
+- creates specified number of groups
+- randomly assigns objects to groups
+- useful for applying varied materials/shading
+- maintains object relationships
+
+usage:
+1. select objects to group
+2. specify number of groups
+3. objects will be randomly distributed' data-tab='Selection.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Selection_tab_random_selection_to_group_button_icon.png' class='tool-icon' alt='RandomSelectionToGroup icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RandomSelectionToGroup</h3>
+                                </header>
+        <p class='tool-description'>Randomly distributes selected objects into groups.
+
+Features:
+- Creates specified number of groups
+- Randomly assigns objects to groups
+- Useful for applying varied materials/shading
+- Maintains object relationships
+
+Usage:
+1. Select objects to group
+2. Specify number of groups
+3. Objects will be randomly distributed</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Tailor_tab'><div class='tab-title'>Tailor.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='2425replaceblocks' data-doc='block replacement tool for 2425 project
+
+replaces blocks between twinmotion and enscape versions based on excel mapping data.
+features:
+- supports bidirectional block replacement (twinmotion â†” enscape)
+- uses excel mapping file for block name relationships
+- processes entire document with progress tracking
+- maintains block transformations and properties
+- provides user selection for replacement direction
+- automatically redraws viewport after replacement
+
+replacement options:
+1. twinmotion block â†’ enscape block
+2. enscape block â†’ twinmotion block
+
+excel mapping:
+- reads from 'enscape_twinmotion_block_mapping.xlsx'
+- uses 'enneadtab helper' worksheet
+- maps block names in columns a and b
+- supports multiple block mappings
+
+workflow:
+1. user selects replacement direction
+2. reads block mapping from excel file
+3. iterates through mapping data
+4. replaces blocks using rhino_block utility
+5. redraws viewport to show changes
+
+usage:
+- select replacement direction when prompted
+- tool processes all mapped blocks automatically
+- maintains block positions and transformations
+- provides completion feedback' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>2425ReplaceBlocks</h3>
+                                </header>
+        <p class='tool-description'>Block Replacement Tool for 2425 Project
+
+Replaces blocks between Twinmotion and Enscape versions based on Excel mapping data.
+Features:
+- Supports bidirectional block replacement (Twinmotion â†” Enscape)
+- Uses Excel mapping file for block name relationships
+- Processes entire document with progress tracking
+- Maintains block transformations and properties
+- Provides user selection for replacement direction
+- Automatically redraws viewport after replacement
+
+Replacement Options:
+1. Twinmotion block â†’ Enscape block
+2. Enscape block â†’ Twinmotion block
+
+Excel Mapping:
+- Reads from 'enscape_twinmotion_block_mapping.xlsx'
+- Uses 'EnneadTab Helper' worksheet
+- Maps block names in columns A and B
+- Supports multiple block mappings
+
+Workflow:
+1. User selects replacement direction
+2. Reads block mapping from Excel file
+3. Iterates through mapping data
+4. Replaces blocks using RHINO_BLOCK utility
+5. Redraws viewport to show changes
+
+Usage:
+- Select replacement direction when prompted
+- Tool processes all mapped blocks automatically
+- Maintains block positions and transformations
+- Provides completion feedback</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='childrenpalacemassing' data-doc='children palace massing tool
+
+creates solid massing geometry from wall, roof, and base layers for children palace project.
+features:
+- processes massing layers (massing_1, massing_2, etc.) with sublayers (wall, roof, base)
+- creates solid geometry from closure shapes and moves them horizontally
+- generates area shapes by intersecting solids with level planes
+- creates planar surfaces from intersection curves for gfa calculations
+- organizes output into 'updated geo' and 'slab[gfa]' layers
+
+usage:
+1. ensure massing layers exist with wall/roof/base sublayers
+2. place level reference points on 'levels' layer
+3. run tool to generate massing solids and area calculations' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ChildrenPalaceMassing</h3>
+                                </header>
+        <p class='tool-description'>Children Palace Massing Tool
+
+Creates solid massing geometry from wall, roof, and base layers for Children Palace project.
+Features:
+- Processes massing layers (massing_1, massing_2, etc.) with sublayers (wall, roof, base)
+- Creates solid geometry from closure shapes and moves them horizontally
+- Generates area shapes by intersecting solids with level planes
+- Creates planar surfaces from intersection curves for GFA calculations
+- Organizes output into 'Updated Geo' and 'Slab[GFA]' layers
+
+Usage:
+1. Ensure massing layers exist with wall/roof/base sublayers
+2. Place level reference points on 'Levels' layer
+3. Run tool to generate massing solids and area calculations</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='exportwithoutcrv_1643' data-doc='export tool for 1643 project - solids only
+
+exports rhino file as dwg with all blocks exploded and curves removed.
+features:
+- explodes all block instances to individual geometry
+- removes all curve objects from export
+- keeps only solid geometry for cad export
+- handles nested block instances automatically
+- provides progress tracking for large files
+- supports project-specific file naming
+
+workflow:
+1. collects all block instances in the document
+2. explodes blocks to individual geometry objects
+3. filters out curves and block references
+4. selects only solid geometry for export
+5. exports as dwg with "2007 solids" scheme
+6. cleans up temporary exploded geometry
+
+file naming:
+- motherbabylobby.3dm â†’ tempstudy_motherbabylobby.dwg
+- other files â†’ tempstudy.dwg
+
+usage:
+- run tool to prepare geometry for cad export
+- only solid geometry will be exported
+- curves and blocks are automatically removed
+- provides completion notification' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ExportWithoutCrv_1643</h3>
+                                </header>
+        <p class='tool-description'>Export Tool for 1643 Project - Solids Only
+
+Exports Rhino file as DWG with all blocks exploded and curves removed.
+Features:
+- Explodes all block instances to individual geometry
+- Removes all curve objects from export
+- Keeps only solid geometry for CAD export
+- Handles nested block instances automatically
+- Provides progress tracking for large files
+- Supports project-specific file naming
+
+Workflow:
+1. Collects all block instances in the document
+2. Explodes blocks to individual geometry objects
+3. Filters out curves and block references
+4. Selects only solid geometry for export
+5. Exports as DWG with "2007 Solids" scheme
+6. Cleans up temporary exploded geometry
+
+File Naming:
+- MotherBabyLobby.3dm â†’ TempStudy_MotherBabyLobby.dwg
+- Other files â†’ TempStudy.dwg
+
+Usage:
+- Run tool to prepare geometry for CAD export
+- Only solid geometry will be exported
+- Curves and blocks are automatically removed
+- Provides completion notification</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='2128_patternmaker' data-doc='pattern maker tool for 2128 project
+
+creates randomized patterns by replacing blocks based on type definitions and distribution algorithms.
+features:
+- supports multiple pattern generation algorithms (random, gradient, excel-based)
+- uses type definitions with color coding and ratio controls
+- sorts blocks by uv position on reference surface
+- supports header blocks with special treatment
+- provides multiple distribution options for pattern variety
+
+type definitions:
+- a1, c1, d2, d4, d7 with specific colors and ratios
+- rank-based positioning for gradient effects
+- color-coded block identification
+
+pattern options:
+1. true random: pure random distribution
+2. random with gradient: bottom-to-top gradient effect
+3. random with double gradient: paired row patterns
+4. excel-based: pattern from spreadsheet data
+
+usage:
+1. place blocks on reference surface layer
+2. select blocks to pattern
+3. choose distribution algorithm
+4. tool replaces blocks based on pattern rules' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>2128_PatternMaker</h3>
+                                </header>
+        <p class='tool-description'>Pattern Maker Tool for 2128 Project
+
+Creates randomized patterns by replacing blocks based on type definitions and distribution algorithms.
+Features:
+- Supports multiple pattern generation algorithms (random, gradient, excel-based)
+- Uses type definitions with color coding and ratio controls
+- Sorts blocks by UV position on reference surface
+- Supports header blocks with special treatment
+- Provides multiple distribution options for pattern variety
+
+Type Definitions:
+- A1, C1, D2, D4, D7 with specific colors and ratios
+- Rank-based positioning for gradient effects
+- Color-coded block identification
+
+Pattern Options:
+1. True Random: Pure random distribution
+2. Random with Gradient: Bottom-to-top gradient effect
+3. Random with Double Gradient: Paired row patterns
+4. Excel-based: Pattern from spreadsheet data
+
+Usage:
+1. Place blocks on reference surface layer
+2. Select blocks to pattern
+3. Choose distribution algorithm
+4. Tool replaces blocks based on pattern rules</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='registermirror' data-doc='mirror command shortcut registration tool
+
+registers keyboard shortcuts for mirror commands with and without copy options.
+features:
+- registers f1 key for mirror with copy (_mirror _copy=yes)
+- registers f2 key for mirror without copy (_mirror _copy=no)
+- uses rhino alias system for persistent shortcuts
+- provides user notification of successful registration
+- designed for efficient mirror operations in modeling workflow
+
+shortcuts:
+- f1: mirror with copy (creates duplicate objects)
+- f2: mirror without copy (moves existing objects)
+
+usage:
+- run tool to register shortcuts
+- use f1/f2 keys for quick mirror operations
+- shortcuts persist across rhino sessions
+- provides feedback on successful registration' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RegisterMirror</h3>
+                                </header>
+        <p class='tool-description'>Mirror Command Shortcut Registration Tool
+
+Registers keyboard shortcuts for mirror commands with and without copy options.
+Features:
+- Registers F1 key for mirror with copy (_mirror _copy=Yes)
+- Registers F2 key for mirror without copy (_mirror _copy=No)
+- Uses Rhino alias system for persistent shortcuts
+- Provides user notification of successful registration
+- Designed for efficient mirror operations in modeling workflow
+
+Shortcuts:
+- F1: Mirror with copy (creates duplicate objects)
+- F2: Mirror without copy (moves existing objects)
+
+Usage:
+- Run tool to register shortcuts
+- Use F1/F2 keys for quick mirror operations
+- Shortcuts persist across Rhino sessions
+- Provides feedback on successful registration</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='relocateall_1643' data-doc='batch relocation tool for 1643 project
+
+relocates all rhino content (objects, cameras, named views) to new project coordinates.
+features:
+- moves all objects from world origin to new base point (440,160,0)
+- updates all named views and camera positions
+- maintains relative positions and orientations
+- preserves camera-target relationships
+- automatically updates view transformations
+- plays completion sound notification
+
+workflow:
+1. calculates vector from world origin to new base point
+2. moves all objects in the document
+3. updates all named views with new camera positions
+4. redraws viewport to reflect changes
+5. provides audio feedback on completion
+
+usage:
+- run tool to relocate entire project to new coordinates
+- all content moves together maintaining spatial relationships
+- named views are automatically updated for new location' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>RelocateAll_1643</h3>
+                                </header>
+        <p class='tool-description'>Batch Relocation Tool for 1643 Project
+
+Relocates all Rhino content (objects, cameras, named views) to new project coordinates.
+Features:
+- Moves all objects from world origin to new base point (440,160,0)
+- Updates all named views and camera positions
+- Maintains relative positions and orientations
+- Preserves camera-target relationships
+- Automatically updates view transformations
+- Plays completion sound notification
+
+Workflow:
+1. Calculates vector from world origin to new base point
+2. Moves all objects in the document
+3. Updates all named views with new camera positions
+4. Redraws viewport to reflect changes
+5. Provides audio feedback on completion
+
+Usage:
+- Run tool to relocate entire project to new coordinates
+- All content moves together maintaining spatial relationships
+- Named views are automatically updated for new location</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='saifpanelmapping' data-doc='maps saif panels using new naming convention cw01_solid x_yyyy_zzzz and cw06_solid x_yyyy_zzzz, extracting pier width (x) as-is' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SaifPanelMapping</h3>
+                                </header>
+        <p class='tool-description'>Maps SAIF panels using new naming convention CW01_SOLID X_YYYY_ZZZZ and CW06_SOLID X_YYYY_ZZZZ, extracting pier width (X) as-is</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='stack psd' data-doc='stack psd files tool
+
+automates the process of stacking and combining psd files for rendering workflows.
+features:
+- processes glass and chrome version renderings
+- creates layered psd compositions with proper blend modes
+- handles special camera views (cam 13, cam 17) with background templates
+- exports final compositions as high-quality jpg files
+- supports multiple study variations (angled_frame, sawtooth, solar_panel, etc.)
+
+workflow:
+1. prepares data by matching glass/chrome version pairs
+2. processes each pair through photoshop automation
+3. applies appropriate blend modes and adjustments
+4. saves as psd and exports as jpg for presentation' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Tailor_tab_stack_enscape_button_icon.png' class='tool-icon' alt='Stack PSD icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>Stack PSD</h3>
+                                </header>
+        <p class='tool-description'>Stack PSD Files Tool
+
+Automates the process of stacking and combining PSD files for rendering workflows.
+Features:
+- Processes glass and chrome version renderings
+- Creates layered PSD compositions with proper blend modes
+- Handles special camera views (cam 13, cam 17) with background templates
+- Exports final compositions as high-quality JPG files
+- Supports multiple study variations (angled_frame, sawtooth, solar_panel, etc.)
+
+Workflow:
+1. Prepares data by matching glass/chrome version pairs
+2. Processes each pair through Photoshop automation
+3. Applies appropriate blend modes and adjustments
+4. Saves as PSD and exports as JPG for presentation</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='moveimg_1643' data-doc='image relocation tool for 1643 project
+
+launches the file organizer gui for relocating rendering images between study versions.
+features:
+- opens interactive file organizer interface
+- supports study selection (angled_frame, sawtooth, solar_panel, etc.)
+- handles glass/chrome version organization
+- automates file cleanup and relocation
+- maintains project-specific folder structure
+
+usage:
+- right-click to open file organizer gui
+- select target study and version
+- automatically relocates png files to appropriate folders' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Tailor_tab_stack_enscape_button_icon.png' class='tool-icon' alt='MoveImg_1643 icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>MoveImg_1643</h3>
+                                </header>
+        <p class='tool-description'>Image Relocation Tool for 1643 Project
+
+Launches the file organizer GUI for relocating rendering images between study versions.
+Features:
+- Opens interactive file organizer interface
+- Supports study selection (angled_frame, sawtooth, solar_panel, etc.)
+- Handles glass/chrome version organization
+- Automates file cleanup and relocation
+- Maintains project-specific folder structure
+
+Usage:
+- Right-click to open file organizer GUI
+- Select target study and version
+- Automatically relocates PNG files to appropriate folders</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='2419_facade move' data-doc='xiong'an facade movement tool
+
+processes facade curves to extract specific points for facade movement operations.
+features:
+- works with grasshopper input/output for facade geometry
+- extracts points at 20% and 80% along curve domains
+- handles curve parameterization for facade manipulation
+- supports multiple curve sets for batch processing
+- designed for xiong'an project facade studies
+
+usage:
+- input: two sets of curves (crv_set_1, crv_set_2)
+- output: points at 20% and 80% positions along curves
+- designed for facade movement and positioning workflows' data-tab='Tailor.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><div class='tool-icon-placeholder'></div></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>2419_Facade move</h3>
+                                </header>
+        <p class='tool-description'>Xiong'an Facade Movement Tool
+
+Processes facade curves to extract specific points for facade movement operations.
+Features:
+- Works with Grasshopper input/output for facade geometry
+- Extracts points at 20% and 80% along curve domains
+- Handles curve parameterization for facade manipulation
+- Supports multiple curve sets for batch processing
+- Designed for Xiong'an project facade studies
+
+Usage:
+- Input: Two sets of curves (crv_set_1, crv_set_2)
+- Output: Points at 20% and 80% positions along curves
+- Designed for facade movement and positioning workflows</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='View_tab'><div class='tab-title'>View.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='batchexportrhinoview' data-doc='exports multiple rhino views in batch.
+
+allows selection of multiple views for automated export.
+supports customizable resolution and format settings.
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_batch_export_rhino_view_button_icon.png' class='tool-icon' alt='BatchExportRhinoView icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>BatchExportRhinoView</h3>
+                                </header>
+        <p class='tool-description'>Exports multiple Rhino views in batch.
+
+Allows selection of multiple views for automated export.
+Supports customizable resolution and format settings.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='batchrenamecamera' data-doc='enables bulk camera renaming operations.
+
+provides interface for renaming multiple cameras without activation.
+maintains camera properties while updating names efficiently.
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_batch_rename_camera_button_icon.png' class='tool-icon' alt='BatchRenameCamera icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>BatchRenameCamera</h3>
+                                </header>
+        <p class='tool-description'>Enables bulk camera renaming operations.
+
+Provides interface for renaming multiple cameras without activation.
+Maintains camera properties while updating names efficiently.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='changeobjectdisplaysource' data-doc='modifies object display source settings.
+
+controls whether objects inherit color and material properties from their layer.
+provides batch modification capabilities for multiple objects.
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_change_object_display_source_button_icon.png' class='tool-icon' alt='ChangeObjectDisplaySource icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ChangeObjectDisplaySource</h3>
+                                </header>
+        <p class='tool-description'>Modifies object display source settings.
+
+Controls whether objects inherit color and material properties from their layer.
+Provides batch modification capabilities for multiple objects.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='sectionboxbyboundingbox' data-doc='creates section boxes around selected elements.
+
+similar to revit's sectionbox, crops views to selected element boundaries.
+supports all clipping modes in rhino, with limited enscape compatibility.
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_section_box_button_icon.png' class='tool-icon' alt='SectionboxByBoundingBox icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SectionboxByBoundingBox</h3>
+                                </header>
+        <p class='tool-description'>Creates section boxes around selected elements.
+
+Similar to Revit's SectionBox, crops views to selected element boundaries.
+Supports all clipping modes in Rhino, with limited Enscape compatibility.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='sectionboxbypolysrf' data-doc='use closed polysrf as input box cutter.' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_section_box_button_icon.png' class='tool-icon' alt='SectionboxByPolysrf icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SectionboxByPolysrf</h3>
+                                </header>
+        <p class='tool-description'>Use closed polysrf as input box cutter.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='sectionboxcleanup' data-doc='reset the view to unbounded.' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_section_box_cleanup_button_icon.png' class='tool-icon' alt='SectionBoxCleanup icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>SectionBoxCleanup</h3>
+                                </header>
+        <p class='tool-description'>Reset the view to unbounded.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='togglegfa' data-doc='toggles gross floor area (gfa) visualization and calculation.
+
+features:
+- processes layers marked with [gfa] to calculate and display area information
+- real-time updates as geometry changes
+- supports area factor multipliers using \{factor\} syntax in layer names
+- excel data export capabilities
+- automatic unit conversion (mm/m -> sqm, inch/ft -> sqft)
+- dynamic merging of coplanar surfaces at same elevation
+- support for single surfaces and polysurfaces
+- live comparison of how much is off from target.
+
+usage:
+- add [gfa] to layer names to include in calculation
+- optional \{factor\} at end of layer name for area multipliers (e.g. \{0.5\})
+- right-click to export to excel or generate checking surfaces or set target area for each keyword.
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_toggle_GFA_button_icon.png' class='tool-icon' alt='ToggleGFA icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ToggleGFA</h3>
+                                </header>
+        <p class='tool-description'>Toggles Gross Floor Area (GFA) visualization and calculation.
+
+Features:
+- Processes layers marked with [GFA] to calculate and display area information
+- Real-time updates as geometry changes
+- Supports area factor multipliers using \{factor\} syntax in layer names
+- Excel data export capabilities
+- Automatic unit conversion (mm/m -> SQM, inch/ft -> SQFT)
+- Dynamic merging of coplanar surfaces at same elevation
+- Support for single surfaces and polysurfaces
+- Live comparison of how much is off from target.
+
+Usage:
+- Add [GFA] to layer names to include in calculation
+- Optional \{factor\} at end of layer name for area multipliers (e.g. \{0.5\})
+- Right-click to export to Excel or generate checking surfaces or set target area for each keyword.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='bakegfadatatoexcel' data-doc='export gfa (gross floor area) data to excel and manage area targets.
+
+features:
+- export area calculations to formatted excel spreadsheet
+- generate checking surfaces for visual verification 
+- set and manage target areas for different gfa categories
+- compare actual vs target areas with variance analysis
+
+usage:
+- click to export current gfa data to excel
+- right-click to access additional options:
+  - generate checking surfaces
+  - set target areas for gfa categories
+  - edit existing target values
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_toggle_GFA_button_icon.png' class='tool-icon' alt='BakeGFADataToExcel icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>BakeGFADataToExcel</h3>
+                                </header>
+        <p class='tool-description'>Export GFA (Gross Floor Area) data to Excel and manage area targets.
+
+Features:
+- Export area calculations to formatted Excel spreadsheet
+- Generate checking surfaces for visual verification 
+- Set and manage target areas for different GFA categories
+- Compare actual vs target areas with variance analysis
+
+Usage:
+- Click to export current GFA data to Excel
+- Right-click to access additional options:
+  - Generate checking surfaces
+  - Set target areas for GFA categories
+  - Edit existing target values
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='togglelayerpointer' data-doc='displays quick layer information for visible objects.
+
+creates a filtered layer list showing only layers with visible objects.
+useful for examining and understanding model layer structure.
+' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_toggle_layer_pointer_button_icon.png' class='tool-icon' alt='ToggleLayerPointer icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ToggleLayerPointer</h3>
+                                </header>
+        <p class='tool-description'>Displays quick layer information for visible objects.
+
+Creates a filtered layer list showing only layers with visible objects.
+Useful for examining and understanding model layer structure.
+</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='viewblockdiagram' data-doc='generate view block diagrams by casting rays from a viewer point to identify unobstructed view areas.
+
+this tool creates 3d surfaces representing the visible areas from a specified viewer point, 
+taking into account obstacles that block the view rays. perfect for:
+- site analysis and view studies
+- building massing and urban planning
+- landscape design and sightline analysis
+- solar access and shadow studies
+
+the process involves:
+1. configuring ray casting parameters (resolution and ray length)
+2. selecting obstacle objects that block the view
+3. picking a viewer point location
+4. automatic generation of view block surfaces
+
+the tool automatically groups consecutive unobstructed rays and creates 
+bounded surfaces using arcs and radius lines for accurate representation.' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_view_block_diagram_button_icon.png' class='tool-icon' alt='ViewBlockDiagram icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ViewBlockDiagram</h3>
+                                </header>
+        <p class='tool-description'>Generate view block diagrams by casting rays from a viewer point to identify unobstructed view areas.
+
+This tool creates 3D surfaces representing the visible areas from a specified viewer point, 
+taking into account obstacles that block the view rays. Perfect for:
+- Site analysis and view studies
+- Building massing and urban planning
+- Landscape design and sightline analysis
+- Solar access and shadow studies
+
+The process involves:
+1. Configuring ray casting parameters (resolution and ray length)
+2. Selecting obstacle objects that block the view
+3. Picking a viewer point location
+4. Automatic generation of view block surfaces
+
+The tool automatically groups consecutive unobstructed rays and creates 
+bounded surfaces using arcs and radius lines for accurate representation.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='viewtoggle' data-doc='quick view navigation tool for rhino.
+
+features:
+- toggles between top and perspective views
+- left click to switch between views
+- keyboard shortcut: {key}
+- optimizes modeling workflow with rapid view changes
+
+usage:
+click button to toggle between views.' data-tab='View.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_View_tab_view_toggle_button_icon.png' class='tool-icon' alt='ViewToggle icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ViewToggle</h3>
+                                </header>
+        <p class='tool-description'>Quick view navigation tool for Rhino.
+
+Features:
+- Toggles between Top and Perspective views
+- Left click to switch between views
+- Keyboard shortcut: {KEY}
+- Optimizes modeling workflow with rapid view changes
+
+Usage:
+Click button to toggle between views.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section><section class='tab-section' id='Web_tab'><div class='tab-title'>Web.tab</div><div class='tool-grid'>
+  <article class='tool-card' data-alias='listentomiro' data-doc='listen to changes in the miro' data-tab='Web.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Web_tab_miro_button_icon.png' class='tool-icon' alt='ListenToMiro icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>ListenToMiro</h3>
+                                </header>
+        <p class='tool-description'>Listen to changes in the miro</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                
+  <article class='tool-card' data-alias='pushtomiro' data-doc='push selected elements in rhino to miro. only support text and rect and circle.' data-tab='Web.tab'>
+    <div class='tool-content'>
+      <div class='tool-icon-column'><img src='assets/_rhino_Web_tab_miro_button_icon.png' class='tool-icon' alt='PushToMiro icon'></div>
+      <div class='tool-text-column'>
+        <header class='tool-header'>
+          <h3 class='tool-title'>PushToMiro</h3>
+                                </header>
+        <p class='tool-description'>Push selected elements in Rhino to Miro. Only support text and rect and circle.</p>
+                            </div>
+                        </div>
+    
+                    </article>
+                </div></section>
+<div id='search-results-container' style='display: none;'>
+  <div class='search-results-header'>
+    <h2>Search Results</h2>
+    <span id='search-results-count'></span>
+  </div>
+  <div class='tool-grid' id='search-results-grid'></div>
+</div>
+
+    </div>
+        </div>
+<button class='return-top-btn' id='returnTopBtn' title='Return to Top'>&uarr;</button>
+    <script>
+// Fuzzy search function with scoring - more forgiving search
+function fuzzySearch(text, query) {
+    if (!query) return { match: true, score: 0 };
+    
+    const textLower = text.toLowerCase();
+    const queryLower = query.toLowerCase();
+    
+    let score = 0;
+    
+    // Direct substring match (highest priority - 100 points)
+    if (textLower.includes(queryLower)) {
+        score += 100;
+        // Bonus for exact start match (50 points)
+        if (textLower.startsWith(queryLower)) {
+            score += 50;
+        }
+        // Bonus for exact end match (25 points)
+        if (textLower.endsWith(queryLower)) {
+            score += 25;
+        }
+    }
+    
+    // Word boundary matches
+    const textWords = textLower.split(/\s+/);
+    const queryWords = queryLower.split(/\s+/);
+    
+    let allWordsFound = true;
+    let wordMatchScore = 0;
+    
+    for (const queryWord of queryWords) {
+        let found = false;
+        let bestWordScore = 0;
+        
+        for (const textWord of textWords) {
+            let wordScore = 0;
+            
+            // Exact word match (40 points)
+            if (textWord === queryWord) {
+                wordScore = 40;
+            }
+            // Word starts with query (30 points)
+            else if (textWord.startsWith(queryWord)) {
+                wordScore = 30;
+            }
+            // Word contains query (20 points)
+            else if (textWord.includes(queryWord)) {
+                wordScore = 20;
+            }
+            // Query contains word (10 points)
+            else if (queryWord.includes(textWord)) {
+                wordScore = 10;
+            }
+            
+            if (wordScore > 0) {
+                found = true;
+                bestWordScore = Math.max(bestWordScore, wordScore);
+            }
+        }
+        
+        if (found) {
+            wordMatchScore += bestWordScore;
+        } else {
+            allWordsFound = false;
+        }
+    }
+    
+    if (allWordsFound) {
+        score += wordMatchScore;
+        // Bonus for matching all query words (25 points)
+        score += 25;
+    }
+    
+    // Length penalty - shorter matches get bonus (up to 20 points)
+    const lengthRatio = Math.min(queryLower.length / textLower.length, 1);
+    score += Math.floor(lengthRatio * 20);
+    
+    return { match: score > 0, score: score };
+}
+
+// Sidebar toggle for mobile
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebar && sidebarToggle) {
+  sidebarToggle.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+  });
+}
+
+// Enhanced search functionality with fuzzy search and tab hiding
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearSearch');
+if (searchInput && clearBtn) {
+  clearBtn.addEventListener('click', function() {
+    searchInput.value = '';
+    searchInput.dispatchEvent(new Event('input'));
+  });
+  
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    
+    // Get search results container
+    const searchContainer = document.getElementById('search-results-container');
+    const searchGrid = document.getElementById('search-results-grid');
+    const searchCount = document.getElementById('search-results-count');
+    
+    // Get all tab sections
+    const tabSections = document.querySelectorAll('.tab-section');
+    
+    if (query === '') {
+      // Clear search - show all sections normally
+      searchContainer.style.display = 'none';
+      tabSections.forEach(section => {
+        section.style.display = '';
+        const toolCards = section.querySelectorAll('.tool-card');
+        toolCards.forEach(card => {
+          card.style.display = '';
+        });
+      });
+      return;
+    }
+    
+    // Collect all matching cards with scores for unified ranking
+    const allCardScores = [];
+    
+    tabSections.forEach(section => {
+      const toolCards = section.querySelectorAll('.tool-card');
+      
+      toolCards.forEach(card => {
+        const alias = card.getAttribute('data-alias') || '';
+        const doc = card.getAttribute('data-doc') || '';
+        const tabName = card.getAttribute('data-tab') || 'Unknown';
+        
+        // Use fuzzy search for both alias and description
+        const aliasResult = fuzzySearch(alias, query);
+        const docResult = fuzzySearch(doc, query);
+        
+        if (aliasResult.match || docResult.match) {
+          // Calculate total score (alias matches get higher weight)
+          let totalScore = (aliasResult.score * 2) + docResult.score;
+          
+          // Apply custom tab/panel ranking based on platform
+          const platform = 'rhino';
+          
+          if (platform === 'rhino') {
+            // For Rhino: rank Tailor.tab as later half
+            if (tabName.toLowerCase().includes('tailor')) {
+              totalScore -= 1000; // Push to later half
+            }
+          } else if (platform === 'revit') {
+            // For Revit: rank Proj.xxx, Tailor, Personal, and No Tab as later half
+            const lowerTabName = tabName.toLowerCase();
+            if (lowerTabName.startsWith('proj.') || 
+                lowerTabName.includes('tailor') || 
+                lowerTabName.includes('personal') || 
+                lowerTabName.includes('no tab')) {
+              totalScore -= 1000; // Push to later half
+            }
+          }
+          
+          allCardScores.push({ 
+            card: card, 
+            score: totalScore,
+            tabName: tabName,
+            alias: alias,
+            doc: doc
+          });
+        }
+      });
+      
+      // Hide all tab sections during search
+      section.style.display = 'none';
+    });
+    
+    // Sort all results by score (highest first)
+    allCardScores.sort((a, b) => b.score - a.score);
+    
+    // Clear search results grid
+    if (searchGrid) {
+      searchGrid.innerHTML = '';
+    }
+    
+    // Add sorted results to search container
+    if (allCardScores.length > 0) {
+      searchContainer.style.display = 'block';
+      
+      // Update results count
+      if (searchCount) {
+        searchCount.textContent = `(${allCardScores.length} results)`;
+      }
+      
+      // Add tab labels and sorted cards
+      let currentTab = '';
+      allCardScores.forEach(item => {
+        // Add tab separator if tab changes
+        if (item.tabName !== currentTab) {
+          currentTab = item.tabName;
+          const tabLabel = document.createElement('div');
+          tabLabel.className = 'search-tab-label';
+          tabLabel.innerHTML = `<h3>${currentTab}</h3>`;
+          searchGrid.appendChild(tabLabel);
+        }
+        
+        // Clone the card for search results and ensure proper styling
+        const clonedCard = item.card.cloneNode(true);
+        
+        // Ensure the cloned card has proper styling and structure
+        clonedCard.style.display = 'block';
+        clonedCard.style.breakInside = 'avoid';
+        clonedCard.style.pageBreakInside = 'avoid';
+        
+        // Remove any potential display:none that might have been set
+        const clonedContent = clonedCard.querySelector('.tool-content');
+        if (clonedContent) {
+          clonedContent.style.display = 'flex';
+        }
+        
+        searchGrid.appendChild(clonedCard);
+      });
+    } else {
+      // No results found
+      searchContainer.style.display = 'none';
+    }
+  });
+}
+
+// Return to Top button
+const returnTopBtn = document.getElementById('returnTopBtn');
+window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+        returnTopBtn.classList.add('visible');
+    } else {
+        returnTopBtn.classList.remove('visible');
+    }
+});
+
+returnTopBtn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+    </script>
+
+</body>
+</html>

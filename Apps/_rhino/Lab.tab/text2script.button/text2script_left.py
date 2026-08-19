@@ -329,7 +329,7 @@ class TextToScriptConverter:
                     last_error = traceback.format_exc()
                     
                     if current_attempt >= self.max_attempts:
-                        NOTIFICATION.messenger(f"Maximum refinement attempts reached.\nLast error: {last_error}")
+                        NOTIFICATION.messenger(f"Maximum refinement attempts reached.\nLast error: {last_error}", sticky=True)
                         return
                         
                     func_request = self.create_refinement_request(func_request, e)

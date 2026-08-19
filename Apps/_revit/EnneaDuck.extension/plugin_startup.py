@@ -802,6 +802,11 @@ def EnneadTab_startup():
     
     REVIT_EVENT.set_doc_change_hook_depressed(stage = False)
     REVIT_EVENT.set_sync_queue_enable_stage(stage = True)
+    try:
+        from EnneadTab import SYNC_TURN_WATCH
+        SYNC_TURN_WATCH.start_poller()
+    except Exception:
+        pass
     REVIT_EVENT.set_family_load_hook_stage(stage = True)
     REVIT_EVENT.set_L_drive_alert_hook_depressed(stage = False)
 

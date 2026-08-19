@@ -5,9 +5,13 @@ from Autodesk.Revit import DB
 
 from EnneadTab.REVIT import REVIT_APPLICATION
 
+from _request_utils import get_param
+
 
 def register_family_routes(api):
-    @api.route("/families/", methods=["GET"])
+    # GET+POST: the optional `category` filter must ride the JSON body on this
+    # pyRevit build (query strings are stripped). GET still works (unfiltered).
+    @api.route("/families/", methods=["GET", "POST"])
     def get_families(doc, request):
         if not doc:
             return routes.make_response(
@@ -15,7 +19,7 @@ def register_family_routes(api):
                 status_code=400,
             )
 
-        category_filter = request.get("category")
+        category_filter = get_param(request, "category")
 
         collector = (
             DB.FilteredElementCollector(doc)

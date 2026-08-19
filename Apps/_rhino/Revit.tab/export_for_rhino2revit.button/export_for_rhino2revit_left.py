@@ -570,7 +570,7 @@ def export(output_folder, datas):
 
     DATA_FILE.set_data(out_path_dict, "rhino2revit_out_paths")
     announcement = "{} layers content exported".format(good_layer_count)
-    NOTIFICATION.messenger(main_text = announcement )
+    NOTIFICATION.messenger(main_text = announcement , sticky=True)
     SPEAK.speak(announcement)
     SOUND.play_sound()
 

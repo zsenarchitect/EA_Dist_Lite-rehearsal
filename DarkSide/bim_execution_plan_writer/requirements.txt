@@ -1,0 +1,6 @@
+flask
+python-docx
+mammoth
+google-generativeai
+werkzeug
+markdown

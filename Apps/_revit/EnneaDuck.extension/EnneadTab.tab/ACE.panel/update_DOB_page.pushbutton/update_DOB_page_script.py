@@ -32,7 +32,7 @@ def update_DOB_page(doc, show_log = True):
         for sheet in all_working_sheets:
             if not sheet.LookupParameter("Sheet_$Issue_DOB"):
                 if show_log:
-                    NOTIFICATION.messenger("Need proper parameter for your DOB marking in doc [{}].\nAsk Gayatri for detail.".format(working_doc.Title))
+                    NOTIFICATION.messenger("Need proper parameter for your DOB marking in doc [{}].\nAsk Gayatri for detail.".format(working_doc.Title), sticky=True)
                 return
 
             if not sheet.LookupParameter("Sheet No.") or not sheet.LookupParameter("Total Sheets"):

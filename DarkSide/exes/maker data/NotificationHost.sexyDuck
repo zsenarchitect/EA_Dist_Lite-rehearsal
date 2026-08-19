@@ -1,0 +1,121 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\NotificationHost\\NotificationHost.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": true
+  },
+  {
+   "optionDest": "console",
+   "value": false
+  },
+  {
+   "optionDest": "icon_file",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\Apps\\lib\\EnneadTab\\images\\icon_duck.ico"
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "strip",
+   "value": false
+  },
+  {
+   "optionDest": "noupx",
+   "value": false
+  },
+  {
+   "optionDest": "disable_windowed_traceback",
+   "value": false
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "argv_emulation",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "name",
+   "value": "NotificationHost"
+  },
+  {
+   "optionDest": "pathex",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\NotificationHost"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "PyQt5"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "PyQt5.QtCore"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "PyQt5.QtGui"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "PyQt5.QtWidgets"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "PyQt5.sip"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "lock"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "inbox"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "styles"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "toast_window"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "mute"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "error_report"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "youtube_thumb"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\Apps\\lib\\EnneadTab\\images\\icon_duck.ico;."
+  }
+ ],
+ "nonPyinstallerOptions": {
+  "increaseRecursionLimit": true,
+  "manualArguments": ""
+ }
+}

@@ -590,7 +590,8 @@ def apply_renames(rows):
         output.write(log)
     output.plot()
     NOTIFICATION.messenger(
-        main_text="Renamed {} | Skipped {} | Errors {}".format(ok, skipped, err))
+        main_text="Renamed {} | Skipped {} | Errors {}".format(ok, skipped, err),
+        sticky=(err > 0))
 
     # No post-commit grid reload: reload_current_scope() runs a full family
     # FilteredElementCollector + per-family checks, and doing that on the API

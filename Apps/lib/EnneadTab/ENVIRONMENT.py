@@ -228,33 +228,22 @@ REVIT_TAILOR_TAB = os.path.join(REVIT_PRIMARY_EXTENSION, "{} Tailor.tab".format(
 
 #################### shared network root (formerly the L: drive) ####################
 #
-# The office L: drive is being retired. Nothing below hardcodes "L:" any more.
-# The shared root is RESOLVED AT RUNTIME so that cutover is one config value,
-# not forty files.
+# The office L: drive is RETIRED. Nothing below may resolve to L:. Shared data
+# lives in the enneadtab.com depot (DEPOT.STATE / DEPOT.ASSET). A machine with
+# no replacement share is deliberately offline: local dump only, no L: probe.
 #
 # Precedence, first hit wins:
 #   1. EA_SHARED_ROOT environment variable.
-#      Per-machine / per-session override. Set it to the literal string
-#      "OFFLINE" to declare deliberate offline use (laptop off the network);
-#      that suppresses the "your data is not being shared" alarm.
-#   2. <ECO_SYS_FOLDER>/shared_root.json      -- per-user / per-machine override,
-#      e.g. IT drops one on a machine that mounts the share differently.
-#   3. <CORE_FOLDER>/shared_root.json         -- SHIPPED WITH EA_DIST.
-#      *** THIS IS THE CUTOVER LEVER. *** Edit this one file, publish, and the
-#      whole fleet moves. It lives under Apps/lib/EnneadTab/ (not the repo root)
-#      because the publisher only copies Apps/ and Installation/ into EA_Dist.
-#   4. LEGACY_SHARED_ROOT -- the historical L: path, last resort.
+#      "OFFLINE" (or any L: path) -> local dump, deliberately offline.
+#      Any other path is a real replacement share.
+#   2. <ECO_SYS_FOLDER>/shared_root.json      -- per-user / per-machine override
+#   3. <CORE_FOLDER>/shared_root.json         -- SHIPPED WITH EA_DIST
+#   4. No share configured -> local dump, deliberately offline.
 #
-# shared_root.json shape (every key optional):
-#   {
-#     "shared_root": "\\\\fileserver\\DesignTechnology",
-#     "db_folder":   "\\\\fileserver\\DesignTechnology\\05_EnneadTab-DB",
-#     "offline": false
-#   }
-# "db_folder" only needs setting if the new target does NOT keep the
-# <shared_root>/05_EnneadTab-DB layout.
+# An L: path in env or json is treated as "not configured". Never last-resort
+# to L:\4b_Design Technology -- that share is gone and a mapped ghost letter
+# produces Access Denied (the 2026-08-03 cn-myruan silent crash).
 
-LEGACY_SHARED_ROOT = os.path.join("L:\\", "4b_Design Technology")
 DB_FOLDER_NAME = "05_EnneadTab-DB"
 
 SHARED_ROOT_ENV_VAR = "EA_SHARED_ROOT"
@@ -263,6 +252,34 @@ _OFFLINE_SENTINEL = "OFFLINE"
 
 USER_SHARED_ROOT_CONFIG = os.path.join(ECO_SYS_FOLDER, SHARED_ROOT_CONFIG_NAME)
 DIST_SHARED_ROOT_CONFIG = os.path.join(CORE_FOLDER, SHARED_ROOT_CONFIG_NAME)
+
+
+def _is_retired_l_drive_path(path):
+    """True if path is the retired office L: drive (any spelling)."""
+    if not path:
+        return False
+    try:
+        text = str(path).strip().replace("/", "\\")
+    except Exception:
+        return False
+    if not text:
+        return False
+    upper = text.upper()
+    if upper == "L:" or upper.startswith("L:\\"):
+        return True
+    if upper.startswith("\\\\TSCLIENT\\L\\"):
+        return True
+    return False
+
+
+def _retired_offline_root(source):
+    """Local-only root. Sentinel is never created, so exists() is False and
+    IS_OFFLINE_MODE trips without probing a hanging UNC or a ghost L: letter."""
+    sentinel = os.path.join(DUMP_FOLDER, "_no_shared_network_root")
+    return (sentinel,
+            os.path.join(sentinel, DB_FOLDER_NAME),
+            source,
+            True)
 
 
 def _load_shared_root_config(config_path):
@@ -300,18 +317,15 @@ def _resolve_shared_root():
             source (str): Human-readable provenance, for diagnostics and for
                 the ErrorDump payload -- when the fleet goes dark we need to
                 know WHICH lever fed it the dead path.
-            is_deliberately_offline (bool): True only when a human explicitly
-                asked for offline operation.
+            is_deliberately_offline (bool): True when no live share is configured
+                (L: retired, offline flag, or explicit OFFLINE).
     """
     env_value = os.environ.get(SHARED_ROOT_ENV_VAR)
     if env_value:
         env_value = env_value.strip()
     if env_value:
-        if env_value.upper() == _OFFLINE_SENTINEL:
-            return (LEGACY_SHARED_ROOT,
-                    os.path.join(LEGACY_SHARED_ROOT, DB_FOLDER_NAME),
-                    "env:{}=OFFLINE".format(SHARED_ROOT_ENV_VAR),
-                    True)
+        if env_value.upper() == _OFFLINE_SENTINEL or _is_retired_l_drive_path(env_value):
+            return _retired_offline_root("env:{}=OFFLINE".format(SHARED_ROOT_ENV_VAR))
         return (env_value,
                 os.path.join(env_value, DB_FOLDER_NAME),
                 "env:{}".format(SHARED_ROOT_ENV_VAR),
@@ -322,19 +336,17 @@ def _resolve_shared_root():
         if not config:
             continue
         if config.get("offline") is True:
-            return (LEGACY_SHARED_ROOT,
-                    os.path.join(LEGACY_SHARED_ROOT, DB_FOLDER_NAME),
-                    "config:{} (offline=true)".format(config_path),
-                    True)
+            return _retired_offline_root("config:{} (offline=true)".format(config_path))
         root = config.get("shared_root")
+        if root and _is_retired_l_drive_path(root):
+            return _retired_offline_root("config:{} (retired L: ignored)".format(config_path))
         if root:
             db_folder = config.get("db_folder") or os.path.join(root, DB_FOLDER_NAME)
+            if _is_retired_l_drive_path(db_folder):
+                return _retired_offline_root("config:{} (retired L: db ignored)".format(config_path))
             return (root, db_folder, "config:{}".format(config_path), False)
 
-    return (LEGACY_SHARED_ROOT,
-            os.path.join(LEGACY_SHARED_ROOT, DB_FOLDER_NAME),
-            "legacy-default",
-            False)
+    return _retired_offline_root("retired-no-shared-root")
 
 
 SHARED_ROOT, DB_FOLDER, SHARED_ROOT_SOURCE, IS_DELIBERATELY_OFFLINE = _resolve_shared_root()
@@ -350,9 +362,6 @@ SHARED_DUMP_FOLDER = os.path.join(DB_FOLDER, "Shared Data Dump")
 PUBLIC_TEMP_FOLDER = os.path.join(DB_FOLDER, "temp")
 
 STAND_ALONE_FOLDER = os.path.join(DB_FOLDER, "Stand Alone Tools")
-
-# Backup repository in case SH cannot use the shared drive
-BACKUP_REPO_FOLDER = os.path.join(DB_FOLDER, "BackupRepo")
 
 # Where the shared dump / public temp are SUPPOSED to be. Both get rewritten to
 # the local dump below when the shared root is unreachable, so the expected paths
@@ -419,10 +428,14 @@ SITE_PACKAGES_FOLDER = os.path.join(ENGINE_FOLDER, "Lib")
 # Fix: Use compatible approach for both IronPython 2.7 and Python 3
 _execute_map_compatible(_secure_folder, [ECO_SYS_FOLDER, DUMP_FOLDER])
 
-# Use safer folder creation for network drives
-_execute_map_compatible(_secure_folder_safe, [SHARED_ROOT, DB_FOLDER, SHARED_DUMP_FOLDER,
-                     PUBLIC_TEMP_FOLDER, STAND_ALONE_FOLDER, BACKUP_REPO_FOLDER,
-                     ENGINE_FOLDER, SITE_PACKAGES_FOLDER])
+# Never mkdir the retired sentinel (that would make exists() True and hide
+# IS_OFFLINE_MODE). Engine folders are always local.
+_local_only = [ENGINE_FOLDER, SITE_PACKAGES_FOLDER]
+if IS_DELIBERATELY_OFFLINE:
+    _execute_map_compatible(_secure_folder_safe, _local_only)
+else:
+    _execute_map_compatible(_secure_folder_safe, [SHARED_ROOT, DB_FOLDER, SHARED_DUMP_FOLDER,
+                         PUBLIC_TEMP_FOLDER, STAND_ALONE_FOLDER] + _local_only)
 
 IS_SHARED_ROOT_REACHABLE = os.path.exists(SHARED_DUMP_FOLDER_EXPECTED)
 
@@ -1045,12 +1058,10 @@ def alert_l_drive_not_available(play_sound=False):
 if should_cleanup_dump_folder():
     cleanup_dump_folder()
 
-# 2026-07-13 (#2360): the L: drive is being decommissioned. The path is no
-# longer hardcoded -- see _resolve_shared_root() above. At cutover, edit
-# Apps/lib/EnneadTab/shared_root.json and publish; do NOT edit call sites.
-# alert_l_drive_not_available() stays a silent existence check; the loud
-# "your data is not being shared" path is announce_shared_root_status(),
-# fired from FOLDER.get_shared_dump_folder_file().
+# 2026-08-18: office L: is retired. shared_root.json ships with offline:true.
+# Do not put an L: path in that file. Shared data is the enneadtab.com depot.
+# alert_l_drive_not_available() is a silent existence check of SHARED_ROOT
+# (a local sentinel when offline). Loud alarm is announce_shared_root_status().
 ###############
 if __name__ == "__main__":
     unit_test()

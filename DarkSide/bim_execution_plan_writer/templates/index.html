@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BIM Assistant - Execution Plan Writer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>BIM Assistant</h1>
+        <p>Upload your existing BEP (.docx) to start editing with smart assistance.</p>
+        
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept=".docx">
+            <button onclick="uploadFile()">Upload</button>
+        </div>
+        
+        <div class="file-list-section">
+            <h2>Your Documents</h2>
+            <ul class="file-list">
+                {% for file in files %}
+                <li>
+                    <a href="/editor/{{ file }}" class="file-link">
+                        <span class="icon">📄</span> {{ file }}
+                    </a>
+                </li>
+                {% else %}
+                <li>No files uploaded yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -33,6 +33,12 @@ _thread = None
 _running = False
 _active_port = None
 
+# The shared filesystem search/read module (Apps/lib/EnneadTab/CODE_SEARCH.py). Imported
+# ONCE at module load -- at the BOTTOM of this file, after _ensure_lib_on_path is defined --
+# so the off-UI-thread reference routes never race a sys.path mutation. Stays None if the
+# EnneadTab lib is not importable; the handlers degrade loudly rather than crash.
+CODE_SEARCH = None
+
 # 48900..48915 is Rhino's OWN port window, disjoint from pyRevit Routes' 48884..48899.
 # pyRevit Routes starts at 48884 and increments per Revit instance, so the old fixed Rhino port
 # (48885) collided with a 2nd Revit instance. Two reasons this is a RANGE, not one fixed port:
@@ -199,6 +205,25 @@ def _handle_request(context):
         response.OutputStream.Close()
         return
 
+    # ---- Off-UI-thread fast path: reference-code search/read -----------------
+    # These two routes touch NO Rhino API -- they are pure filesystem work over the
+    # EnneadTab-OS Apps/ tree (CODE_SEARCH). Answer them DIRECTLY on this listener
+    # thread instead of marshaling to Rhino's UI thread: the UI marshal is pure cost
+    # here and would freeze Rhino for the whole scan (and a long scan would head-of-line
+    # block status probes on the single UI thread). This runs AFTER the browser-origin
+    # 403 guard above (a browser request is still refused) and BEFORE the InvokeOnUiThread
+    # marshal below. Wrapped so any error serializes a 500 rather than propagating to
+    # _listen_loop's `except: continue`, which would silently drop the request and hang
+    # the client. CODE_SEARCH itself also bounds the scan (MAX_FILES + a wall-clock budget).
+    fs_routes = ("/enneadtab/search-reference-code", "/enneadtab/read-reference-code")
+    if path in fs_routes:
+        try:
+            fs_result, fs_status = _route(path, method, body, query)
+        except Exception:
+            fs_result, fs_status = {"error": traceback.format_exc()}, 500
+        _write_json(response, fs_result, fs_status)
+        return
+
     result = {"error": "Internal error"}
     status = 500
 
@@ -261,7 +286,43 @@ def _handle_request(context):
         return
 
     # Send JSON response
-    response_body = json.dumps(result, default=str)
+    _write_json(response, result, status)
+
+
+def _json_safe(value):
+    """Coerce a value tree so json.dumps(ensure_ascii=True) can always encode it.
+
+    Rhino .NET strings surface in IronPython 2.7 as cp1252 BYTE strings, so a
+    layer/block/material name with a non-ASCII glyph -- an e-acute is a lone 0xE9
+    -- makes py_encode_basestring_ascii raise "'unknown' codec can't decode byte
+    0xe9" INSIDE json.dumps (line below), crashing the response before UTF8.GetBytes
+    ever runs. Decoding byte strings to unicode here makes every Rhino route's
+    payload serialization-safe. Mirror of the Revit routes' _request_utils.json_safe
+    (Revit<->Rhino parity, per EnneadTab-OS CLAUDE.md).
+    """
+    if isinstance(value, unicode):
+        return value
+    if isinstance(value, str):
+        for codec in ("utf-8", "cp1252", "latin-1"):
+            try:
+                return value.decode(codec)
+            except Exception:
+                continue
+        return value.decode("ascii", "replace")
+    if isinstance(value, dict):
+        return dict((_json_safe(k), _json_safe(v)) for k, v in value.items())
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(v) for v in value]
+    return value
+
+
+def _write_json(response, result, status):
+    """Serialize `result` as JSON and write it to the HttpListener response.
+
+    Shared by the normal UI-thread path and the off-UI-thread reference-route fast
+    path -- there is no reusable inline writer otherwise, so both would drift.
+    """
+    response_body = json.dumps(_json_safe(result), default=str)
     response_bytes = System.Text.Encoding.UTF8.GetBytes(response_body)
     response.StatusCode = status
     response.ContentType = "application/json; charset=utf-8"
@@ -279,6 +340,25 @@ def _route(path, method, body, query):
 
     Returns (result_dict, status_code).
     """
+    # Reference-code routes (search/read) are pure filesystem -- they touch NO Rhino
+    # API -- and are dispatched from the LISTENER thread by the _handle_request fast
+    # path. Handle them FIRST, BEFORE the sc.doc rebind below, so nothing reads a Rhino
+    # API object off the UI thread.
+    _segs = [s for s in path.split("/") if s]
+    if len(_segs) >= 2 and _segs[0] == "enneadtab" and \
+            _segs[1] in ("search-reference-code", "read-reference-code"):
+        fs_data = {}
+        if body:
+            try:
+                fs_data = json.loads(body)
+            except Exception:
+                pass
+        fs_merged = dict(query)
+        fs_merged.update(fs_data)
+        if _segs[1] == "search-reference-code":
+            return _handle_search_reference(fs_merged), 200
+        return _handle_read_reference(fs_merged), 200
+
     # Re-bind scriptcontext.doc to the live active document on EVERY request. This
     # router runs on Rhino's UI thread (InvokeOnUiThread above), so ActiveDoc is
     # reliable here. The RPC server module is persistent: scriptcontext.doc is set once
@@ -339,8 +419,9 @@ def _route(path, method, body, query):
     if route == "views":
         return _handle_views(), 200
 
-    if route == "families":
-        # /families/<name>/instances/ — instances of one block definition.
+    if route == "blocks" or route == "block-definitions" or route == "families":
+        # Canonical: /blocks/. Aliases: /block-definitions/ (CPython adapter),
+        # /families/ (legacy RhinoAssistant). Rhino has blocks, not families.
         if len(segments) >= 4 and segments[3] == "instances":
             return _handle_block_instances(segments[2]), 200
         return _handle_block_defs(merged), 200
@@ -540,7 +621,7 @@ def _handle_views():
 
 
 def _handle_block_defs(data):
-    """GET /enneadtab/families/ — list block definitions (Rhino equivalent)."""
+    """GET /enneadtab/blocks/ — list block definitions."""
     names = rs.BlockNames(sort=True) or []
     blocks = []
     for name in names:
@@ -622,6 +703,12 @@ def _handle_execute_code(data):
         "System": System,
         "__builtins__": __builtins__,
     }
+
+    # Ensure `from EnneadTab import ...` resolves inside the generated code. This is
+    # idempotent (a no-op once Apps/lib is on sys.path) and is the Phase 0 sys.path gate:
+    # execute-code has no other bootstrap on the cold path, so without this a generated
+    # `from EnneadTab import ENVIRONMENT` fails with No module named EnneadTab.
+    _ensure_lib_on_path()
 
     old_stdout = sys.stdout
     try:
@@ -847,6 +934,47 @@ def _handle_export(data):
         return {"error": "Export command failed. Check file path and format."}
 
 
+def _handle_search_reference(data):
+    """POST /enneadtab/search-reference-code/ — rank existing EnneadTab code for a task.
+
+    Body: {"query": "...", "scope": "rhino,lib"?, "max_results": 8?}. Pure filesystem
+    (CODE_SEARCH over the Apps/ tree); dispatched OFF the Rhino UI thread. Touches no
+    Rhino API, so it is safe on the listener thread.
+    """
+    if CODE_SEARCH is None:
+        return {"error": "CODE_SEARCH unavailable (EnneadTab lib not importable)"}
+    try:
+        return CODE_SEARCH.search(
+            data.get("query", ""),
+            data.get("scope", "rhino,lib"),   # host default: Rhino + shared lib
+            data.get("max_results", 8),
+        )
+    except Exception:
+        return {"error": traceback.format_exc()}
+
+
+def _handle_read_reference(data):
+    """POST /enneadtab/read-reference-code/ — return one reference file's source.
+
+    Body: {"path": "...", "max_chars"?, "start_line"?, "end_line"?}. The path is
+    confined to the Apps/ corpus by CODE_SEARCH._safe_resolve (rejects traversal,
+    absolute/drive-letter paths, junctions, and non-.py files).
+    """
+    if CODE_SEARCH is None:
+        return {"error": "CODE_SEARCH unavailable (EnneadTab lib not importable)"}
+    try:
+        return CODE_SEARCH.read_file(
+            data.get("path", ""),
+            data.get("max_chars"),
+            data.get("start_line"),
+            data.get("end_line"),
+        )
+    except ValueError as e:
+        return {"error": "refused: {}".format(e)}
+    except Exception:
+        return {"error": traceback.format_exc()}
+
+
 def _handle_selected():
     """GET /enneadtab/selected/ — currently selected objects (id, name, layer, type)."""
     ids = rs.SelectedObjects() or []
@@ -894,7 +1022,7 @@ def _handle_groups():
 
 
 def _handle_block_instances(block_name):
-    """GET /enneadtab/families/<name>/instances/ — instances of one block, with insert points."""
+    """GET /enneadtab/blocks/<name>/instances/ — instances of one block, with insert points."""
     # AbsolutePath may leave the name segment percent-escaped (spaces -> %20);
     # unescape defensively (a no-op on an already-decoded name).
     name = System.Uri.UnescapeDataString(block_name)
@@ -947,3 +1075,18 @@ def _ensure_lib_on_path():
             break
         current = parent
     return None
+
+
+# ---------------------------------------------------------------------------
+# One-time bootstrap (runs at module import)
+# ---------------------------------------------------------------------------
+# Put Apps/lib on sys.path and import the shared CODE_SEARCH module NOW, at module
+# load, so the off-UI-thread reference routes never race a sys.path mutation. Kept at
+# the BOTTOM of the file because it depends on _ensure_lib_on_path being defined above;
+# calling it near the top would raise NameError at import time.
+_ensure_lib_on_path()
+try:
+    from EnneadTab import CODE_SEARCH as _CODE_SEARCH_MODULE
+    CODE_SEARCH = _CODE_SEARCH_MODULE
+except Exception:
+    CODE_SEARCH = None

@@ -1,0 +1,86 @@
+# KeynoteExporter Configuration File
+# This file defines the column mappings and data types for Excel parsing
+
+# Excel file settings
+excel:
+  sheet_name: "Database"
+  header_search_rows: 10  # Number of rows to search for headers
+  expected_headers:  # Headers to look for when finding the header row
+    - "BldgId"
+    - "FORMAT"
+    - "DIVISION #"
+    - "DIVISION NAME"
+    - "SECTION #"
+    - "SECTION NAME"
+    - "KEYNOTE #"
+    - "KEYNOTE DESCRIPTION"
+
+# Column type definitions
+column_types:
+  # String columns - these will be treated as text fields
+  string_columns:
+    - "BldgId"
+    - "FORMAT"
+    - "DIVISION #"
+    - "DIVISION NAME"
+    - "SECTION #"
+    - "SECTION NAME"
+    - "KEYNOTE #"
+    - "KEYNOTE DESCRIPTION"
+    - "SOURCE"
+    - "PRODUCT"
+    - "CAT. NO."
+    - "COLOR"
+    - "FINISH"
+    - "SIZE"
+    - "CONTACT"
+    - "REMARKS"
+
+  # Interior scope columns - treated as boolean fields (non-empty cell = True).
+  # Matched by exact HEADER TEXT, not by column position. List order here = output
+  # grouping order in the exported scope sheet, so keep it aligned with the
+  # spreadsheet layout. A header whose text differs by even one character
+  # (spacing/case/dots) is silently dropped.
+  interior_scope_columns:
+    - "BASE"
+    - "INT. WALL"
+    - "PAINT"
+    - "CEILING"
+    - "FLOOR"
+    - "MILLWORK"
+    - "INT. OTHER"
+
+  # Exterior scope columns - same rules as interior (exact header text, list order = output order).
+  exterior_scope_columns:
+    - "ROOF"
+    - "EXT. WALL"
+    - "FENESTRATION"
+    - "SOFFIT"
+    - "PAVING"
+    - "EXT. OTHER"
+
+# Data handling settings
+data_handling:
+  # How to handle missing values
+  missing_values:
+    string_default: ""  # Default value for string columns when empty
+    boolean_default: false  # Default value for boolean columns when empty
+  
+  # Boolean conversion rules
+  boolean_conversion:
+    # Simple rule: any non-empty value = True, any empty value = False
+    # This means any text, number, or content will be treated as True
+    # Only empty cells, NaN, or whitespace-only will be treated as False
+    true_values: []  # Not used - any non-empty content is True
+    false_values: []  # Not used - only empty content is False
+
+# Revit keynote .txt export
+# Invisible character appended to keynote key when FORMAT is NOTES, so Revit can filter by type in schedule filters.
+revit_keynote:
+  notes_format_suffix: "\u200b"  # U+200B ZERO-WIDTH SPACE (default NOTES marker; change if needed)
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "keynote_exporter.log"
+  console_output: true

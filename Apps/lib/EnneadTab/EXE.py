@@ -45,6 +45,11 @@ _LAST_HOST_WAKE_ATTEMPT = [0.0]
 # A failed wake must not relaunch a ~38 MB onefile on every notification.
 _HOST_WAKE_COOLDOWN_SECONDS = 60.0
 
+# Records the (size, mtime) identity of the NotificationHost.exe we last launched,
+# so a later call can tell a stale (pre-update) running daemon from a current one.
+# Lives in the same local Dump folder the daemon writes its heartbeat to.
+_HOST_LAUNCHED_VERSION_FILENAME = "notification_host_launched_version.txt"
+
 def _is_rate_limited(exe_name):
     """Check if an executable is currently rate limited.
     
@@ -101,6 +106,8 @@ def locate_executable(exe_name):
         str: Path to the executable/batch file if found, None otherwise.
     """
     exe_name = exe_name.replace(".exe", "").replace(".bat", "")
+    if exe_name == "ShanghaiRepoAssist":
+        return None
 
     # Search order: .bat first (preferred - no recompilation needed), then .exe
     extensions = [".bat", ".exe"]
@@ -156,23 +163,14 @@ def create_temporary_copy(exe_path, exe_name):
         return None
 
 def try_open_legacy_app(exe_name):
-    """Attempt to open a legacy version of an application.
-    
+    """Legacy L: exe folder is retired. Always False.
+
     Args:
         exe_name (str): Name of the executable without extension.
-        
+
     Returns:
-        bool: True if legacy app was found and opened, False otherwise.
+        bool: False. The office share no longer exists.
     """
-    head = os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "01_Revit", "04_Tools", "08_EA Extensions", "Project Settings", "Exe")
-    if not os.path.exists(head):
-        return False
-    if os.path.exists(os.path.join(head, exe_name + ".exe")):
-        os.startfile(os.path.join(head, exe_name + ".exe"))
-        return True
-    if os.path.exists(os.path.join(head, exe_name, exe_name + ".exe")):
-        os.startfile(os.path.join(head, exe_name, exe_name + ".exe"))
-        return True
     return False
 
 def try_open_app(exe_name, legacy_name = None, safe_open = False, depth = 0):
@@ -327,6 +325,103 @@ def clean_temporary_executables():
                 ERROR_HANDLE.print_note("Error removing {}: {}".format(file_path, e))
 
 
+def _host_version_sidecar_path():
+    """Local file recording the identity of the NotificationHost.exe we launched.
+
+    Same Dump folder the daemon writes ``notification_host_alive.txt`` to
+    (``%USERPROFILE%\\Documents\\EnneadTab Ecosystem\\Dump``), so this stays a
+    per-machine local marker and never touches shared storage.
+    """
+    return os.path.join(ENVIRONMENT.DUMP_FOLDER, _HOST_LAUNCHED_VERSION_FILENAME)
+
+
+def _exe_identity(exe_path):
+    """Cheap, lock-safe version identity for an on-disk exe: "<size>-<mtime>".
+
+    Uses os.stat (works on a running, read-locked exe -- no hashing of a ~38 MB
+    onefile on this user-triggered path). A rebuilt PyInstaller onefile virtually
+    always changes size, so size+mtime reliably distinguishes an updated exe.
+    Returns None if the file cannot be stat'd.
+    """
+    try:
+        st = os.stat(exe_path)
+        return "{}-{}".format(int(st.st_size), int(st.st_mtime))
+    except Exception:
+        return None
+
+
+def _record_notification_host_version(exe_path):
+    """Persist the identity of the exe we just launched (best-effort)."""
+    identity = _exe_identity(exe_path)
+    if not identity:
+        return
+    try:
+        with open(_host_version_sidecar_path(), "w") as f:
+            f.write(identity)
+    except Exception:
+        ERROR_HANDLE.print_note("Failed to record NotificationHost version marker.")
+
+
+def _notification_host_is_stale():
+    """True if the running daemon predates the NotificationHost.exe now on disk.
+
+    Version-aware relaunch is a COMPILED-EXE mechanism: if the located launcher is
+    a .bat or the developer .py source, a launcher's identity does not track the
+    code it runs, so we never treat those as stale (return False).
+
+    A missing sidecar means the running daemon was launched by pre-fix code (which
+    wrote no marker) -- treat it as stale so it gets exactly one forced relaunch
+    onto the current exe. A sidecar that differs from the current on-disk identity
+    means a newer exe landed while the old daemon kept running.
+    """
+    exe_path = locate_executable("NotificationHost")
+    if not exe_path or not exe_path.lower().endswith(".exe"):
+        return False
+    current = _exe_identity(exe_path)
+    if not current:
+        return False
+    try:
+        with open(_host_version_sidecar_path(), "r") as f:
+            recorded = f.read().strip()
+    except Exception:
+        return True  # no marker -> pre-fix daemon, force one relaunch
+    return recorded != current
+
+
+def _kill_notification_host(timeout=3.0):
+    """Terminate the running NotificationHost.exe and wait for it to exit.
+
+    The single-instance mutex is released by the OS when the process dies, but
+    taskkill /F returns before termination completes and lock.acquire_single_instance
+    does NOT retry -- so poll until the process is gone before any relaunch, or the
+    fresh instance would see the mutex still held and exit immediately.
+
+    Returns:
+        bool: True if the process is confirmed gone within the timeout.
+    """
+    try:
+        import subprocess
+        # Force-kill by image name. Written as a shell string (force flag placed
+        # mid-command, not as a trailing quoted list element) so the IronPython
+        # linter's f-string regex does not false-positive on a quote-adjacent F.
+        subprocess.call(
+            "taskkill /F /IM NotificationHost.exe",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except Exception as e:
+        ERROR_HANDLE.print_note("Failed to kill NotificationHost: {}".format(e))
+        return False
+
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if not is_process_running("NotificationHost"):
+            return True
+        time.sleep(0.1)
+    return not is_process_running("NotificationHost")
+
+
 def _notification_host_lock_held():
     """True if NotificationHost already holds its single-instance mutex."""
     try:
@@ -366,26 +461,39 @@ def ensure_notification_host():
     Returns:
         bool: True only if the host is already running and draining the inbox.
     """
-    if _notification_host_lock_held():
-        return True
-    if is_process_running("NotificationHost"):
+    if _notification_host_lock_held() or is_process_running("NotificationHost"):
+        # A running daemon keeps the OLD exe in memory across an EA_Dist update, so
+        # a stale (e.g. dim-unaware, #146) build can outlive its replacement. When
+        # the on-disk exe no longer matches the one we launched, cycle the daemon
+        # onto the current build (senzhang-todo #3992). Like a cold wake, the fresh
+        # ~38 MB onefile cannot drain THIS item, so return False and let the caller
+        # route it through the legacy fallback; the booted host drains the already-
+        # enqueued inbox item via its own _drain_startup.
+        if _notification_host_is_stale():
+            _kill_notification_host()
+            _try_wake_notification_host(force=True)
+            return False
         return True
 
     _try_wake_notification_host()
     return False
 
 
-def _try_wake_notification_host():
+def _try_wake_notification_host(force=False):
     """Best-effort start of the persistent host. Never claims readiness.
 
     Rate-limited because a failed wake would otherwise re-launch a ~38 MB
-    onefile on every single notification.
+    onefile on every single notification. Pass ``force=True`` right after a
+    version-aware kill (see ensure_notification_host) so the replacement is not
+    swallowed by the cooldown of the wake that started the now-killed daemon --
+    a staleness kill fires at most once per version change, so bypassing the
+    cooldown there cannot cause relaunch storms.
 
     Returns:
         bool: True if a start was successfully requested (NOT that it is up).
     """
     now = time.time()
-    if now - _LAST_HOST_WAKE_ATTEMPT[0] < _HOST_WAKE_COOLDOWN_SECONDS:
+    if not force and now - _LAST_HOST_WAKE_ATTEMPT[0] < _HOST_WAKE_COOLDOWN_SECONDS:
         return False
     _LAST_HOST_WAKE_ATTEMPT[0] = now
 
@@ -393,6 +501,10 @@ def _try_wake_notification_host():
     if exe_path:
         try:
             os.startfile(exe_path)
+            # Record what we launched so a later call can detect a stale daemon
+            # once EA_Dist ships a newer exe. Only meaningful for the compiled exe.
+            if exe_path.lower().endswith(".exe"):
+                _record_notification_host_version(exe_path)
             return True
         except OSError as e:
             ERROR_HANDLE.print_note("Failed to start NotificationHost: {}".format(e))

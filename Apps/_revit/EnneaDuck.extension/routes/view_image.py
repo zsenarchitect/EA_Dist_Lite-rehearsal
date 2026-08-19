@@ -8,6 +8,8 @@ from Autodesk.Revit import DB
 
 from EnneadTab.REVIT import REVIT_APPLICATION
 
+from _request_utils import get_param
+
 try:
     from System.IO import File
 except ImportError:
@@ -15,15 +17,17 @@ except ImportError:
 
 
 def register_view_image_routes(api):
-    @api.route("/view-image/", methods=["GET"])
-    def get_view_image(doc, request):
+    # GET+POST: the optional `name` must ride the JSON body on this pyRevit
+    # build (query strings are stripped); GET falls back to the active view.
+    @api.route("/view-image/", methods=["GET", "POST"])
+    def get_view_image(doc, uidoc, request):
         if not doc:
             return routes.make_response(
                 data={"error": "No document open"},
                 status_code=400,
             )
 
-        view_name = request.get("name")
+        view_name = get_param(request, "name")
 
         if view_name:
             # Find view by name
@@ -44,8 +48,8 @@ def register_view_image_routes(api):
                     status_code=404,
                 )
         else:
-            # Use the active view
-            uidoc = revit.uidoc
+            # Use the active view (uidoc is injected by pyRevit; avoids the
+            # revit.uidoc access that masked errors as a 408 elsewhere).
             if uidoc is None:
                 return routes.make_response(
                     data={"error": "No active UI document"},

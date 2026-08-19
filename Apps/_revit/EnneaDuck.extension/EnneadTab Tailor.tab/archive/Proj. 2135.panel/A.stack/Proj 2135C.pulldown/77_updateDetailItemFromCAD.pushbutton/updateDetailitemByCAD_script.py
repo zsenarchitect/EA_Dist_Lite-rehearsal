@@ -13,7 +13,7 @@ from pyrevit import script #
 
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
-from EnneadTab import DATA_CONVERSION
+from EnneadTab import DATA_CONVERSION, ENVIRONMENT
 from Autodesk.Revit import DB # pyright: ignore 
 import os.path as op
 # from Autodesk.Revit import UI # pyright: ignore
@@ -69,7 +69,7 @@ def process_cad(source_file, is_always_override) :
     content_name = source_file.split('\\')[-1].split(".")[0]
     #print content_name
 
-    family_template_path = r"L:\4b_Applied Computing\01_Revit\02_Template\02_Asia\EA_Family Templates\Metric_Detail Component.rft"
+    family_template_path = op.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "01_Revit", "02_Template", "02_Asia", "EA_Family Templates", "Metric_Detail Component.rft")
     family_doc = app.NewFamilyDocument (family_template_path)
 
     family_path = source_file.replace(".dwg", ".rfa")

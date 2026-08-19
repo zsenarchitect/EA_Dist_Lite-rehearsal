@@ -17,9 +17,9 @@ import proDUCKtion  # pyright: ignore
 proDUCKtion.validify()
 
 from EnneadTab import (
-    ERROR_HANDLE, FOLDER, SOUND, LOG, NOTIFICATION, SPEAK, 
-    MODULE_HELPER, ENVIRONMENT, EMAIL, USER, DATA_FILE, 
-    IMAGE, TIME
+    ERROR_HANDLE, FOLDER, SOUND, LOG, NOTIFICATION, SPEAK,
+    MODULE_HELPER, ENVIRONMENT, USER,
+    TIME, SYNC_TURN_EMAIL
 )
 from EnneadTab.REVIT import (
     REVIT_SYNC, REVIT_FORMS, REVIT_EVENT, 
@@ -438,41 +438,130 @@ def update_area_tracking(doc):
 # SYNC QUEUE MANAGEMENT
 # =============================================================================
 
+def _gather_sync_changes(doc):
+    changes = []
+    try:
+        from pyrevit.coreutils import envvars
+        import System
+        
+        # 1. Warning delta
+        before_str = envvars.get_pyrevit_env_var("EA_SYNC_WARNINGS_BEFORE")
+        if before_str is not None:
+            before = int(before_str)
+            from EnneadTab.SESSION_STATS import count_warnings
+            after = count_warnings(doc)
+            if after is not None:
+                delta = after - before
+                if delta < 0:
+                    changes.append("Cleared {} warning{}".format(abs(delta), "" if abs(delta) == 1 else "s"))
+                elif delta > 0:
+                    changes.append("Added {} warning{}".format(delta, "" if delta == 1 else "s"))
+
+        # 2. GetChangedElements (Revit 2023+)
+        if hasattr(doc, "GetChangedElements"):
+            guid_str = envvars.get_pyrevit_env_var("EA_SYNC_START_VERSION_GUID")
+            if guid_str:
+                guid = System.Guid(guid_str)
+                diff = doc.GetChangedElements(guid)
+                
+                created = diff.GetCreatedElementIds()
+                modified = diff.GetModifiedElementIds()
+                deleted = diff.GetDeletedElementIds()
+                
+                c_count = len(created) if created else 0
+                m_count = len(modified) if modified else 0
+                d_count = len(deleted) if deleted else 0
+                
+                if c_count > 0:
+                    changes.append("Created {} element{}".format(c_count, "" if c_count == 1 else "s"))
+                if m_count > 0:
+                    changes.append("Modified {} element{}".format(m_count, "" if m_count == 1 else "s"))
+                if d_count > 0:
+                    changes.append("Deleted {} element{}".format(d_count, "" if d_count == 1 else "s"))
+                    
+    except Exception as e:
+        from EnneadTab import ERROR_HANDLE
+        ERROR_HANDLE.print_note("Could not gather sync changes: {}".format(e))
+        
+    return changes
+
 def update_sync_queue(doc):
     """Remove current user from sync queue after successful sync.
 
-    Priority order:
-    1. EnneadTab-DB API (primary) - notifies next user via API response
-    2. File-based queue (fallback) - only if API fails AND L drive is available
+    The office L: drive is retired. enneadtab.com/sync is the only queue.
+    If the API is unreachable, skip cleanup -- do not write a dead share.
     """
     if REVIT_EVENT.is_sync_cancelled():
         return
 
-    # === PRIMARY: EnneadTab-DB API ===
+    try:
+        from EnneadTab import SYNC_TURN_WATCH
+        SYNC_TURN_WATCH.remove_watch(REVIT_SYNC.get_model_guid(doc))
+    except Exception as err:
+        ERROR_HANDLE.print_note("sync-turn watch remove failed: {}".format(err))
+
     api_result = None
     if hasattr(REVIT_SYNC, "api_complete_sync"):
         try:
-            api_result = REVIT_SYNC.api_complete_sync(doc)
+            changes = _gather_sync_changes(doc)
+            # Compatibility guard if api_complete_sync signature changes or doesn't support changes keyword
+            import inspect
+            sig = inspect.getargspec(REVIT_SYNC.api_complete_sync)
+            if "changes" in sig.args:
+                api_result = REVIT_SYNC.api_complete_sync(doc, changes=changes)
+            else:
+                api_result = REVIT_SYNC.api_complete_sync(doc)
         except Exception as e:
             ERROR_HANDLE.print_note("Sync queue API complete failed: {}".format(e))
 
-    if api_result is not None:
-        ERROR_HANDLE.print_note("Sync queue API: complete sync reported success={}".format(
-            api_result.get("success")))
-        _notify_next_user_from_api(doc, api_result)
-
-        # Also clean file-based queue if L drive is available (keep in sync during transition)
-        if not ENVIRONMENT.IS_OFFLINE_MODE:
-            _clean_file_based_queue(doc)
+    if api_result is None:
+        ERROR_HANDLE.print_note(
+            "Sync queue API unreachable for completion; L: fallback is retired, skipping.")
+        try:
+            ERROR_HANDLE.report_infra_warning_to_error_dump_async(
+                "revit-sync /complete unreachable; file-based L: fallback is retired",
+                "doc-synced.update_sync_queue",
+                throttle_key="sync_queue_api_complete_unreachable")
+        except Exception:
+            pass
         return
 
-    # === FALLBACK: File-based queue (only if L drive is available) ===
-    ERROR_HANDLE.print_note("Sync queue API unreachable for completion, checking fallback...")
-    if ENVIRONMENT.IS_OFFLINE_MODE:
-        ERROR_HANDLE.print_note("L drive unavailable, skipping file-based queue cleanup.")
+    ERROR_HANDLE.print_note("Sync queue API: complete sync reported success={}".format(
+        api_result.get("success")))
+    _notify_next_user_from_api(doc, api_result)
+
+
+def _usernames_from_api_queue(queue):
+    names = []
+    for entry in queue or []:
+        name = (entry.get("username") or "").strip()
+        if name:
+            names.append(name)
+    return names
+
+
+def _send_turn_email(doc, next_user, remaining_after):
+    """Notify the next waiter via the email gateway. No Outlook fallback."""
+    next_user = (next_user or "").strip()
+    if not next_user:
+        ERROR_HANDLE.print_note("Sync queue notification skipped: empty next_user.")
         return
 
-    _complete_file_based_queue(doc)
+    model_guid = None
+    try:
+        model_guid = REVIT_SYNC.get_model_guid(doc)
+    except Exception as err:
+        ERROR_HANDLE.print_note("Could not resolve model guid for sync-turn mail: {}".format(err))
+
+    result = SYNC_TURN_EMAIL.send(
+        model_title=doc.Title,
+        just_finished=USER.USER_NAME,
+        next_user=next_user,
+        remaining_after=remaining_after or [],
+        model_guid=model_guid,
+    )
+    ERROR_HANDLE.print_note("Sync-turn email status={} reason={}".format(
+        result.get("status"), result.get("reason")))
 
 
 def _notify_next_user_from_api(doc, api_result):
@@ -485,19 +574,15 @@ def _notify_next_user_from_api(doc, api_result):
     if REVIT_EVENT.is_sync_queue_disabled():
         return
 
-    if not EMAIL:
-        return
-
     queue = api_result.get("queue", [])
     if not queue:
         return
 
     # Defensively drop ourselves before picking the head. The /complete
-    # endpoint is documented to remove the caller server-side, but the
-    # file-based path (_complete_file_based_queue) filters self out explicitly
-    # and this path must match: if a server race / eventual-consistency window
-    # ever returns a queue that still contains us at index 0, we would email
-    # ourselves "your turn to sync" and show our own name in the popup.
+    # endpoint is documented to remove the caller server-side, but a server
+    # race / eventual-consistency window can still return a queue that still
+    # contains us at index 0. Without this filter we would email ourselves
+    # "your turn to sync" and show our own name in the popup.
     remaining = [entry for entry in queue
                  if entry.get("username", "") != USER.USER_NAME]
     if not remaining:
@@ -510,83 +595,12 @@ def _notify_next_user_from_api(doc, api_result):
     except Exception:
         return
 
-    if EMAIL is None:
-        ERROR_HANDLE.print_note("EMAIL module not available, skipping sync queue notification.")
-        return
-
-    EMAIL.email(
-        receiver_email_list="{}@ennead.com".format(next_user),
-        subject="Your Turn To Sync!",
-        body="Hi there, it is your turn to sync <{}>!".format(doc.Title),
-        body_image_link_list=[IMAGE.get_image_path_by_name("meme_you_sync_first.jpg")]
-    )
+    after = _usernames_from_api_queue(remaining[1:])
+    _send_turn_email(doc, next_user, after)
 
     REVIT_FORMS.notification(
         main_text="[{}]\nshould sync next.".format(next_user),
         sub_text="Queue managed by EnneadTab-DB.",
-        window_width=500,
-        window_height=400,
-        self_destruct=15
-    )
-
-
-def _clean_file_based_queue(doc):
-    """Silently remove current user from file-based queue (transition cleanup)."""
-    try:
-        log_file = FOLDER.get_shared_dump_folder_file("SYNC_QUEUE_{}".format(doc.Title))
-        if not os.path.exists(log_file):
-            return
-        queue = DATA_FILE.get_list(log_file)
-        OUT = [item for item in queue if USER.USER_NAME not in item]
-        DATA_FILE.set_list(OUT, log_file)
-    except Exception as e:
-        ERROR_HANDLE.print_note("File-based queue cleanup failed: {}".format(e))
-
-
-def _complete_file_based_queue(doc):
-    """Full file-based queue completion with next-user notification (fallback path)."""
-    log_file = FOLDER.get_shared_dump_folder_file("SYNC_QUEUE_{}".format(doc.Title))
-
-    if not os.path.exists(log_file):
-        with io.open(log_file, "w", encoding="utf-8"):
-            pass
-
-    queue = DATA_FILE.get_list(log_file)
-    OUT = []
-
-    for item in queue:
-        if USER.USER_NAME in item:
-            continue
-        OUT.append(item)
-
-    if not DATA_FILE.set_list(OUT, log_file):
-        NOTIFICATION.messenger("Your account have no access to write in DB folder.")
-        return
-
-    if REVIT_EVENT.is_sync_queue_disabled():
-        return
-
-    if len(OUT) == 0:
-        return
-    try:
-        next_user = OUT[0].split("]")[-1]
-    except Exception:
-        return
-
-    if EMAIL is None:
-        ERROR_HANDLE.print_note("EMAIL module not available, skipping sync queue notification.")
-        return
-
-    EMAIL.email(
-        receiver_email_list="{}@ennead.com".format(next_user),
-        subject="Your Turn To Sync!",
-        body="Hi there, it is your turn to sync <{}>!".format(doc.Title),
-        body_image_link_list=[IMAGE.get_image_path_by_name("meme_you_sync_first.jpg")]
-    )
-
-    REVIT_FORMS.notification(
-        main_text="[{}]\nshould sync next.".format(next_user),
-        sub_text="Expect slight network lag between SH/NY server to transfer waitlist file.",
         window_width=500,
         window_height=400,
         self_destruct=15

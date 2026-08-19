@@ -191,7 +191,7 @@ def revit_drafter():
 
     bad_layer = validate_layer_objs(out_layers)
     if bad_layer:
-        NOTIFICATION.messenger("Please only put crvs on curve layer, and surface on filledregion layer. " + RHINO_LAYER.rhino_layer_to_user_layer(bad_layer))
+        NOTIFICATION.messenger("Please only put crvs on curve layer, and surface on filledregion layer. " + RHINO_LAYER.rhino_layer_to_user_layer(bad_layer), sticky=True)
         return
 
 

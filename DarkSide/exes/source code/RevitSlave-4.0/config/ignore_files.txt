@@ -1,0 +1,20 @@
+# RevitSlave4 Ignore List
+# ---------------------------------------------------------------------------
+# Lines define models that should be skipped during batch processing.
+# Matching is case-insensitive. Supported formats:
+#   - File name only: `Example_Model.rvt`
+#   - Project/file: `Project Name/Example_Model.rvt`
+#   - Folder/file: `Folder/Path/Example_Model.rvt`
+#
+# Comments begin with `#`. Blank lines are ignored.
+
+HLB_UCSC IIRB_L_Building.rvt
+
+GAYNER_UCSC IIRB_E_Building_Alternate_v25
+GAYNER_UCSC IIRB_E_Building_v25
+GAYNER_UCSC IIRB_M_Building_Alternate_v25
+GAYNER_UCSC IIRB_M_Building_v25
+GAYNER_UCSC IIRB_P_Building_v25
+DE_UCSC IRB_S_Building
+EA_UCSC IIRB_LV_Building
+EA_UCSC IIRB_LV_Building_Alternate

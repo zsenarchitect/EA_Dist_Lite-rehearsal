@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Markup>
+    <Header/>
+    <Topic Guid="fa148e63-69b6-418e-afa5-26cbc614b287" TopicType="Issue" TopicStatus="in_review">
+        <Title>Existing Hospital</Title>
+        <Description/>
+        <Index>47</Index>
+        <CreationDate>2024-05-10T18:42:13.224</CreationDate>
+        <CreationAuthor>dmora@ewingcole.com</CreationAuthor>
+        <ModifiedDate>2024-06-07T20:08:10.171</ModifiedDate>
+        <AssignedTo>daniel.stube@ennead.com</AssignedTo>
+    </Topic>
+    <Comment Guid="ccf84983-a41c-44df-bd4c-bbf5853f0ca3">
+        <Date>2024-06-07T20:08:04.061Z</Date>
+        <Author>xhu@ennead.com</Author>
+        <Comment>Double open door is provided in new model </Comment>
+        <Viewpoint Guid="1a3767c9-5e02-46b5-ba26-c3061e9aa36b"/>
+        <ModifiedAuthor>xhu@ennead.com</ModifiedAuthor>
+        <Topic Guid="a78e73a4-a41c-44df-9057-61e3eae09c25"/>
+    </Comment>
+    <Comment Guid="ccf84983-a41c-44df-8093-cfe53731917c">
+        <Date>2024-05-21T14:31:27.073Z</Date>
+        <Author>dmora@ewingcole.com</Author>
+        <Comment>Opening is shown on "existing" model but opening also needed on "new" model</Comment>
+        <Viewpoint Guid="64173983-d0e5-46b7-a836-9c1776c12a1a"/>
+        <ModifiedAuthor>dmora@ewingcole.com</ModifiedAuthor>
+        <Topic Guid="a78e73a4-a41c-44df-9057-61e3eae09c25"/>
+    </Comment>
+    <Comment Guid="ccf84983-a41c-44df-b47e-01e8b23fb80d">
+        <Date>2024-05-13T19:36:21.251Z</Date>
+        <Author>xhu@ennead.com</Author>
+        <Comment>These wall are already deleted in the model, please review and close this issue. Thank you.</Comment>
+        <Viewpoint Guid="a23448d0-8f87-44da-bae3-680a98e91886"/>
+        <ModifiedAuthor>xhu@ennead.com</ModifiedAuthor>
+        <Topic Guid="a78e73a4-a41c-44df-9057-61e3eae09c25"/>
+    </Comment>
+    <Comment Guid="ccf84983-a41c-44df-bdd2-620097b6b2a8">
+        <Date>2024-05-10T18:42:47.440Z</Date>
+        <Author>dmora@ewingcole.com</Author>
+        <Comment>Provide opening in existing wall to align with corridor</Comment>
+        <Viewpoint Guid="f88c56f5-c4ee-4c15-b82c-630db017cb2d"/>
+        <ModifiedAuthor>dmora@ewingcole.com</ModifiedAuthor>
+        <Topic Guid="a78e73a4-a41c-44df-9057-61e3eae09c25"/>
+    </Comment>
+    <Comment Guid="ccf84983-a41c-44df-9a22-66380158cdd2"><Date>2024-05-10T18:42:13.224</Date>Author<Comment/><Viewpoint Guid="207dde99-39f9-4231-9826-0de8a8e02418"/>ModifiedAuthor<Topic Guid="a78e73a4-a41c-44df-9057-61e3eae09c25"/></Comment>
+    <Viewpoints Guid="207dde99-39f9-4231-9826-0de8a8e02418">
+        <Viewpoint>207dde99-39f9-4231-9826-0de8a8e02418_viewpoint.bcfv</Viewpoint>
+        <Snapshot>snapshot.png</Snapshot>
+    </Viewpoints>
+    <Viewpoints Guid="1a3767c9-5e02-46b5-ba26-c3061e9aa36b">
+        <Viewpoint>1a3767c9-5e02-46b5-ba26-c3061e9aa36b_viewpoint.bcfv</Viewpoint>
+        <Snapshot>snapshot.png</Snapshot>
+    </Viewpoints>
+    <Viewpoints Guid="64173983-d0e5-46b7-a836-9c1776c12a1a">
+        <Viewpoint>64173983-d0e5-46b7-a836-9c1776c12a1a_viewpoint.bcfv</Viewpoint>
+        <Snapshot>snapshot.png</Snapshot>
+    </Viewpoints>
+    <Viewpoints Guid="a23448d0-8f87-44da-bae3-680a98e91886">
+        <Viewpoint>a23448d0-8f87-44da-bae3-680a98e91886_viewpoint.bcfv</Viewpoint>
+        <Snapshot>snapshot.png</Snapshot>
+    </Viewpoints>
+    <Viewpoints Guid="f88c56f5-c4ee-4c15-b82c-630db017cb2d">
+        <Viewpoint>f88c56f5-c4ee-4c15-b82c-630db017cb2d_viewpoint.bcfv</Viewpoint>
+        <Snapshot>snapshot.png</Snapshot>
+    </Viewpoints>
+</Markup>

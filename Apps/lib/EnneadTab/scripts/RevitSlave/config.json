@@ -1,5 +1,5 @@
 {
-  "data_file": "L:/4b_Design Technology/05_EnneadTab-DB/Shared Data Dump/DOC_OPENER_DATA.sexyDuck",
+  "data_file": "DOC_OPENER_DATA.sexyDuck",
   "max_workers": 4,
   "log_level": "DEBUG",
   "task_interval": 3600

@@ -7,6 +7,8 @@ from Autodesk.Revit import DB
 
 from EnneadTab.REVIT import REVIT_APPLICATION
 
+from _request_utils import get_param
+
 
 MAX_RESULTS = 500
 
@@ -27,7 +29,10 @@ def _find_builtin_category(category_name):
 
 
 def register_element_routes(api):
-    @api.route("/elements/", methods=["GET"])
+    # GET+POST: on this pyRevit build query strings are stripped before the
+    # handler runs, so `category` must ride the JSON body (POST). GET is kept so
+    # an older client fails with a clean 400 rather than a masked 408.
+    @api.route("/elements/", methods=["GET", "POST"])
     def get_elements(doc, request):
         if not doc:
             return routes.make_response(
@@ -35,10 +40,10 @@ def register_element_routes(api):
                 status_code=400,
             )
 
-        category = request.get("category")
+        category = get_param(request, "category")
         if not category:
             return routes.make_response(
-                data={"error": "category query parameter is required"},
+                data={"error": "category is required (send it in the JSON POST body)"},
                 status_code=400,
             )
 
@@ -55,11 +60,14 @@ def register_element_routes(api):
             .WhereElementIsNotElementType()
         )
 
-        # Optional filters
-        filters_str = request.get("filters")
-        if filters_str:
+        # Optional filters. Accept either a JSON string (legacy) or an already
+        # decoded object (when sent as a nested value in the POST body).
+        filters_raw = get_param(request, "filters")
+        if isinstance(filters_raw, dict):
+            filters = filters_raw
+        elif filters_raw:
             try:
-                filters = json.loads(filters_str)
+                filters = json.loads(filters_raw)
             except (ValueError, TypeError):
                 filters = {}
         else:

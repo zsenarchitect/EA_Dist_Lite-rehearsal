@@ -1,0 +1,32 @@
+# RevitSlave3 .gitignore
+
+# Credentials - NEVER commit!
+config/aps_credentials.json
+
+# Runtime data
+data/
+*.json
+!requirements.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+

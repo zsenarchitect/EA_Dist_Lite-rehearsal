@@ -423,6 +423,51 @@ def _save_dict_to_json_in_shared_dump_folder(data_dict, file_name, use_encode=Tr
     return STATE.write_state(key, data_dict)
 
 
+def _describe_write_target(filepath):
+    """Best-effort diagnostic string for a failed list-file write.
+
+    IronPython 2.7 / CPython safe. os.access on Windows is not an ACL check,
+    but the readonly-bit / existence bits still distinguish "file missing"
+    from "file present but not writable" when we log access-denied.
+    """
+    bits = ["path={}".format(filepath)]
+    try:
+        bits.append("exists={}".format(os.path.exists(filepath)))
+    except Exception:
+        bits.append("exists=?")
+    try:
+        parent = os.path.dirname(filepath)
+        bits.append("parent_exists={}".format(os.path.exists(parent)))
+    except Exception:
+        pass
+    try:
+        if os.path.exists(filepath):
+            bits.append("os.access_W_OK={}".format(os.access(filepath, os.W_OK)))
+        else:
+            bits.append("parent_W_OK={}".format(
+                os.access(os.path.dirname(filepath), os.W_OK)))
+    except Exception:
+        pass
+    try:
+        bits.append("user={}".format(os.environ.get("USERNAME", "?")))
+        bits.append("computer={}".format(os.environ.get("COMPUTERNAME", "?")))
+    except Exception:
+        pass
+    return " ".join(bits)
+
+
+def _is_sharing_violation(error):
+    """True when a write failed because another process holds the file."""
+    msg = str(error)
+    lower = msg.lower()
+    return (
+        "being used by another process" in msg
+        or "WinError 32" in msg
+        or "sharing" in lower
+        or "used by another process" in lower
+    )
+
+
 def get_list(filepath):
     """Read file contents as list of strings.
     
@@ -453,6 +498,11 @@ def set_list(list, filepath, end_with_new_line=False):
     Each element in the list becomes a line in the file.
     Supports UTF-8 encoding for international characters.
 
+    Network-share writes routinely fail with UnauthorizedAccessException /
+    IOError when the caller can see the folder but cannot write it, or when
+    another process holds the file. Callers already treat a False return as
+    "no write access" -- this function used to throw instead.
+
     Args:
         list (list): List of strings to write
         filepath (str): Target file path
@@ -460,14 +510,38 @@ def set_list(list, filepath, end_with_new_line=False):
             Defaults to False.
 
     Returns:
-        bool: True if write successful
+        bool: True if write successful, False if denied or otherwise failed
     """
-    with io.open(filepath, "w", encoding="utf-8") as f:
-        f.write("\n".join(list))
-        if end_with_new_line:
-            f.write("\n")
+    payload = "\n".join(list)
+    if end_with_new_line:
+        payload += "\n"
 
-    return True
+    max_retries = 3
+    retry_delay = 0.5
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            with io.open(filepath, "w", encoding="utf-8") as f:
+                f.write(payload)
+            return True
+        except (OSError, IOError) as e:
+            last_error = e
+            if _is_sharing_violation(e) and attempt < max_retries - 1:
+                print("set_list sharing conflict (attempt {}/{}): {}. Retrying...".format(
+                    attempt + 1, max_retries, e))
+                time.sleep(retry_delay)
+                retry_delay *= 2
+                continue
+            print("set_list failed: {} | {}".format(e, _describe_write_target(filepath)))
+            return False
+        except Exception as e:
+            print("set_list unexpected error: {} | {}".format(
+                e, _describe_write_target(filepath)))
+            return False
+
+    print("set_list failed after {} attempts: {} | {}".format(
+        max_retries, last_error, _describe_write_target(filepath)))
+    return False
 
 
 #######################################################################################

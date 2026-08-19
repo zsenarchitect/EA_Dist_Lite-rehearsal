@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>Installation Guide - EnneadTabWiki</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            var path = window.location.pathname;
+            if (!path.endsWith('/') && !path.split('/').pop().includes('.')) {
+                var newUrl = window.location.protocol + '//' + window.location.host + path + '/' + window.location.search + window.location.hash;
+                window.location.replace(newUrl);
+            }
+        })();
+    </script>
+</head>
+
+<body class="base-text">
+    <header class="header">
+        <div class="header-content">
+            <div class="logo"><span class="logo-text navigation-text">EnneadTabWiki</span></div>
+            <nav class="nav"><a href="index.html" class="nav-link navigation-text">← Back to Knowledge Center</a></nav>
+        </div>
+    </header>
+    <div class="installation-bg">
+        <main class="main installation-container base-text">
+            <h1 class="hero-title">Step-by-Step Installation Guide</h1>
+            <div class="progress-bar-bg">
+                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <!-- Questionnaire Steps -->
+            <div id="step0" class="step active">
+                <div class="question hero-subtitle">Is this your first time installing EnneadTab on this machine?</div>
+                <div class="hint description-text">Hint: If you have never installed EnneadTab before(never use
+                    EnneadTab for Rhino or Revit), or you are setting up a new computer, this is your first time.
+                    <br>How do you know? If you don't see an "EnneadTab Ecosystem" folder in your Documents, it's your
+                    first time.</div>
+                <div class="answers">
+                    <button class="answer-btn button-text" onclick="goToStep(1)">Yes, first time</button>
+                    <button class="answer-btn button-text" onclick="goToStep(2)">No, I have installed before</button>
+                </div>
+            </div>
+            <div id="step1" class="step">
+                <div class="step-title hero-subtitle">Download and run the OS installer</div>
+                <div class="hint description-text">You can get the installer from one of the option below:<br>
+                    <b>Ennead Network:</b>
+                    <code>L:\4b_Design Technology\05_EnneadTab-DB\Stand Alone Tools\EnneadTab_OS_Installer.exe</code><br>
+                    <b>GitHub:</b> <a
+                        href="https://raw.githubusercontent.com/Ennead-Architects-LLP/EA_Dist/main/Installation/EnneadTab_OS_Installer.exe"
+                        target="_blank" download>Download from GitHub</a>
+                </div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToStep(2)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToStep(0)">← Back</button>
+            </div>
+            <div id="step2" class="step">
+                <div class="question hero-subtitle">Are you getting ready to use EnneadTab for Rhino, Revit, or Both?
+                </div>
+                <div class="answers">
+                    <button class="answer-btn button-text" onclick="chooseProduct('rhino')">Rhino Only</button>
+                    <button class="answer-btn button-text" onclick="chooseProduct('revit')">Revit Only</button>
+                    <button class="answer-btn button-text" onclick="chooseProduct('both')">Both Rhino and Revit</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToStep(0)">← Back</button>
+            </div>
+            <!-- Rhino Steps -->
+            <div id="rhinoStep0" class="step">
+                <div class="step-title hero-subtitle">Uninstall "legacy" EnneadTab for Rhino (Support dropped in 2023)
+                </div>
+                <div class="hint description-text"><strong>How do I know if I have the "legacy" version? If your Rhino
+                        toolbar says "Ennead" or "Ennead+", instead of the "EnneadTab", you have the legacy version.
+                        Drop in the installer.rui and use the uninstall button from the menu and restart Rhino.</strong>
+                </div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRhinoStep(1)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToStep(2)">← Back</button>
+            </div>
+            <div id="rhinoStep1" class="step">
+                <div class="step-title hero-subtitle">Navigate to the installation folder</div>
+                <div class="hint description-text">Go to
+                    <code>C:\Users\[USER_NAME]\Documents\EnneadTab Ecosystem\EA_Dist\Installation</code></div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRhinoStep(2)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRhinoStep(0)">← Back</button>
+            </div>
+            <div id="rhinoStep2" class="step">
+                <div class="step-title hero-subtitle">Open ONLY ONE Rhino window</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRhinoStep(3)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRhinoStep(1)">← Back</button>
+            </div>
+            <div id="rhinoStep3" class="step">
+                <div class="step-title hero-subtitle">Drag EnneadTab_For_Rhino_Installer.rui from the installation
+                    folder into the Rhino window</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRhinoStep(4)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRhinoStep(2)">← Back</button>
+            </div>
+            <div id="rhinoStep4" class="step">
+                <div class="step-title hero-subtitle">Find the "Enneaaaaaaaaaaaad" menu and click on "Install"</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRhinoStep(5)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRhinoStep(3)">← Back</button>
+            </div>
+            <div id="rhinoStep5" class="step">
+                <div class="step-title hero-subtitle">For Rhino 8 and above: What if the Sidebar is not showing up?
+                </div>
+                <div class="hint description-text">Go to Rhino settings and toggle the 'Block' collection or other
+                    checkboxes to trigger activation. Make sure to check the Group: Dynamic Rui at the end.</div>
+                <video src="assets/Instruction_toggle_r8_sidebar.mp4" alt="Rhino sidebar setting" class="guide-img"
+                    autoplay loop muted playsinline>
+                    <source src="assets/Instruction_toggle_r8_sidebar.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRhinoStep(6)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRhinoStep(4)">← Back</button>
+            </div>
+            <div id="rhinoStep6" class="step">
+                <div class="step-title hero-subtitle">Restart Rhino</div>
+                <div class="hint description-text">Rhino only remembers the setting of the most recently closed Rhino.
+                    Using only one Rhino helps make installation stick.<br>For a complete command list, see the <a
+                        href="https://github.com/Ennead-Architects-LLP/EA_Dist/blob/main/Installation/EnneadTab_For_Rhino_HandBook.pdf"
+                        target="_blank">EnneadTab-For-Rhino Handbook.pdf</a>, or visit <a
+                        href="https://ennead-architects-llp.github.io/EnneadTabWiki/rhino.html"
+                        target="_blank">EnneadTab-For-Rhino Wiki</a>.</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="afterRhino()">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRhinoStep(5)">← Back</button>
+            </div>
+            <!-- Revit Steps -->
+            <div id="revitStep0" class="step">
+                <div class="step-title hero-subtitle">Check your pyRevit version</div>
+                <div class="hint description-text">What version is your pyRevit? (This depends on what year of Revit you
+                    will be using.)</div>
+                <ul class="guide-list description-text">
+                    <li><b>2027:</b> Need pyRevit 6.0.0 or above</li>
+                    <li><b>2026:</b> Need pyRevit 5.1.0 or above</li>
+                    <li><b>2025:</b> Need pyRevit 5.0.1 or above</li>
+                    <li><b>2024 and before:</b> Need pyRevit 4.8 or above</li>
+                </ul>
+                <div class="hint description-text" style="font-style: italic; opacity: 0.8;">(Note: Check for new Revit version and pyRevit compatibility annually.)</div>
+                <div class="hint description-text">To get the latest pyRevit, go to <a
+                        href="https://github.com/pyrevitlabs/pyRevit/releases" target="_blank" class="link-text">pyRevit
+                        Releases</a> and pick the first one under "Download". No admin rights needed.</div>
+                <div class="hint description-text" style="color: #d32f2f; font-weight: bold; margin-top: 12px;">⚠️ DO
+                    NOT USE the pyRevit from Company Portal. That version is admin version and will cause issues for us
+                    later.</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRevitStep(1)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToStep(2)">← Back</button>
+            </div>
+            <div id="revitStep1" class="step">
+                <div class="step-title hero-subtitle">No need to uninstall old EnneadTab-For-Revit</div>
+                <div class="hint description-text">It will be handled automatically.</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRevitStep(2)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRevitStep(0)">← Back</button>
+            </div>
+            <div id="revitStep2" class="step">
+                <div class="step-title hero-subtitle">Make sure no Revit is running during the installation</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRevitStep(3)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRevitStep(1)">← Back</button>
+            </div>
+            <div id="revitStep3" class="step">
+                <div class="step-title hero-subtitle">Navigate to the installation folder</div>
+                <div class="hint description-text">Go to
+                    <code>C:\Users\[USER_NAME]\Documents\EnneadTab Ecosystem\EA_Dist\Installation</code></div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRevitStep(4)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRevitStep(2)">← Back</button>
+            </div>
+            <div id="revitStep4" class="step">
+                <div class="step-title hero-subtitle">Double click on EnneadTab-For-Revit.exe</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRevitStep(5)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRevitStep(3)">← Back</button>
+            </div>
+            <div id="revitStep5" class="step">
+                <div class="step-title hero-subtitle">You can now open Revit</div>
+                <div class="hint description-text" style="color: #d32f2f; font-weight: bold; margin-top: 12px;">⚠️ If
+                    pyRevit is not showing up in Revit after installation, this is likely due to a previous global
+                    reimaging at the bluescreen disaster that caused pyRevit to be wired to the admin account. Please
+                    run the following PowerShell script with admin rights (ask AJ for providing the admin
+                    password):<br><code>C:\Users\YourUsername\github\ennead-llp\EnneadTab-OS\Apps\lib\EnneadTab\scripts\FixPyRevitAdminPath.ps1</code><br><small>(Replace
+                        "YourUsername" with your actual Windows username)</small></div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="goToRevitStep(6)">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRevitStep(4)">← Back</button>
+            </div>
+            <div id="revitStep6" class="step">
+                <div class="step-title hero-subtitle">(Optional) Configure your Revit's notification level in EnneadTab
+                    Revit settings</div>
+                <div class="hint description-text">For a complete command list, see the <a
+                        href="https://github.com/Ennead-Architects-LLP/EA_Dist/blob/main/Installation/EnneadTab_For_Revit_HandBook.pdf"
+                        target="_blank">EnneadTab-For-Revit Handbook.pdf</a>, or visit <a
+                        href="https://ennead-architects-llp.github.io/EnneadTabWiki/revit.html"
+                        target="_blank">EnneadTab-For-Revit Wiki</a>.</div>
+                <div class="answers">
+                    <button class="next-btn button-text" onclick="afterRevit()">Next</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToRevitStep(5)">← Back</button>
+            </div>
+            <!-- Congratulations -->
+            <div id="congratulations" class="step">
+                <div class="guide-section">
+                    <div class="guide-title hero-title">🎉 Congratulations! Installation Complete</div>
+                    <div class="hint description-text">
+                        <p><strong>You have successfully installed EnneadTab!</strong></p>
+                        <p>You can start using all the functions in EnneadTab.</p>
+                        <p>EnneadTab will check for updates and install them automatically and silently.</p>
+                        <p><strong>Need help?</strong> You can always return to this installation guide or visit the
+                            main knowledge center for more information.</p>
+                    </div>
+                </div>
+                <div class="answers">
+                    <button class="answer-btn button-text" onclick="window.location.href='index.html'">Go to Knowledge
+                        Center</button>
+                </div>
+                <button class="back-btn button-text" onclick="goToStep(0)">← Start Over</button>
+            </div>
+        </main>
+    </div>
+    <script>
+        // Questionnaire state
+        let product = null; // 'rhino', 'revit', 'both'
+        let rhinoStep = 0;
+        let revitStep = 0;
+        let totalSteps = 0;
+        let currentStepIndex = 0;
+        let stepOrder = [];
+        // Step counts
+        const rhinoSteps = 7;
+        const revitSteps = 7;
+        // Step navigation
+        function goToStep(idx) {
+            hideAllSteps();
+            document.getElementById('step' + idx).classList.add('active');
+            updateProgress(idx);
+        }
+        function chooseProduct(sel) {
+            product = sel;
+            if (sel === 'rhino') {
+                stepOrder = ['rhinoStep0', 'rhinoStep1', 'rhinoStep2', 'rhinoStep3', 'rhinoStep4', 'rhinoStep5', 'rhinoStep6', 'congratulations'];
+            } else if (sel === 'revit') {
+                stepOrder = ['revitStep0', 'revitStep1', 'revitStep2', 'revitStep3', 'revitStep4', 'revitStep5', 'revitStep6', 'congratulations'];
+            } else {
+                stepOrder = ['rhinoStep0', 'rhinoStep1', 'rhinoStep2', 'rhinoStep3', 'rhinoStep4', 'rhinoStep5', 'rhinoStep6', 'revitStep0', 'revitStep1', 'revitStep2', 'revitStep3', 'revitStep4', 'revitStep5', 'revitStep6', 'congratulations'];
+            }
+            totalSteps = stepOrder.length;
+            currentStepIndex = 0;
+            goToStepByOrder(0);
+        }
+        function goToRhinoStep(idx) {
+            if (product === 'both') {
+                currentStepIndex = idx;
+                goToStepByOrder(currentStepIndex);
+            } else {
+                hideAllSteps();
+                document.getElementById('rhinoStep' + idx).classList.add('active');
+                updateProgress(idx + 1);
+            }
+        }
+        function goToRevitStep(idx) {
+            if (product === 'both') {
+                currentStepIndex = (product === 'both' ? 7 : 0) + idx;
+                goToStepByOrder(currentStepIndex);
+            } else {
+                hideAllSteps();
+                document.getElementById('revitStep' + idx).classList.add('active');
+                updateProgress(idx + 1);
+            }
+        }
+        function afterRhino() {
+            if (product === 'both') {
+                currentStepIndex = 7;
+                goToStepByOrder(currentStepIndex);
+            } else {
+                goToStepByOrder(stepOrder.length - 1);
+            }
+        }
+        function afterRevit() {
+            goToStepByOrder(stepOrder.length - 1);
+        }
+        function goToStepByOrder(idx) {
+            hideAllSteps();
+            document.getElementById(stepOrder[idx]).classList.add('active');
+            updateProgress(idx + 1);
+        }
+        function hideAllSteps() {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        }
+        function updateProgress(idx) {
+            let percent = 0;
+            if (product === 'rhino') percent = Math.round((idx) / rhinoSteps * 100);
+            else if (product === 'revit') percent = Math.round((idx) / revitSteps * 100);
+            else if (product === 'both') percent = Math.round((idx) / 14 * 100);
+
+            // Ensure percent doesn't exceed 100%
+            percent = Math.min(percent, 100);
+            percent = Math.max(percent, 0);
+
+            document.getElementById('progressBar').style.width = percent + "%";
+        }
+        // On load, show first step
+        goToStep(0);
+
+        // Video handling
+        document.addEventListener('DOMContentLoaded', function () {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                // Ensure video plays when it comes into view
+                video.addEventListener('loadedmetadata', function () {
+                    video.play().catch(function (error) {
+                        console.log("Video autoplay failed:", error);
+                    });
+                });
+
+                // Add click to play/pause functionality
+                video.addEventListener('click', function () {
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
+                });
+
+                // Add keyboard controls
+                video.addEventListener('keydown', function (e) {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (video.paused) {
+                            video.play();
+                        } else {
+                            video.pause();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -82,6 +82,8 @@ def export_using_new_method(color_scheme, is_ignore_non_used):
     excel_name =  color_scheme.Name
     file_location = forms.save_file(file_ext='xlsx',
                                     default_name=excel_name)
+    if not file_location:
+        return
 
     data = []
     # prepare the header
@@ -112,8 +114,14 @@ def export_using_new_method(color_scheme, is_ignore_non_used):
         data.append(EXCEL.ExcelDataItem(entry.Color.Green, row, "E"))
         data.append(EXCEL.ExcelDataItem(entry.Color.Blue, row, "F"))
         
-    EXCEL.save_data_to_excel(data, file_location, worksheet="Color Scheme")
-    NOTIFICATION.messenger("Excel saved at '{}'".format(file_location))
+    saved_ok = EXCEL.save_data_to_excel(data, file_location, worksheet="Color Scheme")
+    if saved_ok and os.path.exists(file_location):
+        NOTIFICATION.messenger("Excel saved at '{}'".format(file_location))
+    else:
+        NOTIFICATION.messenger(
+            "Could not save Excel to '{}'.\n"
+            "The Excel helper may be blocked by IT security, or the folder is not writable.\n"
+            "Try saving to a local folder (e.g. your Desktop) instead of a network/OneDrive path.".format(file_location))
 
 def export_using_old_method(color_scheme, is_ignore_non_used):
     cate_name = DB.Category.GetCategory(doc, color_scheme.CategoryId).Name

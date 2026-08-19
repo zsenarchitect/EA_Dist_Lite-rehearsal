@@ -8,21 +8,21 @@
     </menu>
   </extend_rhino_menus>
   <menus>
-    <menu guid="74c155b9-04d7-4680-8031-440c13c84155">
+    <menu guid="4ce6c109-a197-484d-af9a-44cfcf47befd">
       <text>
         <locale_1033>Enneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad</locale_1033>
       </text>
-      <menu_item guid="7cd8b6a5-fed1-42f7-b121-720b2cf7dfd7">
+      <menu_item guid="005b7fd7-9581-40db-b1ba-06aa4d935e4a">
         <text>
           <locale_1033>Installation</locale_1033>
         </text>
-        <macro_id>5fa2db7f-3e07-42f5-9c1a-39a6ed8951ff</macro_id>
+        <macro_id>875ae18d-5511-49cd-bbd4-e40316db4dd3</macro_id>
       </menu_item>
-      <menu_item guid="2870e184-e5a3-4be1-a716-4d0a0a7486b2">
+      <menu_item guid="c13891ae-f306-435d-9a6f-bbaa08f7838d">
         <text>
           <locale_1033>uninstall_old_version</locale_1033>
         </text>
-        <macro_id>a51d8a2c-22eb-4b50-af4a-a7c82049e720</macro_id>
+        <macro_id>8830f350-503b-4b17-95a4-5d351f43e3c5</macro_id>
       </menu_item>
     </menu>
   </menus>
@@ -36,7 +36,7 @@
   </tool_bar_groups>
   <tool_bars/>
   <macros>
-    <macro_item guid="5fa2db7f-3e07-42f5-9c1a-39a6ed8951ff" bitmap_id="1ac3478c-27d3-4c21-a3d0-acc0f688122d">
+    <macro_item guid="875ae18d-5511-49cd-bbd4-e40316db4dd3" bitmap_id="28e515d6-1bbb-4c72-8811-3e495e067219">
       <text>
         <locale_1033>Install EnneadTab</locale_1033>
       </text>
@@ -56,17 +56,9 @@
 import os
 import sys
 common_folders = [&quot;github&quot;,&quot;dev-repo&quot;,&quot;duck-repo&quot;,&quot;design-repo&quot;]
-org_folders = [&quot;&quot;, &quot;ennead-llp&quot;, &quot;Personal&quot;, &quot;LakeHouse-LLP&quot;, &quot;Toni-LLP&quot;, &quot;TimeBank-llp&quot;, &quot;zsenarchitect&quot;]
-lib_folders = []
-for parent in common_folders:
-    for org in org_folders:
-        parts = [os.environ['USERPROFILE'], parent]
-        if org:
-            parts.append(org)
-        parts += [&quot;EnneadTab-OS&quot;, &quot;Apps&quot;, &quot;lib&quot;, &quot;EnneadTab&quot;]
-        lib_folders.append(os.path.join(*parts))
-lib_folders.append(os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
-lib_folders.append(os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab-Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
+lib_folders = [os.path.join(os.environ['USERPROFILE'],x, &quot;EnneadTab-OS&quot;,&quot;Apps&quot;,&quot;lib&quot;,&quot;EnneadTab&quot;) for x in common_folders]
+lib_folders.append( os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
+lib_folders.append( os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab-Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
 for lib_folder in lib_folders:
     if os.path.exists(lib_folder):
         sys.path.append(lib_folder)
@@ -76,7 +68,7 @@ MODULE_HELPER.run_Rhino_button('Enneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 )
 </script>
     </macro_item>
-    <macro_item guid="a51d8a2c-22eb-4b50-af4a-a7c82049e720" bitmap_id="bfcd9d90-01d3-463a-bb97-a73b5af25950">
+    <macro_item guid="8830f350-503b-4b17-95a4-5d351f43e3c5" bitmap_id="25e8a2d5-35f5-40a8-baa6-5bb282a2d0ad">
       <text>
         <locale_1033>UninstallOldVersion</locale_1033>
       </text>
@@ -100,17 +92,9 @@ MODULE_HELPER.run_Rhino_button('Enneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 import os
 import sys
 common_folders = [&quot;github&quot;,&quot;dev-repo&quot;,&quot;duck-repo&quot;,&quot;design-repo&quot;]
-org_folders = [&quot;&quot;, &quot;ennead-llp&quot;, &quot;Personal&quot;, &quot;LakeHouse-LLP&quot;, &quot;Toni-LLP&quot;, &quot;TimeBank-llp&quot;, &quot;zsenarchitect&quot;]
-lib_folders = []
-for parent in common_folders:
-    for org in org_folders:
-        parts = [os.environ['USERPROFILE'], parent]
-        if org:
-            parts.append(org)
-        parts += [&quot;EnneadTab-OS&quot;, &quot;Apps&quot;, &quot;lib&quot;, &quot;EnneadTab&quot;]
-        lib_folders.append(os.path.join(*parts))
-lib_folders.append(os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
-lib_folders.append(os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab-Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
+lib_folders = [os.path.join(os.environ['USERPROFILE'],x, &quot;EnneadTab-OS&quot;,&quot;Apps&quot;,&quot;lib&quot;,&quot;EnneadTab&quot;) for x in common_folders]
+lib_folders.append( os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
+lib_folders.append( os.path.join(os.environ['USERPROFILE'], 'Documents','EnneadTab-Ecosystem','EA_Dist','Apps','lib','EnneadTab'))
 for lib_folder in lib_folders:
     if os.path.exists(lib_folder):
         sys.path.append(lib_folder)
@@ -123,8 +107,8 @@ MODULE_HELPER.run_Rhino_button('Enneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   </macros>
   <bitmaps>
     <small_bitmap item_width="16" item_height="16">
-      <bitmap_item guid="1ac3478c-27d3-4c21-a3d0-acc0f688122d" index="0"/>
-      <bitmap_item guid="bfcd9d90-01d3-463a-bb97-a73b5af25950" index="1"/>
+      <bitmap_item guid="28e515d6-1bbb-4c72-8811-3e495e067219" index="0"/>
+      <bitmap_item guid="25e8a2d5-35f5-40a8-baa6-5bb282a2d0ad" index="1"/>
       <bitmap>iVBORw0KGgoAAAANSUhEUgAAABAAAAAgCAYAAAAbifjMAAAFaElEQVR4nJVUe2xTZRQ/33cfbbdu
 3QbbgEEtjwxhOLcIM2ZEwYAKMYOhRYMQo0TlD4MaCRoh6ZDsD2PEEN8SRSUEtiVTfCU4xggBRxwM
 JjDGww42tnZd13dvb+/jO+brmIwgBk/ypbm95/zO7/zO77sAAIBfvCzx30AgMVlToo2mnjwyMjRQ
@@ -149,13 +133,13 @@ GZwVaZD7/OALBkBAAJf/K7AXOeFyRyv09BtUFaI0L3xhESA2kAebQ2sXHlyzpyx2nE2ZUUJnTbHB
 wVNDcKLXhPtcDv49gO6+GMwtYjA5RwZBlsCWDrMTQhVtXbJvrWiJ9ZfZw38hWi2GmjbFviEVKmZN
 gIimYMvZOOFCVU6VwC4hEEGAkiIbDFxXjJyoV7RFr80TQ67yH3tLlm529H4razqDgDBqjelWCrMq
 AVTNhLiiAFMp6ESECxfjoKuafHnaSgxPrziQya5qjq0oudL0GtFSBdzz/LqhaeomClxkIooEOC5D
-ggQYQcES6it9auepVQUHbrqRyKOXZezIOQBWx63/jR2eOxqjte7GRsEDQPnT3Ryey2t47d9BL/iH
-sh9CEwAAAABJRU5ErkJggg==</bitmap>
+ggQYQcES6it9auepVQUHbrqRyKOXZezIOQBWx63/jR2eOxqjte7GRsEDQPnT3Ryey2t48d9BL/iH
+xguA8wAAAABJRU5ErkJggg==</bitmap>
     </small_bitmap>
     <normal_bitmap item_width="24" item_height="24">
-      <bitmap_item guid="1ac3478c-27d3-4c21-a3d0-acc0f688122d" index="0"/>
-      <bitmap_item guid="bfcd9d90-01d3-463a-bb97-a73b5af25950" index="1"/>
-      <bitmap>iVBORw0KGgoAAAANSUhEUgAAABgAAAAwCAYAAAALiLqjAAAKLUlEQVR4nKVXCZBU1RU97//f/ad7
+      <bitmap_item guid="28e515d6-1bbb-4c72-8811-3e495e067219" index="0"/>
+      <bitmap_item guid="25e8a2d5-35f5-40a8-baa6-5bb282a2d0ad" index="1"/>
+      <bitmap>iVBORw0KGgoAAAANSUhEUgAAABgAAAAwCAYAAAALiLqjAAAKLklEQVR4nKVXCZBU1RU97//f/ad7
 epnuGWYjA8M2IxARAVFUwlYTCRRJRMHSmIpSpZEo0YoxVGXroUqTUqMsJqbUisEtKWYClCJEDXEG
 NSgyqECGRR1mWGaf3rt/d//l3dT7s8qiQl7V7/e7333nLu/dc28zjBhExFBfL9UDqKmZv4pxq8al
 qmesHK13FxaeFuuMMcKlDAqFpKZn7naI91ik6zEig6xcisScjHY3R6PRAqHANuKiwYGhTVT/5Fwt
@@ -201,11 +185,11 @@ GRN+ir+XIKVtEpomVsxtTf931ASlr1OP+7xyNs2gKHaTAJskAYxWGSrHMugmRzRpoqXVhCdfQdDv
 xJn26EBLyaAlklbSUeSMjJ7T0laFJgWMpbvfpzUfW8/9Y8qHj7rzjDBkSxFN6ggGZLCygGlyWGSJ
 9hKuAgUJCYikBbf18yZxC1nPGLl59i/TZ2Yt+SkY09hgNat+j2YFeiJ3ykZyApHkEPLDPEiZflph
 TtEYCETbYur/o90vIwo/GZBdLZGSUc8fm8sODFXE4ZdBBj/7wcAQYudbP4/sFzD7rZS+pJCfremC
-w8YYAX6BTWfX2MEC8lWdx7kl839lAW6dRV3m6AAAAABJRU5ErkJggg==</bitmap>
+w8YYAX6BTWfX2MEC8lWdx7lt4/8AZQFuneiywJwAAAAASUVORK5CYII=</bitmap>
     </normal_bitmap>
     <large_bitmap item_width="32" item_height="32">
-      <bitmap_item guid="1ac3478c-27d3-4c21-a3d0-acc0f688122d" index="0"/>
-      <bitmap_item guid="bfcd9d90-01d3-463a-bb97-a73b5af25950" index="1"/>
+      <bitmap_item guid="28e515d6-1bbb-4c72-8811-3e495e067219" index="0"/>
+      <bitmap_item guid="25e8a2d5-35f5-40a8-baa6-5bb282a2d0ad" index="1"/>
       <bitmap>iVBORw0KGgoAAAANSUhEUgAAACAAAABACAYAAAB7jnWuAAAPwUlEQVR4nN1ZeZRU1Zn/3fveq1f7
 0jvSdLOJgIAILkEngTYmMThojrE5szl64oljdMyox0wyZE6a1plBzdEzyZhMzJyYmFVpo+IWBxfA
 LUgERJHNpaEb6K7uqura6233fnPua1qhBQyK/8x3zq169d599/t9y/2++33FcAwiIs4YkwcP7p0d

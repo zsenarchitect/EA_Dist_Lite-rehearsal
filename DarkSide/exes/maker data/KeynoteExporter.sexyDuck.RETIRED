@@ -1,0 +1,141 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter\\KeynoteExporter.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": true
+  },
+  {
+   "optionDest": "console",
+   "value": false
+  },
+  {
+   "optionDest": "icon_file",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter\\icon.ico"
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "strip",
+   "value": false
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "win_private_assemblies",
+   "value": false
+  },
+  {
+   "optionDest": "win_no_prefer_redirects",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "disable_windowed_traceback",
+   "value": false
+  },
+  {
+   "optionDest": "argv_emulation",
+   "value": false
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter\\src;src"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter\\sample excel;sample excel"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter\\icon.ico;."
+  },
+  {
+   "optionDest": "splash",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter\\splash.png"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "openpyxl"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "tkinter"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "tkinter.ttk"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "tkinter.filedialog"
+  },
+  {
+   "optionDest": "hidden-import",
+   "value": "tkinter.messagebox"
+  },
+  {
+   "optionDest": "collect-all",
+   "value": "openpyxl"
+  },
+  {
+   "optionDest": "exclude-module",
+   "value": "matplotlib"
+  },
+  {
+   "optionDest": "exclude-module",
+   "value": "scipy"
+  },
+  {
+   "optionDest": "exclude-module",
+   "value": "IPython"
+  },
+  {
+   "optionDest": "exclude-module",
+   "value": "PIL"
+  },
+  {
+   "optionDest": "exclude-module",
+   "value": "PyQt5"
+  },
+  {
+   "optionDest": "exclude-module",
+   "value": "PySide2"
+  },
+  {
+   "optionDest": "name",
+   "value": "KeynoteExporter"
+  },
+  {
+   "optionDest": "distpath",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\dist"
+  },
+  {
+   "optionDest": "workpath",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\build"
+  },
+  {
+   "optionDest": "specpath",
+   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\KeynoteExporter"
+  }
+ ]
+}

@@ -68,7 +68,7 @@ def has_required_lib(module, attr_name):
         ERROR_HANDLE.print_note(message)
         NOTIFICATION.messenger(
             "Your EnneadTab install is incomplete or out of date.\n"
-            "Please re-run the EnneadTab installer.")
+            "Please re-run the EnneadTab installer.", sticky=True)
 
         # Once per day per missing symbol. Without this gate a torn machine would
         # fire one ErrorDump event per family load -- the exact flood we are here
