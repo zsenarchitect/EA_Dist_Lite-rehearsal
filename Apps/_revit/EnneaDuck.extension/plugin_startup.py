@@ -664,19 +664,24 @@ def _enable_routes_server():
     pyRevit ships Routes OFF by default; the desktop app then probes
     localhost:48884.. for /enneadtab/status/, finds nothing, and reports
     "cannot detect Revit". We flip the user_config flag ourselves (idempotent:
-    only writes + saves the first time it is found off) so pyRevit starts the
-    server on every session load via its own proven init path
-    (loader/sessionmgr.py: `if user_config.routes_server: routes.activate_server()`).
+    only writes + saves the first time it is found off).
 
-    We deliberately do NOT call routes.activate_server() by hand here: at this
-    point in extension startup pyRevit has already run its own routes block for
-    this session, so a manual activate would race that ordering. Setting the
-    config + letting the NEXT load start it is the verified-safe path; the
-    one-time notice below tells the user to reload once. The /enneadtab/* routes
-    themselves are registered by _register_mcp_routes()."""
+    This runs from execute_extension_startup_script(), which sessionmgr calls
+    from inside _new_session() -- BEFORE _perform_onsessionloadcomplete_ops()
+    reads user_config.routes_server and calls routes.activate_server() for this
+    same session (see loader/sessionmgr.py). So flipping the flag here already
+    covers the normal case with no extra call needed. We ALSO call
+    routes.activate_server() directly as a safety net for hosts/orderings where
+    that later step does not run (e.g. a hot-reload that skips
+    onsessionloadcomplete): activate_server() is idempotent (it checks the
+    ROUTES_SERVER env var and no-ops if a server is already up), so calling it
+    twice in the same session is harmless. The /enneadtab/* routes themselves
+    are registered by _register_mcp_routes()."""
     try:
         from pyrevit.userconfig import user_config
-    except:
+    except Exception as e:
+        if USER.IS_DEVELOPER:
+            print("_enable_routes_server: cannot import user_config: {}".format(e))
         return
     changed = False
     try:
@@ -691,17 +696,24 @@ def _enable_routes_server():
             changed = True
         if changed:
             user_config.save_changes()
-    except:
+    except Exception as e:
+        if USER.IS_DEVELOPER:
+            print("_enable_routes_server: failed to set/save routes config: {}".format(e))
         return
 
     if changed:
-        # Config only takes effect on the next pyRevit load (that is when pyRevit
-        # starts the server). Say so once, rather than silently leaving the user
-        # wondering why the Assistant still cannot connect this session.
+        try:
+            from pyrevit import routes
+            routes.activate_server()
+        except Exception as e:
+            if USER.IS_DEVELOPER:
+                print("_enable_routes_server: activate_server() failed: {}".format(e))
+            # Non-fatal: _perform_onsessionloadcomplete_ops() still gets a
+            # chance to start the server later in this same session load.
+
         try:
             NOTIFICATION.messenger(
-                main_text="EnneadTab turned on the Revit Assistant connection.\n"
-                          "Reload pyRevit (or restart Revit) once to activate it."
+                main_text="EnneadTab turned on the Revit Assistant connection."
             )
         except:
             pass

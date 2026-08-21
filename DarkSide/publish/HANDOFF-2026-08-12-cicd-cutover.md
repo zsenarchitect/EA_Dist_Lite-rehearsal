@@ -166,10 +166,12 @@ Each was checked empirically today. Several contradict the obvious assumption.
 ### Machine layout
 
 ```
-~/github/rehearsal/EnneadTab-OS        <- vars.ENNEADTAB_PUBLISHER_CLONE
+~/github/rehearsal/EnneadTab-OS_NO_WORK_INSIDE  <- vars.ENNEADTAB_PUBLISHER_CLONE (renamed 2026-08-19
+  from EnneadTab-OS; see DarkSide/publish/HANDOFF-2026-08-18-rename-publisher-clones.md)
   siblings: EA_Dist, EA_Dist_Lite      -> zsenarchitect/*-rehearsal   (FORKS)
 
-~/github/ennead-llp/EnneadTab-OS-publisher  <- vars.ENNEADTAB_PUBLISHER_CLONE_PRODUCTION
+~/github/ennead-llp/EnneadTab-OS_NO_WORK_INSIDE  <- vars.ENNEADTAB_PUBLISHER_CLONE_PRODUCTION (renamed
+  2026-08-19 from EnneadTab-OS-publisher)
   (detached git worktree, created today)
   siblings: ~/github/ennead-llp/EA_Dist, EA_Dist_Lite  -> PRODUCTION
 

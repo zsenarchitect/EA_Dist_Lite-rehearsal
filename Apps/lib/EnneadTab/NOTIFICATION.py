@@ -22,6 +22,12 @@ Note:
     All notifications respect user preferences and can be disabled through
     configuration settings.
 """
+# 2026-08-21: signing-pipeline trigger touch (see senzhang-todo #4600) -- no behavior change.
+# 2026-08-21: publish trigger touch after the EA_Dist clone repair (senzhang-todo #4456, #4634)
+# -- no behavior change. Confirms production publish is green again end-to-end.
+# 2026-08-21: publish trigger touch to ship PR #192 (the fleet went stale when run
+# 32511676656 refused with no output) and to exercise the guard-output capture from
+# PR #195 -- no behavior change. See senzhang-todo #4661.
 
 import os
 import random

@@ -3,10 +3,43 @@
 
 import os
 import shutil
+import subprocess
 import time
 from ..stage_base import PublishStage, PublishStageError
 
 EXE_PRODUCTS_REL = os.path.join("Apps", "lib", "ExeProducts")
+
+# The ONLY folders this stage wipes and recopies. The crash-restore below uses this
+# exact list as its git pathspec, so the blast radius of a restore can never exceed
+# what the sync already destroyed. Keep them derived from one another -- a restore
+# scoped wider than the wipe would revert tracked paths this stage never touches
+# (EA_Dist also carries CNAME, .github/, rhino-assistant/, README.md), and an
+# uncommitted edit to one of those is unrecoverable: never staged, so not in the
+# reflog and not in any git object.
+FOLDERS_TO_PROCESS = ["Apps", "Installation", "DarkSide"]
+
+# Fault injection for testing the restore path. A repair that has never been WATCHED
+# to fire is unverified -- "silently does nothing" and "works" look identical. Set
+# ENNEADTAB_PUBLISH_FAULT_INJECT=<n> to raise after n files have been copied.
+# Refuses to arm outside a rehearsal, so it can never wedge a production publish.
+FAULT_INJECT_ENV = "ENNEADTAB_PUBLISH_FAULT_INJECT"
+
+
+def _fault_inject_after():
+    """Return the copy count to fail after, or None. Rehearsal-only, by construction."""
+    raw = os.environ.get(FAULT_INJECT_ENV, "").strip()
+    if not raw:
+        return None
+    if not os.environ.get("ENNEADTAB_PUBLISH_REHEARSAL_TARGETS", "").strip():
+        print("    Notice: {} is set but this is not a rehearsal -- IGNORING it. "
+              "Fault injection is never armed against the production "
+              "distribution.".format(FAULT_INJECT_ENV))
+        return None
+    try:
+        return int(raw)
+    except ValueError:
+        print("    Notice: {}={!r} is not an integer; ignoring.".format(FAULT_INJECT_ENV, raw))
+        return None
 
 
 def try_remove_content(folder_path):
@@ -31,6 +64,114 @@ def _count_exe_files(folder):
     return len([f for f in os.listdir(folder) if f.lower().endswith(".exe")])
 
 
+def _git(context, repo, args, timeout=1800):
+    """Run git in `repo`. Returns (rc, stdout+stderr). Never raises on non-zero."""
+    try:
+        proc = subprocess.run(
+            [context.git_exe] + list(args),
+            cwd=repo, capture_output=True, text=True, timeout=timeout,
+        )
+        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+    except Exception as exc:  # timeout, git missing, permissions
+        return 1, "{}: {}".format(type(exc).__name__, exc)
+
+
+def _is_git_worktree(context, repo):
+    """A restore is only meaningful in a git repo. stage_04 will happily os.makedirs a
+    plain directory, and `git checkout` there would raise and MASK the real error."""
+    rc, out = _git(context, repo, ["rev-parse", "--is-inside-work-tree"], timeout=60)
+    return rc == 0 and out.strip().lower().startswith("true")
+
+
+def _dump_forensics(context, repo, label):
+    """Write the wedged tree's state to a durable file BEFORE repairing it.
+
+    The wedged tree IS the diagnostic artifact: on 2026-08-21 it was the 1802 stray
+    deletions that identified the copy-loop crash. Repairing without recording first
+    trades a 3-day outage for an unexplainable one.
+    """
+    rc, out = _git(context, repo, ["status", "--porcelain"], timeout=300)
+    if rc != 0:
+        return None, 0
+    lines = [ln for ln in out.splitlines() if ln.strip()]
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    dest = os.path.join(
+        os.path.dirname(repo),
+        "publish-crash-{}-{}.txt".format(os.path.basename(repo.rstrip("\\/")), stamp),
+    )
+    try:
+        with open(dest, "w", encoding="utf-8") as fh:
+            fh.write("Dist tree state at crash -- {} ({})\n".format(label, stamp))
+            fh.write("repo: {}\n".format(repo))
+            fh.write("dirty paths: {}\n\n".format(len(lines)))
+            fh.write("\n".join(lines))
+        return dest, len(lines)
+    except Exception as exc:
+        print("    Notice: could not write forensics file: {}".format(exc))
+        return None, len(lines)
+
+
+def _restore_dist_tree(context, repo, label):
+    """Undo this stage's own damage, scoped to exactly the folders it wipes.
+
+    checkout restores tracked deletions/modifications; clean removes files the copy
+    loop wrote that are absent from HEAD (a new file leaves the tree dirty, and the
+    guard treats ANY porcelain output as dirty, so checkout alone cannot unwedge it).
+
+    Both are pathspec-scoped. `clean` must NEVER run at repo root -- that would delete
+    untracked work, stray worktrees, and .env files that survive by design.
+    """
+    problems = []
+    rc, out = _git(context, repo, ["checkout", "--"] + FOLDERS_TO_PROCESS)
+    if rc != 0:
+        problems.append("checkout failed: {}".format(out.strip()[:400]))
+    rc, out = _git(context, repo, ["clean", "-fd", "--"] + FOLDERS_TO_PROCESS)
+    if rc != 0:
+        problems.append("clean failed: {}".format(out.strip()[:400]))
+    rc, out = _git(context, repo, ["status", "--porcelain"], timeout=300)
+    remaining = len([ln for ln in out.splitlines() if ln.strip()]) if rc == 0 else -1
+    return problems, remaining
+
+
+def restore_dist_repos(context, repos, reason):
+    """Best-effort repair of every dist repo touched. NEVER raises.
+
+    Errors here must not replace the exception that triggered the repair, and must not
+    be swallowed either -- both get reported (global rule #13).
+    """
+    if not repos:
+        return
+    print("\n" + "=" * 70)
+    print("DIST REPAIR -- {}".format(reason))
+    print("=" * 70)
+    for repo, label in repos:
+        try:
+            if not os.path.isdir(repo):
+                print("  {}: gone from disk, nothing to repair".format(label))
+                continue
+            if not _is_git_worktree(context, repo):
+                print("  {}: NOT a git repo -- cannot repair, leaving as-is: {}".format(label, repo))
+                continue
+            dump, dirty = _dump_forensics(context, repo, label)
+            if dirty == 0:
+                print("  {}: already clean, nothing to repair".format(label))
+                continue
+            print("  {}: {} dirty path(s){}".format(
+                label, dirty, "; recorded at {}".format(dump) if dump else ""))
+            problems, remaining = _restore_dist_tree(context, repo, label)
+            for p in problems:
+                print("  {}: REPAIR PROBLEM -- {}".format(label, p))
+            if remaining == 0:
+                print("  {}: repaired, tree clean".format(label))
+            else:
+                print("  {}: STILL DIRTY after repair ({} path(s)). The next publish will "
+                      "refuse until this is cleared by hand.".format(label, remaining))
+        except Exception as exc:
+            # Repair is best-effort. It must never become the reported failure.
+            print("  {}: repair raised {}: {}".format(label, type(exc).__name__, exc))
+    print("=" * 70 + "\n")
+
+
 class StageDistStage(PublishStage):
     """Staging stage: copies OS content into EA_Dist and EA_Dist_Lite with filtering."""
 
@@ -48,18 +189,33 @@ class StageDistStage(PublishStage):
             (context.dist_lite_folder, True, "EA_Dist_Lite (Lite)"),
         ]
 
-        for dist_folder, is_lite, label in dist_targets:
-            if not os.path.exists(os.path.dirname(dist_folder)):
-                raise PublishStageError("Parent directory for {} does not exist: {}".format(
-                    label, dist_folder))
-            self._sync_dist_repo(context, dist_folder, is_lite, label)
+        # Every repo we START syncing is a repair candidate, recorded BEFORE the work
+        # begins: the damage is done by try_remove_content at the top of the sync, so a
+        # crash one file in still leaves a wiped tree. Tracking all touched targets (not
+        # just the failing one) matters -- a crash in Lite otherwise leaves EA_Dist fully
+        # copied and dirty, and the next publish refuses on IT instead.
+        touched = []
+        try:
+            for dist_folder, is_lite, label in dist_targets:
+                if not os.path.exists(os.path.dirname(dist_folder)):
+                    raise PublishStageError("Parent directory for {} does not exist: {}".format(
+                        label, dist_folder))
+                touched.append((dist_folder, label))
+                self._sync_dist_repo(context, dist_folder, is_lite, label)
+        except BaseException:
+            # BaseException so a cancelled CI job (KeyboardInterrupt) repairs too.
+            # Repair, then re-raise the ORIGINAL with a bare raise: the traceback is
+            # preserved and stage_base prints it. Repair problems are printed, never
+            # raised, so they cannot replace the real cause.
+            restore_dist_repos(context, touched, "staging failed -- undoing this stage's own damage")
+            raise
 
     def _sync_dist_repo(self, context, dist_folder, is_lite, label):
         """Synchronize OS repository into target distribution directory."""
         print("\nStaging content for {} at: {}".format(label, dist_folder))
         os.makedirs(dist_folder, exist_ok=True)
 
-        folders_to_process = ["Apps", "Installation", "DarkSide"]
+        folders_to_process = FOLDERS_TO_PROCESS
         lite_skip_folders = ["DuckMaker.extension", "_cad", "_engine", "DumpScripts", "dependency"]
         lite_allowed_exes = [
             "EnneadTab_OS_Installer.exe",
@@ -70,6 +226,13 @@ class StageDistStage(PublishStage):
             "NotificationHost.exe",
             "ProgressBar.exe",
         ]
+
+        # Accumulates across folders. It used to be rebound per folder, so the "[OK]
+        # ... N files copied" line below reported only the LAST folder's count (and
+        # raised UnboundLocalError if every folder hit the `continue`).
+        files_to_copy = []
+        copied_count = 0
+        fail_after = _fault_inject_after()
 
         for folder in folders_to_process:
             exe_backup_dir = None
@@ -92,7 +255,7 @@ class StageDistStage(PublishStage):
                 continue
 
             # Batch file copy
-            files_to_copy = []
+            folder_files = []
             for root, dirs, files in os.walk(src_subfolder):
                 if is_lite and any(skip.lower() in root.lower() for skip in lite_skip_folders):
                     continue
@@ -109,11 +272,20 @@ class StageDistStage(PublishStage):
                     src_file = os.path.join(root, filename)
                     rel_path = os.path.relpath(src_file, src_subfolder)
                     dest_file = os.path.join(dest_subfolder, rel_path)
-                    files_to_copy.append((src_file, dest_file))
+                    folder_files.append((src_file, dest_file))
 
-            for src_file, dest_file in files_to_copy:
+            files_to_copy.extend(folder_files)
+
+            for src_file, dest_file in folder_files:
                 os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                 shutil.copy2(src_file, dest_file)
+                copied_count += 1
+                if fail_after is not None and copied_count >= fail_after:
+                    raise PublishStageError(
+                        "FAULT INJECTION ({}={}): deliberately failing after {} copied "
+                        "files to exercise the crash-restore path. This is a test, and it "
+                        "only ever arms in a rehearsal.".format(
+                            FAULT_INJECT_ENV, fail_after, copied_count))
 
             if exe_backup_dir and os.path.isdir(exe_backup_dir):
                 if _count_exe_files(dist_exe_folder) == 0:
@@ -122,4 +294,4 @@ class StageDistStage(PublishStage):
                     print("    Restored dist ExeProducts from backup")
                 try_remove_content(exe_backup_dir)
 
-        print("[OK] Staging complete for {} ({} files copied).".format(label, len(files_to_copy)))
+        print("[OK] Staging complete for {} ({} files copied).".format(label, copied_count))

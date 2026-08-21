@@ -17,7 +17,7 @@ import pytest
 # the test imports exactly the module the button imports.
 _BUTTON_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "..", "..", "..", "Apps", "_rhino", "Create.tab", "get_earth.button")
+    "..", "..", "..", "Apps", "_rhino", "Render.tab", "get_earth.button")
 sys.path.insert(0, os.path.abspath(_BUTTON_DIR))
 
 import get_earth_utility as U

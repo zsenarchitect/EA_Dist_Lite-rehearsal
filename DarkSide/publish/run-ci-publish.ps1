@@ -194,10 +194,38 @@ try {
         Write-Host ""
     }
 
+    # Capture stderr with 2>&1 (the same pattern the enrollment call above uses).
+    # Without it the guard's traceback goes nowhere: on 2026-08-21 run 32511676656
+    # refused with NOTHING but "publish_guard exited 1" -- no banner, no problem
+    # list, no traceback -- because the guard died inside
+    # verify_publish_preconditions BEFORE its unconditional banner, and the only
+    # explanation went to a stream this call discarded. The fleet silently went
+    # stale (PR #192 never shipped) and the cause is still unknown, because the
+    # evidence was thrown away. A refusal must never be output-free.
+    # senzhang-todo #4661.
+    # $ErrorActionPreference is 'Stop' (line 53). On Windows PowerShell 5.1 -- the host
+    # the workflow actually uses -- that turns native-command stderr captured via 2>&1
+    # into a TERMINATING NativeCommandError, so the script would die on this line and
+    # never reach the Fail below. Verified on both hosts with a known-bad fixture:
+    # relaxing EAP around the call passes on 5.1 AND pwsh 7, while redirecting stderr
+    # to a temp file passes on pwsh 7 and THROWS on 5.1. Do not "simplify" this to a
+    # bare 2>&1 or a file redirect without re-testing on 5.1 specifically.
     Write-Host "publish_guard --report:" -ForegroundColor Cyan
-    & $python $guardPy --report
-    if ($LASTEXITCODE -ne 0) {
-        Fail "publish_guard exited $LASTEXITCODE"
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $guardLines = & $python $guardPy --report 2>&1
+        $guardExit = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $prevEAP
+    }
+    $guardLines | ForEach-Object { Write-Host $_ }
+    if ($guardExit -ne 0) {
+        $guardText = ($guardLines | Out-String).Trim()
+        if ([string]::IsNullOrWhiteSpace($guardText)) {
+            $guardText = "(the guard produced NO output on stdout or stderr -- it likely died before its banner; see senzhang-todo #4661)"
+        }
+        Fail "publish_guard exited $guardExit`n--- publish_guard output ---`n$guardText"
     }
     Write-Host ""
 

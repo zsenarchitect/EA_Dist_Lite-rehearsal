@@ -1,202 +1,4 @@
 {
-    "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py": {
-        "script": "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py",
-        "icon": "EnneadTab.menu\\activate_enneadtab.button\\icon.png",
-        "alias": "ActivateEnneadTab",
-        "doc": "Restore EnneadTab functionality.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- System path verification\n- Component activation\n- Path configuration\n- Startup script setup",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\app_store.button\\app_store_left.py": {
-        "script": "EnneadTab.menu\\app_store.button\\app_store_left.py",
-        "icon": "EnneadTab.menu\\app_store.button\\icon.png",
-        "alias": "AppStore",
-        "doc": "Access EnneadTab's centralized tool repository.\n\nKey Features:\n- Complete tool collection\n- Category organization\n- Installation management\n- Update notifications\n- Tool documentation access",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py": {
-        "script": "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py",
-        "icon": "EnneadTab.menu\\check_error_log.button\\icon.png",
-        "alias": "CheckErrorLog",
-        "doc": "Opens the Google error log URL in the default browser",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\create_new_button.button\\new_button_left.py": {
-        "script": "EnneadTab.menu\\create_new_button.button\\new_button_left.py",
-        "icon": "EnneadTab.menu\\create_new_button.button\\icon.png",
-        "alias": "MakeANewButton",
-        "doc": "Create new EnneadTab button components.\n\nKey Features:\n- Interactive button creation\n- Template generation\n- File structure setup\n- Icon integration support\n- Documentation templates",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py": {
-        "script": "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py",
-        "icon": "EnneadTab.menu\\extract_preview_images.button\\icon.png",
-        "alias": "ExtractPreviewImages",
-        "doc": "Extract preview images from Rhino files.\n\nKey Features:\n- Batch image extraction\n- Multiple file support\n- Automatic naming convention\n- Progress tracking",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\get_engine.button\\get_engine_left.py": {
-        "script": "EnneadTab.menu\\get_engine.button\\get_engine_left.py",
-        "icon": "EnneadTab.menu\\get_engine.button\\icon.png",
-        "alias": "GetEngine",
-        "doc": "Ensure that you have a localized Python engine installed",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\get_latest.button\\get_latest_left.py": {
-        "script": "EnneadTab.menu\\get_latest.button\\get_latest_left.py",
-        "icon": "EnneadTab.menu\\get_latest.button\\icon.png",
-        "alias": "GetLatest",
-        "doc": "Update EnneadTab to latest version.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- Automatic version detection\n- Core module updates\n- System path configuration\n- Component synchronization\n- Installation verification",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py": {
-        "script": "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py",
-        "icon": "EnneadTab.menu\\how_to_install.button\\icon.png",
-        "alias": "HowToInstall",
-        "doc": "Access EnneadTab installation documentation.\n\nKey Features:\n- Step-by-step installation guide\n- System requirements\n- Troubleshooting tips\n- Configuration instructions\n- Team deployment guidance",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py": {
-        "script": "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py",
-        "icon": "EnneadTab.menu\\mcp_server.button\\icon.png",
-        "alias": "MCPServer",
-        "doc": "Start the EnneadTab MCP Server for Rhino. When running, Claude Code can query and control this Rhino session via MCP protocol.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\monitor_drive_connection.button\\monitor_drive_connection_left.py": {
-        "script": "EnneadTab.menu\\monitor_drive_connection.button\\monitor_drive_connection_left.py",
-        "icon": "EnneadTab.menu\\monitor_drive_connection.button\\icon.png",
-        "alias": "MonitorDriveConnection",
-        "doc": "Launches the MonitorDrive application to track and manage network drive connections.\nThis tool provides real-time monitoring of network drive status and connection health.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py": {
-        "script": "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py",
-        "icon": "EnneadTab.menu\\open_autosave_folder.button\\icon.png",
-        "alias": "OpenAutosaveFolder",
-        "doc": "Open the Rhino autosave folder lcoations.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py": {
-        "script": "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py",
-        "icon": "EnneadTab.menu\\open_ecosystem_folder.button\\icon.png",
-        "alias": "OpenEcosystemFolder",
-        "doc": "Access the EnneadTab Ecosystem directory.\n\nKey Features:\n- Direct folder access\n- System file management\n- Resource exploration\n- Configuration access\n- Template management",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py": {
-        "script": "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py",
-        "icon": "EnneadTab.menu\\reload_engine.button\\icon.png",
-        "alias": "ReloadEngine",
-        "doc": "Reload all EnneadTab modules to ensure latest changes are applied.\n\nThis script will:\n1. Import all EnneadTab modules\n2. Reload each module to apply latest changes\n3. Handle any import errors gracefully",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py": {
-        "script": "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py",
-        "icon": "EnneadTab.menu\\remote_fix_code.button\\icon.png",
-        "alias": "RemoteFixCode",
-        "doc": "Launches VS Code Dev for emergency remote code editing and debugging",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py": {
-        "script": "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py",
-        "icon": "EnneadTab.menu\\reset_all_conduit.button\\icon.png",
-        "alias": "ResetAllConduit",
-        "doc": "Reset all display conduits to default state.\n\nKey Features:\n- Complete conduit cleanup\n- Memory optimization\n- Display pipeline reset\n- System performance improvement\n- Debug assistance",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py": {
-        "script": "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py",
-        "icon": "EnneadTab.menu\\restart_rhino.button\\icon.png",
-        "alias": "RestartRhino",
-        "doc": "Restart Rhino to apply core updates.\n\nKey Features:\n- Safe application restart\n- Update implementation\n- Session state preservation\n- Automatic core reloading\n- System verification",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py": {
-        "script": "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py",
-        "icon": "EnneadTab.menu\\secret_key_binding.button\\icon.png",
-        "alias": "SecretKeyBinding",
-        "doc": "Setup some secrete shortcut based on Sen's preference.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\self_repair.button\\self_repair_left.py": {
-        "script": "EnneadTab.menu\\self_repair.button\\self_repair_left.py",
-        "icon": "EnneadTab.menu\\self_repair.button\\icon.png",
-        "alias": "SelfRepair",
-        "doc": "Automatically repair and update EnneadTab installation.\n\nKey Features:\n- Legacy RUI detection and repair\n- Automatic version updates\n- System path verification\n- Component synchronization\n- Installation validation",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py": {
-        "script": "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py",
-        "icon": "EnneadTab.menu\\tell_me_version.button\\icon.png",
-        "alias": "TellMeVersion",
-        "doc": "Display current EnneadTab Rhino version.\n\nKey Features:\n- Version number display\n- Update status information\n- Installation verification\n- Component compatibility check\n- Release notes access",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py": {
-        "script": "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py",
-        "icon": "EnneadTab.menu\\Uninstall.button\\icon.png",
-        "alias": "Uninstall EnneadTab",
-        "doc": "Completely uninstall EnneadTab from the system",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\unit_test.button\\unit_test_left.py": {
-        "script": "EnneadTab.menu\\unit_test.button\\unit_test_left.py",
-        "icon": "EnneadTab.menu\\unit_test.button\\icon.png",
-        "alias": "UnitTest",
-        "doc": "Execute unit tests for EnneadTab components.\n\nKey Features:\n- Comprehensive module testing\n- Automated error detection\n- System integrity verification\n- Performance validation",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py": {
-        "script": "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py",
-        "icon": "EnneadTab.menu\\youtube_playlist.button\\icon.png",
-        "alias": "YoutubePlaylist",
-        "doc": "Access EnneadTab's video tutorial library.\n\nOpens the official EnneadTab YouTube playlist containing tutorials, \ndemonstrations and workflow guides.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
     "Block.tab\\batch_rename_blocks.button\\batch_rename_blocks_left.py": {
         "script": "Block.tab\\batch_rename_blocks.button\\batch_rename_blocks_left.py",
         "icon": "Block.tab\\batch_rename_blocks.button\\icon.png",
@@ -281,20 +83,20 @@
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
     },
-    "Block.tab\\randomize_block_transformation.button\\randomize_block_transformation_left.py": {
-        "script": "Block.tab\\randomize_block_transformation.button\\randomize_block_transformation_left.py",
-        "icon": "Block.tab\\randomize_block_transformation.button\\icon.png",
-        "alias": "RandomizeBlockTransformation",
-        "doc": "Randomly transform block transformation for rotation and scale.\n\nFeatures:\n- Rotates blocks randomly\n- Scales blocks 1D height softly or taller\n- Scales 3D dimensions evenly\n- Animates transformation process",
-        "tab": "Block.tab",
-        "tab_icon": "Block.tab\\icon.png",
-        "is_popular": true
-    },
     "Block.tab\\random_blocks_on_srfs.button\\random_blocks_on_srfs_left.py": {
         "script": "Block.tab\\random_blocks_on_srfs.button\\random_blocks_on_srfs_left.py",
         "icon": "Block.tab\\random_blocks_on_srfs.button\\icon.png",
         "alias": "RandomBlocksOnSrfs",
         "doc": "Advanced block distribution utility for surfaces.\n\nFeatures:\n- Distributes blocks randomly across target surfaces\n- Configurable edge distance and spacing controls\n- Optional edge-guided or curve-guided placement\n- Real-time preview of block placement\n- Supports multiple distribution patterns:\n  - Random interior placement\n  - Edge-aligned placement\n  - Even edge distribution\n\nUsage:\n1. Select target surfaces and sample blocks\n2. Configure placement parameters\n3. Choose distribution pattern\n4. Preview and adjust as needed",
+        "tab": "Block.tab",
+        "tab_icon": "Block.tab\\icon.png",
+        "is_popular": true
+    },
+    "Block.tab\\randomize_block_transformation.button\\randomize_block_transformation_left.py": {
+        "script": "Block.tab\\randomize_block_transformation.button\\randomize_block_transformation_left.py",
+        "icon": "Block.tab\\randomize_block_transformation.button\\icon.png",
+        "alias": "RandomizeBlockTransformation",
+        "doc": "Randomly transform block transformation for rotation and scale.\n\nFeatures:\n- Rotates blocks randomly\n- Scales blocks 1D height softly or taller\n- Scales 3D dimensions evenly\n- Animates transformation process",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": true
@@ -335,15 +137,6 @@
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
     },
-    "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py": {
-        "script": "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py",
-        "icon": "Block.tab\\toggle_block_color_display.button\\icon.png",
-        "alias": "ToggleBlockColorDisplay",
-        "doc": "Toggle on/off for highlighting the different block type. Very helpful when you have many block variation.",
-        "tab": "Block.tab",
-        "tab_icon": "Block.tab\\icon.png",
-        "is_popular": true
-    },
     "Block.tab\\toggle_block_color_display.button\\display_setting_right.py": {
         "script": "Block.tab\\toggle_block_color_display.button\\display_setting_right.py",
         "icon": "Block.tab\\toggle_block_color_display.button\\icon.png",
@@ -352,6 +145,15 @@
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
+    },
+    "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py": {
+        "script": "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py",
+        "icon": "Block.tab\\toggle_block_color_display.button\\icon.png",
+        "alias": "ToggleBlockColorDisplay",
+        "doc": "Toggle on/off for highlighting the different block type. Very helpful when you have many block variation.",
+        "tab": "Block.tab",
+        "tab_icon": "Block.tab\\icon.png",
+        "is_popular": true
     },
     "Block.tab\\uniform_transform_geos.button\\uniform_transform_geos_left.py": {
         "script": "Block.tab\\uniform_transform_geos.button\\uniform_transform_geos_left.py",
@@ -450,6 +252,195 @@
         "doc": "Access sample Excel template for area visualization.\n\nKey Features:\n- Pre-formatted Excel template\n- Example data structure\n- Color coding guidelines\n- Area calculation formulas\n- Category organization samples",
         "tab": "Drafting.tab",
         "tab_icon": "Drafting.tab\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py": {
+        "script": "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py",
+        "icon": "EnneadTab.menu\\Uninstall.button\\icon.png",
+        "alias": "Uninstall EnneadTab",
+        "doc": "Completely uninstall EnneadTab from the system",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py": {
+        "script": "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py",
+        "icon": "EnneadTab.menu\\activate_enneadtab.button\\icon.png",
+        "alias": "ActivateEnneadTab",
+        "doc": "Restore EnneadTab functionality.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- System path verification\n- Component activation\n- Path configuration\n- Startup script setup",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\app_store.button\\app_store_left.py": {
+        "script": "EnneadTab.menu\\app_store.button\\app_store_left.py",
+        "icon": "EnneadTab.menu\\app_store.button\\icon.png",
+        "alias": "AppStore",
+        "doc": "Access EnneadTab's centralized tool repository.\n\nKey Features:\n- Complete tool collection\n- Category organization\n- Installation management\n- Update notifications\n- Tool documentation access",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py": {
+        "script": "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py",
+        "icon": "EnneadTab.menu\\check_error_log.button\\icon.png",
+        "alias": "CheckErrorLog",
+        "doc": "Opens the Google error log URL in the default browser",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\create_new_button.button\\new_button_left.py": {
+        "script": "EnneadTab.menu\\create_new_button.button\\new_button_left.py",
+        "icon": "EnneadTab.menu\\create_new_button.button\\icon.png",
+        "alias": "MakeANewButton",
+        "doc": "Create new EnneadTab button components.\n\nKey Features:\n- Interactive button creation\n- Template generation\n- File structure setup\n- Icon integration support\n- Documentation templates",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py": {
+        "script": "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py",
+        "icon": "EnneadTab.menu\\extract_preview_images.button\\icon.png",
+        "alias": "ExtractPreviewImages",
+        "doc": "Extract preview images from Rhino files.\n\nKey Features:\n- Batch image extraction\n- Multiple file support\n- Automatic naming convention\n- Progress tracking",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\get_engine.button\\get_engine_left.py": {
+        "script": "EnneadTab.menu\\get_engine.button\\get_engine_left.py",
+        "icon": "EnneadTab.menu\\get_engine.button\\icon.png",
+        "alias": "GetEngine",
+        "doc": "Ensure that you have a localized Python engine installed",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\get_latest.button\\get_latest_left.py": {
+        "script": "EnneadTab.menu\\get_latest.button\\get_latest_left.py",
+        "icon": "EnneadTab.menu\\get_latest.button\\icon.png",
+        "alias": "GetLatest",
+        "doc": "Update EnneadTab to latest version.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- Automatic version detection\n- Core module updates\n- System path configuration\n- Component synchronization\n- Installation verification",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py": {
+        "script": "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py",
+        "icon": "EnneadTab.menu\\how_to_install.button\\icon.png",
+        "alias": "HowToInstall",
+        "doc": "Access EnneadTab installation documentation.\n\nKey Features:\n- Step-by-step installation guide\n- System requirements\n- Troubleshooting tips\n- Configuration instructions\n- Team deployment guidance",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py": {
+        "script": "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py",
+        "icon": "EnneadTab.menu\\mcp_server.button\\icon.png",
+        "alias": "MCPServer",
+        "doc": "Start the EnneadTab MCP Server for Rhino. When running, Claude Code can query and control this Rhino session via MCP protocol.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py": {
+        "script": "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py",
+        "icon": "EnneadTab.menu\\open_autosave_folder.button\\icon.png",
+        "alias": "OpenAutosaveFolder",
+        "doc": "Open the Rhino autosave folder lcoations.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py": {
+        "script": "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py",
+        "icon": "EnneadTab.menu\\open_ecosystem_folder.button\\icon.png",
+        "alias": "OpenEcosystemFolder",
+        "doc": "Access the EnneadTab Ecosystem directory.\n\nKey Features:\n- Direct folder access\n- System file management\n- Resource exploration\n- Configuration access\n- Template management",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py": {
+        "script": "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py",
+        "icon": "EnneadTab.menu\\reload_engine.button\\icon.png",
+        "alias": "ReloadEngine",
+        "doc": "Reload all EnneadTab modules to ensure latest changes are applied.\n\nThis script will:\n1. Import all EnneadTab modules\n2. Reload each module to apply latest changes\n3. Handle any import errors gracefully",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py": {
+        "script": "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py",
+        "icon": "EnneadTab.menu\\remote_fix_code.button\\icon.png",
+        "alias": "RemoteFixCode",
+        "doc": "Launches VS Code Dev for emergency remote code editing and debugging",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py": {
+        "script": "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py",
+        "icon": "EnneadTab.menu\\reset_all_conduit.button\\icon.png",
+        "alias": "ResetAllConduit",
+        "doc": "Reset all display conduits to default state.\n\nKey Features:\n- Complete conduit cleanup\n- Memory optimization\n- Display pipeline reset\n- System performance improvement\n- Debug assistance",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py": {
+        "script": "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py",
+        "icon": "EnneadTab.menu\\restart_rhino.button\\icon.png",
+        "alias": "RestartRhino",
+        "doc": "Restart Rhino to apply core updates.\n\nKey Features:\n- Safe application restart\n- Update implementation\n- Session state preservation\n- Automatic core reloading\n- System verification",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py": {
+        "script": "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py",
+        "icon": "EnneadTab.menu\\secret_key_binding.button\\icon.png",
+        "alias": "SecretKeyBinding",
+        "doc": "Setup some secrete shortcut based on Sen's preference.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\self_repair.button\\self_repair_left.py": {
+        "script": "EnneadTab.menu\\self_repair.button\\self_repair_left.py",
+        "icon": "EnneadTab.menu\\self_repair.button\\icon.png",
+        "alias": "SelfRepair",
+        "doc": "Automatically repair and update EnneadTab installation.\n\nKey Features:\n- Legacy RUI detection and repair\n- Automatic version updates\n- System path verification\n- Component synchronization\n- Installation validation",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py": {
+        "script": "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py",
+        "icon": "EnneadTab.menu\\tell_me_version.button\\icon.png",
+        "alias": "TellMeVersion",
+        "doc": "Display current EnneadTab Rhino version.\n\nKey Features:\n- Version number display\n- Update status information\n- Installation verification\n- Component compatibility check\n- Release notes access",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\unit_test.button\\unit_test_left.py": {
+        "script": "EnneadTab.menu\\unit_test.button\\unit_test_left.py",
+        "icon": "EnneadTab.menu\\unit_test.button\\icon.png",
+        "alias": "UnitTest",
+        "doc": "Execute unit tests for EnneadTab components.\n\nKey Features:\n- Comprehensive module testing\n- Automated error detection\n- System integrity verification\n- Performance validation",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py": {
+        "script": "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py",
+        "icon": "EnneadTab.menu\\youtube_playlist.button\\icon.png",
+        "alias": "YoutubePlaylist",
+        "doc": "Access EnneadTab's video tutorial library.\n\nOpens the official EnneadTab YouTube playlist containing tutorials, \ndemonstrations and workflow guides.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
         "is_popular": false
     },
     "File.tab\\archive_file.button\\archive_file_left.py": {
@@ -753,15 +744,6 @@
         "tab_icon": "Layer.tab\\icon.png",
         "is_popular": false
     },
-    "Layer.tab\\random_layer_color.button\\random_layer_color_left.py": {
-        "script": "Layer.tab\\random_layer_color.button\\random_layer_color_left.py",
-        "icon": "Layer.tab\\random_layer_color.button\\icon.png",
-        "alias": "RandomLayerColor",
-        "doc": "Assign random colors to layers.\n\nKey Features:\n- Smart color assignment\n- Context-aware coloring\n- Desaturated color option\n- Color scheme preservation\n- Batch processing support",
-        "tab": "Layer.tab",
-        "tab_icon": "Layer.tab\\icon.png",
-        "is_popular": true
-    },
     "Layer.tab\\random_layer_color.button\\color_setting_right.py": {
         "script": "Layer.tab\\random_layer_color.button\\color_setting_right.py",
         "icon": "Layer.tab\\random_layer_color.button\\icon.png",
@@ -770,6 +752,15 @@
         "tab": "Layer.tab",
         "tab_icon": "Layer.tab\\icon.png",
         "is_popular": false
+    },
+    "Layer.tab\\random_layer_color.button\\random_layer_color_left.py": {
+        "script": "Layer.tab\\random_layer_color.button\\random_layer_color_left.py",
+        "icon": "Layer.tab\\random_layer_color.button\\icon.png",
+        "alias": "RandomLayerColor",
+        "doc": "Assign random colors to layers.\n\nKey Features:\n- Smart color assignment\n- Context-aware coloring\n- Desaturated color option\n- Color scheme preservation\n- Batch processing support",
+        "tab": "Layer.tab",
+        "tab_icon": "Layer.tab\\icon.png",
+        "is_popular": true
     },
     "Material.tab\\assign_empty_material_to_layer.button\\assign_empty_material_to_layer_left.py": {
         "script": "Material.tab\\assign_empty_material_to_layer.button\\assign_empty_material_to_layer_left.py",
@@ -915,20 +906,20 @@
         "tab_icon": "Modify.tab\\icon.png",
         "is_popular": false
     },
-    "Render.tab\\ai_render.button\\view2render_left.py": {
-        "script": "Render.tab\\ai_render.button\\view2render_left.py",
-        "icon": "Render.tab\\ai_render.button\\icon.png",
-        "alias": "AiRenderingFromView",
-        "doc": "Renders Rhino views using Gemini AI via EnneaDuck.\n\nCaptures current viewport, sends it with a style prompt to ennead-ai.com,\nand returns a polished architectural rendering. No local GPU required.\n",
-        "tab": "Render.tab",
-        "tab_icon": "Render.tab\\icon.png",
-        "is_popular": false
-    },
     "Render.tab\\ai_render.button\\render_upscale_right.py": {
         "script": "Render.tab\\ai_render.button\\render_upscale_right.py",
         "icon": "Render.tab\\ai_render.button\\icon.png",
         "alias": "AiRenderUpscale",
         "doc": "Upscale AI generated images.",
+        "tab": "Render.tab",
+        "tab_icon": "Render.tab\\icon.png",
+        "is_popular": false
+    },
+    "Render.tab\\ai_render.button\\view2render_left.py": {
+        "script": "Render.tab\\ai_render.button\\view2render_left.py",
+        "icon": "Render.tab\\ai_render.button\\icon.png",
+        "alias": "AiRenderingFromView",
+        "doc": "Renders Rhino views using Gemini AI via EnneaDuck.\n\nCaptures current viewport, sends it with a style prompt to ennead-ai.com,\nand returns a polished architectural rendering. No local GPU required.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -960,20 +951,29 @@
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
     },
-    "Render.tab\\get_google_earth_model.button\\get_google_earth_model_left.py": {
-        "script": "Render.tab\\get_google_earth_model.button\\get_google_earth_model_left.py",
-        "icon": "Render.tab\\get_google_earth_model.button\\icon.png",
-        "alias": "GetGoogleEarthModel",
-        "doc": "This button does GetGoogleEarthModel when left click",
+    "Render.tab\\get_earth.button\\get_earth_left.py": {
+        "script": "Render.tab\\get_earth.button\\get_earth_left.py",
+        "icon": "Render.tab\\get_earth.button\\icon.png",
+        "alias": "GetEarth",
+        "doc": "Pull a real-world site context model into Rhino from a coordinate.\n\nPaste a Google Maps link (or a \"lat, lon\" pair), give it a size, and the\nEnneadTab EarthModel service returns a georeferenced textured mesh you can\nrender against. No Blender detour, no plugin to install, no API key of your own.\n\nHow to use:\n1. Paste a Google Maps URL, or type \"40.7128, -74.0060\".\n2. Give a square size in metres.\n3. The model arrives on its own layer, anchored to the file's EarthAnchorPoint.\n\nNotes:\n- Good enough to RENDER. Not survey geometry, and deliberately so: do not snap,\n  section, or measure against it.\n- Google attribution is attached to the layer and must not be stripped.\n- Right-click this button for the diagnostic (is the service up, am I signed in,\n  what is cached) and for cache purge.\n- The boundary-curve sizing mode described in the service plan is NOT built yet;\n  only the square-from-a-point mode ships here. get_earth_utility already has\n  the bbox_from_points math it will need.\n- Not to be confused with GoogleEarthTutorial in the Render tab. That one is the\n  older MANUAL route: it opens a Blender walkthrough video. This button is the\n  automatic one. They are separate tools, not two versions of the same thing.\n",
+        "tab": "Render.tab",
+        "tab_icon": "Render.tab\\icon.png",
+        "is_popular": true
+    },
+    "Render.tab\\get_earth.button\\get_earth_right.py": {
+        "script": "Render.tab\\get_earth.button\\get_earth_right.py",
+        "icon": "Render.tab\\get_earth.button\\icon.png",
+        "alias": "GetEarthSettings",
+        "doc": "Diagnose and configure GetEarth.\n\nRun this first when GetEarth misbehaves. It answers the four questions that\nactually explain a failure:\n\n- Can this machine reach the EarthModel service?\n- Am I signed in to EnneadTab?\n- What is cached locally, and how big has it got?\n- Which contract version is this client speaking?\n\nAlso sets the default site size and purges the local cache.\n\nThis diagnostic SHIPS on purpose. DarkSide/ is stripped at publish, so the test\nharness, the stub server and every developer driver are gone on a designer's\nmachine. Without this, a failing GetEarth button has nothing to run at all.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
     },
-    "Render.tab\\get_inspired.button\\get_inspired_left.py": {
-        "script": "Render.tab\\get_inspired.button\\get_inspired_left.py",
-        "icon": "Render.tab\\get_inspired.button\\icon.png",
-        "alias": "GetInspired",
-        "doc": "Opens e.AI rendering website (https://enneadtab.com/rendering/home) in the default browser",
+    "Render.tab\\get_google_earth_model_tutorial.button\\get_google_earth_model_tutorial_left.py": {
+        "script": "Render.tab\\get_google_earth_model_tutorial.button\\get_google_earth_model_tutorial_left.py",
+        "icon": "Render.tab\\get_google_earth_model_tutorial.button\\icon.png",
+        "alias": "GoogleEarthTutorial",
+        "doc": "MANUAL route to site context: opens the Blender video tutorial.\n\nThis is the OLD, hand-driven way. It opens a YouTube walkthrough for capturing a\ncity in Blender and bringing it across into Rhino, plus a companion Blender\nscript in this button's folder that tidies up the imported materials.\n\nThere is now an AUTOMATIC one: GetEarth, in the Create tab. Paste a Google Maps\nlink, give it a size, and the site model arrives georeferenced and textured with\nno Blender step at all. Try that first.\n\nThis button stays for two reasons, and will be retired when neither holds:\n1. GetEarth's server-side model builder is not finished yet, so this is still\n   the only route that works end to end today.\n2. The Blender path gives you manual control over exactly what gets captured,\n   which the automatic one deliberately does not.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -1212,6 +1212,15 @@
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
     },
+    "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py": {
+        "script": "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py",
+        "icon": "Tailor.tab\\SAIF_panel_mapping.button\\icon.png",
+        "alias": "SaifPanelMapping",
+        "doc": "Maps SAIF panels using new naming convention CW01_SOLID X_YYYY_ZZZZ and CW06_SOLID X_YYYY_ZZZZ, extracting pier width (X) as-is",
+        "tab": "Tailor.tab",
+        "tab_icon": "Tailor.tab\\icon.png",
+        "is_popular": false
+    },
     "Tailor.tab\\children_palace_massing.button\\children_palace_massing_left.py": {
         "script": "Tailor.tab\\children_palace_massing.button\\children_palace_massing_left.py",
         "icon": "Tailor.tab\\children_palace_massing.button\\icon.png",
@@ -1257,11 +1266,11 @@
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
     },
-    "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py": {
-        "script": "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py",
-        "icon": "Tailor.tab\\SAIF_panel_mapping.button\\icon.png",
-        "alias": "SaifPanelMapping",
-        "doc": "Maps SAIF panels using new naming convention CW01_SOLID X_YYYY_ZZZZ and CW06_SOLID X_YYYY_ZZZZ, extracting pier width (X) as-is",
+    "Tailor.tab\\stack_enscape.button\\move_img_right.py": {
+        "script": "Tailor.tab\\stack_enscape.button\\move_img_right.py",
+        "icon": "Tailor.tab\\stack_enscape.button\\icon.png",
+        "alias": "MoveImg_1643",
+        "doc": "Image Relocation Tool for 1643 Project\n\nLaunches the file organizer GUI for relocating rendering images between study versions.\nFeatures:\n- Opens interactive file organizer interface\n- Supports study selection (angled_frame, sawtooth, solar_panel, etc.)\n- Handles glass/chrome version organization\n- Automates file cleanup and relocation\n- Maintains project-specific folder structure\n\nUsage:\n- Right-click to open file organizer GUI\n- Select target study and version\n- Automatically relocates PNG files to appropriate folders",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1271,15 +1280,6 @@
         "icon": "Tailor.tab\\stack_enscape.button\\icon.png",
         "alias": "StackPSD",
         "doc": "Stack PSD Files Tool\n\nAutomates the process of stacking and combining PSD files for rendering workflows.\nFeatures:\n- Processes glass and chrome version renderings\n- Creates layered PSD compositions with proper blend modes\n- Handles special camera views (cam 13, cam 17) with background templates\n- Exports final compositions as high-quality JPG files\n- Supports multiple study variations (angled_frame, sawtooth, solar_panel, etc.)\n\nWorkflow:\n1. Prepares data by matching glass/chrome version pairs\n2. Processes each pair through Photoshop automation\n3. Applies appropriate blend modes and adjustments\n4. Saves as PSD and exports as JPG for presentation",
-        "tab": "Tailor.tab",
-        "tab_icon": "Tailor.tab\\icon.png",
-        "is_popular": false
-    },
-    "Tailor.tab\\stack_enscape.button\\move_img_right.py": {
-        "script": "Tailor.tab\\stack_enscape.button\\move_img_right.py",
-        "icon": "Tailor.tab\\stack_enscape.button\\icon.png",
-        "alias": "MoveImg_1643",
-        "doc": "Image Relocation Tool for 1643 Project\n\nLaunches the file organizer GUI for relocating rendering images between study versions.\nFeatures:\n- Opens interactive file organizer interface\n- Supports study selection (angled_frame, sawtooth, solar_panel, etc.)\n- Handles glass/chrome version organization\n- Automates file cleanup and relocation\n- Maintains project-specific folder structure\n\nUsage:\n- Right-click to open file organizer GUI\n- Select target study and version\n- Automatically relocates PNG files to appropriate folders",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false

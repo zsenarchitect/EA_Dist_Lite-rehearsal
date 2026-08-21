@@ -34,6 +34,7 @@ import shutil
 import re
 import logging
 import time
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
@@ -327,10 +328,18 @@ class WikiGenerator:
             return None
         
         try:
-            # Create unique filename
+            # Create unique filename. The full flattened source folder path can run
+            # to 150+ characters (deeply nested pyRevit bundle trees), which risks
+            # Windows' 260-char MAX_PATH once combined with a clone root -- see
+            # DarkSide/publish/HANDOFF-2026-08-18-rename-publisher-clones.md. Keep
+            # only a short, human-readable tail (the part closest to the actual
+            # tool, which is the most useful bit for debugging) and disambiguate
+            # with a short hash of the full path instead of embedding it verbatim.
             icon_filename = source_path.name
             folder_path = str(source_path.parent).replace(str(assets_dir.parent), '').replace(os.sep, '_').replace('.', '_').split("Apps_")[1]
-            unique_filename = f"{folder_path}_{icon_filename}"
+            path_hash = hashlib.md5(folder_path.encode('utf-8')).hexdigest()[:10]
+            folder_tail = folder_path[-60:].lstrip('_')
+            unique_filename = f"{folder_tail}_{path_hash}_{icon_filename}"
             dest_path = assets_dir / unique_filename
             
             # Copy file

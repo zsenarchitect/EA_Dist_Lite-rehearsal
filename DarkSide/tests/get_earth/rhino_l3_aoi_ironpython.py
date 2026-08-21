@@ -23,7 +23,7 @@ import traceback
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
-BUTTON_DIR = os.path.join(REPO, "Apps", "_rhino", "Create.tab", "get_earth.button")
+BUTTON_DIR = os.path.join(REPO, "Apps", "_rhino", "Render.tab", "get_earth.button")
 
 # Rhino's EnneadTab startup puts Apps/lib on sys.path; a rhinocode-driven script
 # does NOT inherit that, so `from EnneadTab import X` fails with a bare
