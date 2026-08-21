@@ -3,6 +3,7 @@
 
 import os
 import shutil
+import stat
 import subprocess
 import time
 from ..stage_base import PublishStage, PublishStageError
@@ -42,19 +43,55 @@ def _fault_inject_after():
         return None
 
 
+def _force_writable_retry(func, path, exc_info):
+    """rmtree handler: clear the read-only bit and retry once, else re-raise.
+
+    Uses the `onerror=` signature deliberately -- `onexc=` is 3.12+, and the publisher and
+    rehearsal clones do not report the same Python version. `onerror` is deprecated but
+    functional in both, so it is the portable choice here.
+    """
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    except Exception:
+        raise
+
+
 def try_remove_content(folder_path):
-    """Safely remove contents of a directory."""
+    """Remove a directory's contents. Returns [(path, error)] for anything it could NOT remove.
+
+    Callers must not discard the return value. The copy loop only writes paths present in
+    SOURCE and never removes extras, so a file that survives this wipe survives into the
+    PUBLISHED distribution. That is silently-wrong content shipped to the fleet, not a nit
+    -- and it raises no exception, so nothing else in the pipeline notices.
+    """
+    failures = []
     if not os.path.exists(folder_path):
-        return
+        return failures
     for item in os.listdir(folder_path):
         item_path = os.path.join(folder_path, item)
-        try:
-            if os.path.isfile(item_path) or os.path.islink(item_path):
-                os.unlink(item_path)
-            elif os.path.isdir(item_path):
-                shutil.rmtree(item_path)
-        except Exception as e:
-            print("    Notice: Could not remove {}: {}".format(item_path, e))
+        # Retry with backoff before calling it a failure. A transient holder -- an
+        # antivirus scan, an indexer, a read-only attribute -- is common enough that a
+        # single attempt would turn a blip into a refused publish, and this repo's own
+        # guidance requires retries around file locks. Deliberately short: a PERSISTENT
+        # lock must still surface rather than being waited out.
+        last_error = None
+        for attempt in range(3):
+            try:
+                if os.path.isfile(item_path) or os.path.islink(item_path):
+                    os.chmod(item_path, stat.S_IWRITE)  # clears the read-only case
+                    os.unlink(item_path)
+                elif os.path.isdir(item_path):
+                    shutil.rmtree(item_path, onerror=_force_writable_retry)
+                last_error = None
+                break
+            except Exception as e:
+                last_error = e
+                if attempt < 2:
+                    time.sleep(0.25 * (2 ** attempt))
+        if last_error is not None:
+            failures.append((item_path, str(last_error)))
+    return failures
 
 
 def _count_exe_files(folder):
@@ -122,12 +159,22 @@ def _restore_dist_tree(context, repo, label):
     untracked work, stray worktrees, and .env files that survive by design.
     """
     problems = []
-    rc, out = _git(context, repo, ["checkout", "--"] + FOLDERS_TO_PROCESS)
-    if rc != 0:
-        problems.append("checkout failed: {}".format(out.strip()[:400]))
-    rc, out = _git(context, repo, ["clean", "-fd", "--"] + FOLDERS_TO_PROCESS)
-    if rc != 0:
-        problems.append("clean failed: {}".format(out.strip()[:400]))
+    # Per folder, NOT one command listing all three. `git checkout -- A B C` fails
+    # WHOLESALE if any single pathspec matches nothing in the index, so one absent
+    # folder means NOTHING is restored -- including the folders that were present and
+    # broken. Verified against a repo tracking only Apps/: a trivially restorable
+    # deletion was left broken because 'Installation' and 'DarkSide' did not match.
+    # Both dist repos track all three today, so this was latent, not live.
+    for folder in FOLDERS_TO_PROCESS:
+        rc, out = _git(context, repo, ["checkout", "--", folder])
+        if rc != 0:
+            msg = out.strip()
+            if "did not match any file" in msg:
+                continue  # folder simply isn't tracked here; nothing to restore
+            problems.append("checkout {} failed: {}".format(folder, msg[:300]))
+        rc, out = _git(context, repo, ["clean", "-fd", "--", folder])
+        if rc != 0:
+            problems.append("clean {} failed: {}".format(folder, out.strip()[:300]))
     rc, out = _git(context, repo, ["status", "--porcelain"], timeout=300)
     remaining = len([ln for ln in out.splitlines() if ln.strip()]) if rc == 0 else -1
     return problems, remaining
@@ -242,24 +289,47 @@ class StageDistStage(PublishStage):
             if folder == "Apps" and _count_exe_files(src_exe_folder) == 0 and _count_exe_files(dist_exe_folder) > 0:
                 exe_backup_dir = os.path.join(dist_folder, ".publish_exe_products_backup")
                 if os.path.exists(exe_backup_dir):
-                    try_remove_content(exe_backup_dir)
+                    # Surfaced, not fatal: this is scratch, and copytree below reports the
+                    # real consequence (it has no dirs_exist_ok, so leftovers make it raise).
+                    # The wider redesign of this backup window is senzhang-todo #4657.
+                    for p, e in try_remove_content(exe_backup_dir):
+                        print("    Warning: leftover in exe backup, could not remove {}: {}".format(p, e))
                 shutil.copytree(dist_exe_folder, exe_backup_dir)
                 print("    Preserving {} existing dist exes".format(_count_exe_files(dist_exe_folder)))
 
             dest_subfolder = os.path.join(dist_folder, folder)
-            try_remove_content(dest_subfolder)
-            os.makedirs(dest_subfolder, exist_ok=True)
-
             src_subfolder = os.path.join(context.os_repo_folder, folder)
-            if not os.path.exists(src_subfolder):
-                continue
 
-            # Batch file copy
+            # A missing source folder used to `continue`, which left dest_subfolder WIPED
+            # AND NOT REPOPULATED -- the whole folder then got committed as deleted and
+            # force-pushed to the fleet, with the stage still reporting OK. There is no
+            # legitimate case for it: FOLDERS_TO_PROCESS is a fixed three-element list and
+            # the publisher clone is a reset --hard checkout of the OS repo.
+            if not os.path.exists(src_subfolder):
+                raise PublishStageError(
+                    "{}: source folder {} does not exist. Staging it would publish an empty "
+                    "{}/ to the fleet.".format(label, src_subfolder, folder))
+
+            # PLAN BEFORE DESTROYING. The walk reads SOURCE only, so doing it first makes
+            # every source-read failure non-destructive: the dist tree is still intact and
+            # nothing needs repairing. Wiping first meant a source problem destroyed the
+            # DESTINATION and then leaned on the crash-repair to put it back.
+            #
+            # os.walk swallows errors by default: an unreadable subtree is SKIPPED SILENTLY
+            # and simply never appears in folder_files, so the distribution ships short a
+            # whole directory with nothing raised and a green check. onerror makes that loud.
             folder_files = []
-            for root, dirs, files in os.walk(src_subfolder):
+            walk_errors = []
+            for root, dirs, files in os.walk(src_subfolder, onerror=walk_errors.append):
+                # dirs[:] = [] PRUNES the walk. Without it os.walk still DESCENDS into these
+                # excluded subtrees, so an unreadable directory inside one of them would
+                # abort the publish over content that was never going to ship -- an
+                # availability regression with no correctness gain.
                 if is_lite and any(skip.lower() in root.lower() for skip in lite_skip_folders):
+                    dirs[:] = []
                     continue
                 if "DuckMaker.extension" in root:
+                    dirs[:] = []
                     continue
 
                 for filename in files:
@@ -273,6 +343,36 @@ class StageDistStage(PublishStage):
                     rel_path = os.path.relpath(src_file, src_subfolder)
                     dest_file = os.path.join(dest_subfolder, rel_path)
                     folder_files.append((src_file, dest_file))
+
+            if walk_errors:
+                detail = "; ".join("{}: {}".format(getattr(e, "filename", "?"), e)
+                                   for e in walk_errors[:5])
+                raise PublishStageError(
+                    "{}: could not read {} director(ies) under {} -- their contents would be "
+                    "MISSING from the published distribution, with no other symptom. "
+                    "First few: {}".format(label, len(walk_errors), src_subfolder, detail))
+
+            # Empty-plan floor. Wiping the destination and copying nothing back publishes an
+            # empty folder to the fleet, and every count-based check downstream reads 0 == 0
+            # and agrees. The catastrophic case is exactly the one a "did everything match?"
+            # assertion cannot see, so it needs its own predicate.
+            if not folder_files:
+                raise PublishStageError(
+                    "{}: planned ZERO files to stage for {}/ from {}. Wiping the destination "
+                    "and copying nothing back would publish an empty {}/ to the fleet.".format(
+                        label, folder, src_subfolder, folder))
+
+            # Only now destroy. Everything above is read-only against SOURCE.
+            # A file that survives this wipe survives into the published distribution: the
+            # copy loop only writes paths present in SOURCE and never removes extras.
+            removal_failures = try_remove_content(dest_subfolder)
+            if removal_failures:
+                detail = "; ".join("{} ({})".format(p, e) for p, e in removal_failures[:5])
+                raise PublishStageError(
+                    "{}: could not clear {} path(s) under {} -- they would persist into the "
+                    "published distribution as stale content. First few: {}".format(
+                        label, len(removal_failures), dest_subfolder, detail))
+            os.makedirs(dest_subfolder, exist_ok=True)
 
             files_to_copy.extend(folder_files)
 
@@ -292,6 +392,25 @@ class StageDistStage(PublishStage):
                     os.makedirs(os.path.dirname(dist_exe_folder), exist_ok=True)
                     shutil.copytree(exe_backup_dir, dist_exe_folder)
                     print("    Restored dist ExeProducts from backup")
-                try_remove_content(exe_backup_dir)
+                # An orphaned backup dir is untracked and NOT gitignored in older dist
+                # clones, and publish_guard counts untracked as dirty -- so leftovers here
+                # can refuse the NEXT publish. Say so rather than dropping it. (#4657)
+                for p, e in try_remove_content(exe_backup_dir):
+                    print("    Warning: could not clean up exe backup {}: {}".format(p, e))
 
-        print("[OK] Staging complete for {} ({} files copied).".format(label, copied_count))
+        # Final assertion: every file the plan named is on disk.
+        #
+        # Note what this does and does NOT cover. It compares the result against the PLAN,
+        # so on its own it is vacuous when the plan is empty -- 0 planned, 0 missing, green.
+        # The empty case is caught earlier, by the per-folder zero floor and the missing
+        # source raise, NOT here. Those three together are what make the staged tree equal
+        # the filtered source; this line alone guarantees nothing about completeness.
+        missing = [d for _, d in files_to_copy if not os.path.exists(d)]
+        if missing:
+            raise PublishStageError(
+                "{}: {} of {} staged file(s) are not on disk after copying -- the "
+                "distribution is incomplete and must not be published. First few: {}".format(
+                    label, len(missing), len(files_to_copy), "; ".join(missing[:5])))
+
+        print("[OK] Staging complete for {} ({} files copied, {} verified present).".format(
+            label, copied_count, len(files_to_copy)))
