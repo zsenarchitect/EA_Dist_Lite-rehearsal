@@ -43,6 +43,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import traceback
 
 # ---------------------------------------------------------------------------
 # The expected publish targets, by directory basename.
@@ -1087,5 +1088,51 @@ def main(argv=None):
     return 0
 
 
+def main_never_silent(argv=None):
+    """Run main(), but guarantee a refusal is never output-free.
+
+    On 2026-08-21 production run 32511676656 refused with literally this, and nothing
+    else:
+
+        publish_guard --report:
+        CI PUBLISH REFUSED: publish_guard exited 1
+
+    No banner, no problem list, no traceback. The banner is printed UNCONDITIONALLY on
+    the report path, so zero output proves the process died BEFORE it -- inside
+    verify_publish_preconditions -- and the traceback went to a stderr the caller
+    discarded. PR #195 fixed the caller. This fixes the other half, at the source: an
+    exception here now explains itself on STDOUT regardless of how any caller, now or
+    later, handles streams. A guard whose entire job is to say WHY a publish was refused
+    must never exit without saying it.
+
+    The fleet went stale behind that silence -- PR #192 merged, its publish refused,
+    nobody could tell why, and the condition then cleared on its own. A self-clearing
+    failure with no diagnostic is unfindable after the fact, which is what makes the
+    reporting fix urgent rather than cosmetic.
+
+    NOTE: this does NOT explain the 2026-08-21 refusal. That root cause is still UNKNOWN
+    and senzhang-todo #4661 stays open on it. This only guarantees the next occurrence
+    arrives with evidence attached.
+
+    SystemExit passes through untouched -- argparse uses it for --help and for usage
+    errors, and those are not crashes.
+    """
+    try:
+        return main(argv)
+    except SystemExit:
+        raise
+    except BaseException as exc:
+        # STDOUT on purpose: stderr is the stream that was thrown away.
+        print("=" * 78)
+        print("PUBLISH GUARD CRASHED before it could report -- {}: {}".format(
+            type(exc).__name__, exc))
+        print("This is a guard failure, NOT a verdict on the distribution. Nothing was "
+              "verified, so nothing may be assumed safe to publish.")
+        print("=" * 78)
+        traceback.print_exc(file=sys.stdout)
+        sys.stdout.flush()
+        return 1
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main_never_silent())

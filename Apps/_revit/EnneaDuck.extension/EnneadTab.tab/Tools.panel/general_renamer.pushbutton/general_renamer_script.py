@@ -124,8 +124,10 @@ def get_unique_view_name(base_name, view_names_pool):
 
 @ERROR_HANDLE.try_catch_error()
 def rename_views(doc, sheets, is_default_format, is_original_flavor, attempt = 0, show_log = True):
-    # Check if there's already an active transaction
-    if doc.IsModifiable:
+    # doc.IsModifiable is True precisely when a transaction is already open --
+    # starting a second one throws "Starting a new transaction is not permitted
+    # while document is in a read-only or active transaction state."
+    if not doc.IsModifiable:
         # No active transaction, start a new one
         t = DB.Transaction(doc, "Rename Views")
         t.Start()

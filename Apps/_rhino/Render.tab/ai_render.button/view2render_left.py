@@ -1068,6 +1068,10 @@ class AiRenderForm(Eto.Forms.Form):
         ptop.EndHorizontal()
         col.Add(ptop)
 
+        # Keep #459 -- suggested starter-prompt chips above the textbox.
+        # Shared list lives in AI_RENDER.get_suggested_starter_prompts().
+        col.Add(self._build_suggested_prompt_chips())
+
         self.tbox_prompt = Eto.Forms.TextArea()
         # 2026-04-30: shrunk 100 -> 80 (user feedback: prompt area too tall).
         # Still scrollable for long prompts via TextArea's intrinsic scrollbar.
@@ -1076,6 +1080,60 @@ class AiRenderForm(Eto.Forms.Form):
         col.Add(self.tbox_prompt, yscale=True)
 
         return col
+
+    def _build_suggested_prompt_chips(self):
+        """Horizontal row of clickable starter-prompt bubbles.
+
+        Click fills the prompt TextArea (undoable). Labels/prompts come from
+        the shared AI_RENDER list so Revit and Rhino cannot drift.
+        """
+        row = Eto.Forms.DynamicLayout()
+        row.Spacing = Eto.Drawing.Size(4, 2)
+        row.BeginHorizontal()
+        hint = Eto.Forms.Label(Text="Try:")
+        hint.TextColor = _hex_to_color("#9A9A9A")
+        try:
+            hint.Font = Eto.Drawing.Font(Eto.Drawing.SystemFont.Default, 9)
+        except Exception:
+            pass
+        row.Add(hint)
+
+        items = AI_RENDER.get_suggested_starter_prompts()
+        for item in items:
+            label = item.get("label") or ""
+            prompt = item.get("prompt") or label
+            if not label:
+                continue
+            btn = Eto.Forms.Button(Text=label)
+            btn.ToolTip = "Fill prompt box with: {}".format(prompt)
+            # Tag is not universally available on Eto Button across builds;
+            # close over prompt via a factory (same pattern as viewer handlers).
+            btn.Click += self._make_suggested_prompt_handler(prompt)
+            try:
+                btn.BackgroundColor = _hex_to_color("#FF3A3A3A")
+                btn.TextColor = _hex_to_color("#CBCBCB")
+            except Exception:
+                pass
+            row.Add(btn)
+        row.Add(None, xscale=True)  # push chips left
+        row.EndHorizontal()
+        return row
+
+    def _make_suggested_prompt_handler(self, prompt_text):
+        def _on_chip(sender, e):
+            self._on_suggested_prompt_chip(prompt_text)
+        return _on_chip
+
+    def _on_suggested_prompt_chip(self, prompt_text):
+        if not prompt_text:
+            return
+        self._push_prompt_undo()
+        self.tbox_prompt.Text = prompt_text
+        try:
+            self.status_label.Text = (
+                "Starter prompt loaded -- edit or queue as-is.")
+        except Exception:
+            pass
 
     def _build_cta_bar(self):
         """Dedicated full-width band: status text on the left, Queue Render

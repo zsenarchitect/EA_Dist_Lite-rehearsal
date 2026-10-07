@@ -19,6 +19,7 @@ Key Features:
 import io
 import os
 import random
+import re
 
 import json
 
@@ -318,15 +319,43 @@ def show_tip_revit(is_random_single=True):
 
 
 
+def _evaluate_format_template(call_node):
+    """Best-effort evaluation of a "text {}".format(...) assignment.
+
+    The AST harvester runs under CPython 3 and cannot evaluate dynamic values,
+    so format arguments become {placeholders} in the returned template string.
+    IronPython 2.7 compatible syntax (no f-strings).
+    """
+    import ast
+
+    try:
+        func = call_node.func
+        if isinstance(func.value, ast.Constant):
+            base_string = func.value.value
+        else:
+            base_string = ast.literal_eval(func.value)
+        format_args = []
+        for arg in call_node.args:
+            if isinstance(arg, ast.Name):
+                format_args.append("{" + arg.id + "}")
+            elif isinstance(arg, ast.Constant):
+                format_args.append(str(arg.value))
+            else:
+                format_args.append("{...}")
+        return base_string.format(*format_args)
+    except Exception:
+        return "Template string with dynamic values"
+
+
 def extract_global_variables(script_path):
     import ast
 
     with io.open(script_path, 'r', encoding="utf-8") as file:
         script_content = file.read()
-    
+
     tree = ast.parse(script_content)
     global_vars = {}
-    
+
     for node in tree.body:
         if isinstance(node, ast.Assign):
             for target in node.targets:
@@ -335,6 +364,13 @@ def extract_global_variables(script_path):
                     # Handling the value directly if it's a constant
                     if isinstance(node.value, ast.Constant):
                         var_value = node.value.value  # Directly accessing the value of the Constant node
+                    elif (isinstance(node.value, ast.Call)
+                            and isinstance(node.value.func, ast.Attribute)
+                            and node.value.func.attr == "format"):
+                        # Handle string formatting cases like "abc {}".format(var):
+                        # literal_eval cannot evaluate these, so keep the template
+                        # with placeholders for the dynamic parts.
+                        var_value = _evaluate_format_template(node.value)
                     else:
                         try:
                             # Fallback for other types using literal_eval for safe evaluation
@@ -343,7 +379,7 @@ def extract_global_variables(script_path):
                             # For non-literals or complex cases, keep a representation of the code
                             var_value = "Unsupported value for safe evaluation, legacy version. See Sen Z to fix this for dynamic constant handling."
                     global_vars[var_name] = var_value
-    
+
     return global_vars
 
 
@@ -411,30 +447,47 @@ def set_revit_knowledge():
 
     DATA_FILE.set_data(data_dict, ENVIRONMENT.KNOWLEDGE_REVIT_FILE )
 
+def _script_path_has_token(script_path, token):
+    """Check whether token appears as a whole token in a script path.
+
+    The path is split on every run of characters that cannot appear inside a
+    button/folder name (separators, spaces, dots). Underscores and hyphens
+    are name-internal, so "archive" matches an archive/ folder but NOT a
+    button named export_gif_from_archive, and "tailor" matches the
+    "EnneadTab Tailor.tab" client tab but NOT mytailored_tool.
+    IronPython 2.7 compatible.
+    """
+    return token in re.split(r"[^a-z0-9_\-]+", script_path.lower())
+
+
 def sanitize(func):
     """Decorator to sanitize knowledge dictionary by filtering out archive and tailor entries.
-    
+
+    Archive/tailor are matched as whole path tokens, not substrings, so a
+    button that merely mentions them (e.g. export_gif_from_archive) is not
+    silently dropped from the knowledge pool.
+
     Args:
         func: The function to decorate that returns a knowledge dictionary
-        
+
     Returns:
         dict: Sanitized knowledge dictionary
     """
     def wrapper(*args, **kwargs):
         knowledge_pool = func(*args, **kwargs)
         knowledge = {}
-        
+
         for value in knowledge_pool.values():
-            if "archive" in value["script"].lower():
+            if _script_path_has_token(value["script"], "archive"):
                 continue
-            if "tailor" in value["script"].lower():
+            if _script_path_has_token(value["script"], "tailor"):
                 continue
             command_names = value["alias"]
             if not isinstance(command_names, list):
                 command_names = [command_names]
             for command_name in command_names:
                 knowledge[command_name] = value
-                
+
         return knowledge
     return wrapper
 

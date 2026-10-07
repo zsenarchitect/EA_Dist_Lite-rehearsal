@@ -1,5 +1,12 @@
 layout:
+  - library_scan_roots
   - search_command
+  - library_assert
   - alias_cheatsheet
+  - library_dry_run
   - '---'
   - perforation_ratio
+  - model_contract
+  - expected_host
+  - library_open_with_inputs
+  - library_refresh

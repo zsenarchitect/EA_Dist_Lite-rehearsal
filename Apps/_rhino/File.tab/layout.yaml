@@ -4,3 +4,7 @@ layout:
   - '---'
   - create_worksession
   - bind_worksession
+  - 'attach_refresh_worksession'
+  - 'harvest_folder_report'
+  - model_snapshot
+  - check_worksession_files

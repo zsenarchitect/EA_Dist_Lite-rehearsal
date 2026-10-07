@@ -44,8 +44,10 @@ class StubDepot(object):
         # state: key -> {"rev": int, "data": obj}
         self.state = dict(state or {})
         self.force_status = None      # set to 401/409/500 to force that on every call
+        self.force_error = "forced"   # {"error": ...} code paired with force_status
         self.conflict_once = False    # force ONE 409 on the next state PUT
         self.request_count = 0        # observe zero-network (TTL) behavior
+        self.last_headers = None      # dict of the most recent request's headers
         self._server = None
         self._thread = None
         self.port = None
@@ -70,8 +72,10 @@ class StubDepot(object):
 
             def do_GET(self):
                 outer.request_count += 1
+                outer.last_headers = dict(self.headers.items())
                 if outer.force_status:
-                    self._send(outer.force_status, b'{"ok":false,"error":"forced"}')
+                    body = json.dumps({"ok": False, "error": outer.force_error}).encode("utf-8")
+                    self._send(outer.force_status, body)
                     return
                 parsed = urlparse(self.path)
                 path = parsed.path
@@ -92,8 +96,10 @@ class StubDepot(object):
 
             def do_PUT(self):
                 outer.request_count += 1
+                outer.last_headers = dict(self.headers.items())
                 if outer.force_status:
-                    self._send(outer.force_status, b'{"ok":false,"error":"forced"}')
+                    body = json.dumps({"ok": False, "error": outer.force_error}).encode("utf-8")
+                    self._send(outer.force_status, body)
                     return
                 parsed = urlparse(self.path)
                 path = parsed.path

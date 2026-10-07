@@ -11,7 +11,8 @@ import rhinoscriptsyntax as rs
 import subprocess
 
 from EnneadTab import LOG, ERROR_HANDLE
-from EnneadTab import FOLDER, EXE, ENVIRONMENT
+from EnneadTab import FOLDER, EXE
+from EnneadTab.DEPOT import ASSET
 from EnneadTab.RHINO import RHINO_FORMS
 
 
@@ -36,10 +37,10 @@ def open_gh_by_selection(folder, selected_opt):
  
 
 def open_local_tutorial():
-    if not ENVIRONMENT.require_shared_root("Tutorials"):
+    folder = ASSET.get_asset_folder('rhino/tutorials')
+    if not folder:
         return
 
-    folder = '{}\\03_Rhino\\12_EnneadTab for Rhino\\Documents\\Tutorials'.format(ENVIRONMENT.L_DRIVE_HOST_FOLDER)
     files = os.listdir(folder)
     special_folder = "#PDF in this directory are reference only"
     files.remove(special_folder)
@@ -58,7 +59,7 @@ def open_local_tutorial():
 
     if keyword == selected_opt:
 
-        path = "{}\\03_Rhino\\12_EnneadTab for Rhino\\Documents\\Tutorials\\#PDF in this directory are reference only".format(ENVIRONMENT.L_DRIVE_HOST_FOLDER)
+        path = os.path.join(folder, "#PDF in this directory are reference only")
         subprocess.Popen(r'explorer /select, {}'.format(path))
         return
 

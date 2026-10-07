@@ -256,8 +256,15 @@ def event_func_arcade_start(sender, e):
 
 @ERROR_HANDLE.try_catch_error(is_pass=True)
 def event_func_arcade_end(sender, e):
-    from EnneadTab import ARCADE
-    ARCADE.end_wait_watch()
+    """Stand down the arcade wait-watcher after a Rhino open finishes.
+
+    Same contract as Revit doc-opened / doc-synced: end_wait_watch returns the
+    flag age so a long open without Arcade installed can earn the post-wait
+    Get Arcade toast (NotificationHost only -- never from the watcher).
+    """
+    from EnneadTab import ARCADE, SYNC_SUMMARY
+    wait_seconds = ARCADE.end_wait_watch()
+    SYNC_SUMMARY.offer_arcade_after_wait(wait_seconds)
 
 
 if __name__ == "__main__":

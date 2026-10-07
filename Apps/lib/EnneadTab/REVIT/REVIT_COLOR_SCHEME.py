@@ -565,13 +565,114 @@ def compute_scheme_diff(color_dict, scheme_entries):
     return rows
 
 
-def apply_color_dict_to_scheme(doc, color_scheme, color_dict):
+# Prefix applied to scheme entries that have no counterpart in the Excel
+# definition. Visible in the Revit legend and reversible: if the stripped name
+# later reappears in Excel the entry is restored to solid fill + Excel color.
+# Same literal as the Kips Bay load_color_template script (TODO-1149 lift).
+ORPHAN_PREFIX = "NO MATCH IN EXCEL-"
+
+_FORBIDDEN_ENTRY_CHARS = {
+    '\\': '-', ':': '-', '{': '-', '}': '-', '[': '-', ']': '-',
+    '|': '-', ';': '-', '<': '', '>': '', '?': '', '`': '', '~': '',
+}
+
+
+def sanitize_entry_name(entry_name):
+    """Return the Revit-legal form of an Excel entry name (forbidden chars replaced/stripped)."""
+    sanitized = str(entry_name)
+    for forbidden, replacement in _FORBIDDEN_ENTRY_CHARS.items():
+        sanitized = sanitized.replace(forbidden, replacement)
+    while '--' in sanitized:
+        sanitized = sanitized.replace('--', '-')
+    while '  ' in sanitized:
+        sanitized = sanitized.replace('  ', ' ')
+    return sanitized.strip(' -')
+
+
+def plan_orphan_action(current_name, excel_names):
+    """Decide what to do with one scheme entry. Pure, so it is testable in CPython.
+
+    Args:
+        current_name: the entry's current string value in Revit.
+        excel_names: set of sanitized entry names present in the Excel definition.
+
+    Returns:
+        (action, new_name) where action is one of:
+            'matched'  - name is in Excel, nothing to rename
+            'mark'     - not in Excel, not yet prefixed: rename to new_name, no-fill
+            'keep'     - already prefixed and still not in Excel (idempotent)
+            'restore'  - prefixed, but Excel now has the base name: rename to new_name
+    """
+    if current_name.startswith(ORPHAN_PREFIX):
+        base = current_name[len(ORPHAN_PREFIX):]
+        if base in excel_names:
+            return ("restore", base)
+        return ("keep", None)
+    if current_name in excel_names:
+        return ("matched", None)
+    return ("mark", ORPHAN_PREFIX + current_name)
+
+
+def mark_orphan_entries(doc, color_scheme, excel_name_to_hex):
+    """Rename/restore scheme entries against the Excel definition. CALLER owns the transaction.
+
+    Orphans (in the scheme, not in Excel) get ORPHAN_PREFIX and no-fill; prefixed
+    entries whose base name is back in Excel are restored (solid fill + Excel color).
+    Idempotent. Returns (marked, restored).
+
+    Args:
+        excel_name_to_hex: {sanitized_name: '#rrggbb'} for every valid Excel entry.
+    """
+    from Autodesk.Revit import DB  # pyright: ignore
+    from EnneadTab import COLOR
+    from EnneadTab.REVIT import REVIT_SELECTION
+
+    invalid_id = DB.ElementId.InvalidElementId
+    excel_names = set(excel_name_to_hex.keys())
+    marked = 0
+    restored = 0
+
+    # Snapshot first: mutating while iterating a live collection can skip entries.
+    for entry in list(color_scheme.GetEntries()):
+        try:
+            current_name = entry.GetStringValue()
+        except Exception:
+            continue
+        action, new_name = plan_orphan_action(current_name, excel_names)
+        try:
+            if action == "mark":
+                entry.SetStringValue(new_name)
+                entry.FillPatternId = invalid_id
+                color_scheme.UpdateEntry(entry)
+                marked += 1
+                print("  Orphan marked '{}' -> '{}'".format(current_name, new_name))
+            elif action == "keep":
+                if entry.FillPatternId != invalid_id:
+                    entry.FillPatternId = invalid_id
+                    color_scheme.UpdateEntry(entry)
+            elif action == "restore":
+                entry.SetStringValue(new_name)
+                entry.Color = COLOR.tuple_to_color(COLOR.hex_to_rgb(excel_name_to_hex[new_name]))
+                entry.FillPatternId = REVIT_SELECTION.get_solid_fill_pattern_id(doc)
+                color_scheme.UpdateEntry(entry)
+                restored += 1
+                print("  Orphan restored '{}' -> '{}'".format(current_name, new_name))
+        except Exception as ex:
+            print("  ERROR orphan-marking '{}': {}".format(current_name, str(ex)))
+    return (marked, restored)
+
+
+def apply_color_dict_to_scheme(doc, color_scheme, color_dict, mark_orphans=False):
     """Apply a {name: hex} dict to one Revit color scheme.
 
     CALLER must wrap in DB.Transaction. This function does NOT manage transactions.
 
     Returns (added_count, updated_count, skipped_count). Prints per-entry actions
     to the pyRevit output for the user to see.
+
+    With mark_orphans=True (opt-in; off by default until verified in live Revit) scheme entries that are absent from color_dict
+    are renamed with ORPHAN_PREFIX and set to no-fill, and previously marked ones
+    whose name is back in Excel are restored (TODO-1149). Orphans are never deleted.
 
     Entry names with forbidden characters (\\ : { } [ ] | ; < > ? ` ~) are
     sanitized -- backslash/colon/brackets/pipe/semicolon become '-', the rest
@@ -594,16 +695,23 @@ def apply_color_dict_to_scheme(doc, color_scheme, color_dict):
               "add at least one placeholder entry in Revit first.")
         return (0, 0, 0)
 
+    if mark_orphans:
+        # Must run BEFORE the add/update loop: a restored entry has to be back
+        # under its real name or the loop would add a duplicate of it.
+        excel_name_to_hex = {}
+        for k, v in color_dict.items():
+            if not k or not str(k).strip() or k == "None" or str(k).strip().startswith('#'):
+                continue
+            if not v or not str(v).startswith('#'):
+                continue
+            excel_name_to_hex[sanitize_entry_name(k)] = v
+        mark_orphan_entries(doc, color_scheme, excel_name_to_hex)
+
     current_entries = {x.GetStringValue(): x for x in color_scheme.GetEntries()}
 
     added = 0
     updated = 0
     skipped = 0
-
-    forbidden_chars = {
-        '\\': '-', ':': '-', '{': '-', '}': '-', '[': '-', ']': '-',
-        '|': '-', ';': '-', '<': '', '>': '', '?': '', '`': '', '~': '',
-    }
 
     for entry_name, hex_color in color_dict.items():
         if not entry_name or not str(entry_name).strip() or entry_name == "None":
@@ -616,14 +724,7 @@ def apply_color_dict_to_scheme(doc, color_scheme, color_dict):
             skipped += 1
             continue
 
-        sanitized = str(entry_name)
-        for forbidden, replacement in forbidden_chars.items():
-            sanitized = sanitized.replace(forbidden, replacement)
-        while '--' in sanitized:
-            sanitized = sanitized.replace('--', '-')
-        while '  ' in sanitized:
-            sanitized = sanitized.replace('  ', ' ')
-        sanitized = sanitized.strip(' -')
+        sanitized = sanitize_entry_name(entry_name)
 
         if sanitized != str(entry_name):
             print("  Sanitized '{}' -> '{}'".format(entry_name, sanitized))

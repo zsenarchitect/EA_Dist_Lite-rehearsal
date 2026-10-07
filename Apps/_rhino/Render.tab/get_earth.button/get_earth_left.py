@@ -43,6 +43,8 @@ import get_earth_utility as UTIL
 
 STICKY_SIZE = "GET_EARTH_SIZE_M"
 DEFAULT_SIZE_M = 500.0
+STICKY_ROTATION = "GET_EARTH_ROTATION_DEG"
+DEFAULT_ROTATION_DEG = 0.0
 
 # Layer the imported context lands on. The name carries the attribution, because
 # service plan section 5 makes "Google attribution visibly attached to imported
@@ -169,12 +171,57 @@ def get_earth():
                        "Try something in the hundreds of metres.").format(size_m))
         return
 
-    NOTIFICATION.messenger(
-        main_text=("Asking for {:.0f} m of context at\n{:.5f}, {:.5f}\n"
-                   "Photogrammetry takes a while. Hang tight.").format(
-                       size_m, lat, lon))
+    # #4857: rotation, so the AOI can align to context (e.g. Manhattan's grid,
+    # ~29deg off true north) instead of always being locked to true north.
+    # NOTE: `if not rotation_deg: return` -- this file's own idiom for the
+    # size prompt above -- would be WRONG here. 0 is a legitimate, common
+    # answer ("no rotation"), unlike size_m where 0 can never be valid
+    # (RealBox's own minimum=1.0 already excludes it). `is None` is the only
+    # correct way to tell "designer cancelled" apart from "designer typed 0".
+    default_rotation = DATA_FILE.get_sticky(STICKY_ROTATION, DEFAULT_ROTATION_DEG)
+    rotation_deg = rs.RealBox(
+        message=("Rotation from true north, in DEGREES clockwise "
+                 "(0 = no rotation).\nE.g. Manhattan's street grid runs "
+                 "about 29 degrees off north."),
+        default_number=float(default_rotation),
+        title="GetEarth - rotation? (optional)")
+    if rotation_deg is None:
+        return
+    rotation_deg = float(rotation_deg)
+    DATA_FILE.set_sticky(STICKY_ROTATION, rotation_deg)
 
-    path = EARTH_MODEL.request_model(lat, lon, size_m)
+    rotation_note = ""
+    if rotation_deg:
+        rotation_note = "\nRotated {:.1f} deg from north.".format(rotation_deg)
+    NOTIFICATION.messenger(
+        main_text=("Asking for {:.0f} m of context at\n{:.5f}, {:.5f}{}\n"
+                   "Watch the command line for progress.").format(
+                       size_m, lat, lon, rotation_note))
+
+    # Two phases, two kinds of feedback (see get_earth_utility's progress
+    # section). Generation is one blocking POST with no progress channel, so
+    # it gets a worded status and no bar. The download has real bytes, so it
+    # gets a real bar -- pumped between chunks, because Rhino repaints nothing
+    # while the main thread is blocked.
+    #
+    # A dict, not a local rebind: IronPython 2.7 has no `nonlocal`, so a
+    # closure that has to hand something back to the outer scope mutates a
+    # container instead.
+    served = {}
+
+    with UTIL.RhinoProgressMeter() as meter:
+
+        def on_response(data):
+            """Generation finished; the download is what happens next."""
+            served["data"] = data
+            meter.set_status(UTIL.download_status())
+
+        meter.set_status(UTIL.generation_status(size_m))
+        path = EARTH_MODEL.request_model(lat, lon, size_m,
+                                         rotation_deg=rotation_deg,
+                                         on_progress=meter.report,
+                                         on_response=on_response)
+
     if not path:
         # request_model already printed the operator-facing reason. The designer
         # gets a calm one. Both faces, per the repo's rule 13.
@@ -223,10 +270,17 @@ def get_earth():
         placement = ("This file had no EarthAnchorPoint, so it is now set to "
                      "{:.5f}, {:.5f}.").format(lat, lon)
 
+    # cache_hit / cost_usd are additive optional fields; an older service omits
+    # them and completion_note then returns "" rather than inventing a figure.
+    cost_note = UTIL.completion_note(served.get("data"))
+    if cost_note:
+        cost_note = "\n\n" + cost_note
+
     NOTIFICATION.messenger(
-        main_text=("Site context imported: {} object(s) on layer\n{}\n\n{}\n\n"
+        main_text=("Site context imported: {} object(s) on layer\n{}\n\n{}{}\n\n"
                    "Imagery (c) Google. Render against it; do not measure "
-                   "from it.").format(len(new_objs), CONTEXT_LAYER, placement))
+                   "from it.").format(len(new_objs), CONTEXT_LAYER, placement,
+                                      cost_note))
 
 
 if __name__ == "__main__":

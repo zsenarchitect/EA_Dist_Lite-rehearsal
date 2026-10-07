@@ -397,9 +397,98 @@ def post_multipart_raw(url, fields, files, token, timeout_ms=180000, progress_ca
 
 # --- File downloader ---
 
-def download_url_to_file(url, dest_path, timeout_ms=30000):
+# Bytes per read. Both download branches have always streamed in chunks; the
+# size is named here because it is now also the CADENCE of the on_progress
+# callback, which makes it a UI-facing number rather than a private detail.
+DOWNLOAD_CHUNK_BYTES = 8192
+
+
+def _content_length_or_none(value):
+    """Normalise a Content-Length into a positive int, or None when unknown.
+
+    .NET's HttpWebResponse.ContentLength is -1 when the header is absent;
+    urllib hands back None. Both mean "no total", and a caller must render
+    that as a bare byte count with NO percentage rather than inventing one --
+    the same honesty rule the generation phase follows.
+    """
+    try:
+        total = int(value)
+    except (TypeError, ValueError):
+        return None
+    if total <= 0:
+        return None
+    return total
+
+
+def _header_value(resp, name):
+    """One response header, or None. Tolerant of both urllib generations.
+
+    Python 3's email.message.Message exposes .get(); Python 2's rfc822.Message
+    exposes .getheader() (and aliases .get to it). Neither is guaranteed on a
+    caller-supplied stand-in, so both are probed and a miss is None.
+    """
+    try:
+        headers = resp.info()
+    except Exception:
+        return None
+    if headers is None:
+        return None
+    for accessor in ("get", "getheader"):
+        fn = getattr(headers, accessor, None)
+        if fn is None:
+            continue
+        try:
+            return fn(name)
+        except Exception:
+            continue
+    return None
+
+
+def _progress_reporter(on_progress):
+    """Wrap a caller's callback so a fault in IT cannot kill the download.
+
+    Two-faced degradation (rule 13): the download still completes, and the
+    operator gets exactly ONE printed reason -- reporting is then switched off
+    rather than printing once per 8 KB chunk for the rest of an 8 MB file.
+
+    Returns None when there is nothing to report to, so the hot loop can skip
+    the call entirely.
+    """
+    if on_progress is None:
+        return None
+
+    state = {"dead": False}
+
+    def report(done, total):
+        if state["dead"]:
+            return
+        try:
+            on_progress(done, total)
+        except Exception as e:
+            state["dead"] = True
+            print("download progress callback failed; continuing without "
+                  "progress: {}".format(e))
+
+    return report
+
+
+def download_url_to_file(url, dest_path, timeout_ms=30000, on_progress=None):
     """Download a URL to a local file. No auth header (used for public assets
     like the Ennead style-reference library). Returns dest_path on success.
+
+    on_progress, when given, is called after every chunk as
+    ``on_progress(bytes_done, total_bytes)``. `bytes_done` accumulates and the
+    last call always carries the full size. `total_bytes` is None when the
+    server sent no Content-Length, and a caller MUST then draw a byte count
+    without a percentage instead of guessing at one.
+
+    Note the name: `progress_callback` in post_multipart_raw above takes a
+    TEXT message, which is a different contract. Two-argument byte progress is
+    `on_progress` throughout, so the two can never be passed to each other by
+    mistake.
+
+    Default None leaves both branches byte-for-byte the behaviour they had
+    before -- the existing AI_RENDER callers are untouched.
     """
     if _USE_DOTNET:
         try:
@@ -410,15 +499,23 @@ def download_url_to_file(url, dest_path, timeout_ms=30000):
             request.Timeout = timeout_ms
             response = request.GetResponse()
             try:
+                total = _content_length_or_none(
+                    getattr(response, "ContentLength", None))
+                report = _progress_reporter(on_progress)
                 stream = response.GetResponseStream()
                 fs = System.IO.FileStream(dest_path, System.IO.FileMode.Create)
                 try:
-                    buf = System.Array[System.Byte](bytearray(8192))
+                    buf = System.Array[System.Byte](
+                        bytearray(DOWNLOAD_CHUNK_BYTES))
+                    done = 0
                     while True:
                         n = stream.Read(buf, 0, buf.Length)
                         if n <= 0:
                             break
                         fs.Write(buf, 0, n)
+                        done += n
+                        if report:
+                            report(done, total)
                 finally:
                     fs.Close()
                     stream.Close()
@@ -431,12 +528,22 @@ def download_url_to_file(url, dest_path, timeout_ms=30000):
         try:
             resp = urlopen(url, timeout=timeout_ms // 1000)
             try:
-                with open(dest_path, "wb") as f:
+                total = _content_length_or_none(
+                    _header_value(resp, "Content-Length"))
+                report = _progress_reporter(on_progress)
+                f = open(dest_path, "wb")
+                try:
+                    done = 0
                     while True:
-                        chunk = resp.read(8192)
+                        chunk = resp.read(DOWNLOAD_CHUNK_BYTES)
                         if not chunk:
                             break
                         f.write(chunk)
+                        done += len(chunk)
+                        if report:
+                            report(done, total)
+                finally:
+                    f.close()
             finally:
                 resp.close()
             return dest_path

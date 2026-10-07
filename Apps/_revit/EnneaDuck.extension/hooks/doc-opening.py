@@ -7,15 +7,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
 from EnneadTab import ERROR_HANDLE, FOLDER, ARCADE, ENVIRONMENT
-from EnneadTab.REVIT import REVIT_FORMS, REVIT_EVENT
+from EnneadTab.REVIT import REVIT_FORMS
 
 
 
 
 
 def check_is_template_folder():
-    if REVIT_EVENT.is_L_drive_alert_hook_depressed:
-        return
     path = EXEC_PARAMS.event_args.PathName
     extension = FOLDER.get_file_extension_from_path(path)
     #print extension

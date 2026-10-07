@@ -156,8 +156,8 @@
                         MaxHeight="300" Cursor="Cross"  
                         SelectedCellsChanged="preview_selection_changed">
                             <DataGrid.Columns>
-                                <DataGridTextColumn  IsReadOnly="True" Header="Family" Width="1*" Binding="{Binding family_name}"/>
-                                <DataGridTextColumn  IsReadOnly="True" Header="Type"  Width="1.5*" Binding="{Binding type_name}"/>
+                                <DataGridTextColumn  IsReadOnly="True" Header="Asset" Width="1*" Binding="{Binding family_name}"/>
+                                <DataGridTextColumn  IsReadOnly="True" Header="Category"  Width="1.5*" Binding="{Binding type_name}"/>
                                
                             </DataGrid.Columns>
                         </DataGrid>

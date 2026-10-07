@@ -6,6 +6,7 @@ import json
 
 from EnneadTab import AUTH
 from EnneadTab.AI._common import ENNEADTAB_URL, AIRequestError, post_json
+from EnneadTab.AI._gate_translate import get_translation_via_gate
 
 
 def translate(input_text, target_language="cn",
@@ -14,6 +15,12 @@ def translate(input_text, target_language="cn",
     token = AUTH.get_token_blocking()
     if not token:
         return ""
+
+    try:
+        return get_translation_via_gate(token, input_text, target_language, personality)
+    except AIRequestError as e:
+        print("Gate translation failed, falling back to direct Home call: {}".format(e))
+
     url = "{}/api/ai/translate".format(ENNEADTAB_URL)
     payload = json.dumps({
         "text": input_text,

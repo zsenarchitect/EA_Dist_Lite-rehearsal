@@ -246,8 +246,12 @@ def get_asset_folder(prefix, channel="prod", token=None, budget_bytes=None):
     finfo = folders.get(prefix) or {}
     total = finfo.get("total_size")
     if total is not None and int(total) > budget_bytes:
+        # Local policy refusal, not a depot-reachability problem -- error_code
+        # picks the distinguishing "folder too large" message instead of the
+        # generic "could not reach the shared depot" text (#5013).
         _alarm.announce_depot_unreachable(
-            "folder {0} is {1} bytes > budget {2}".format(prefix, total, budget_bytes))
+            "folder {0} is {1} bytes > budget {2}".format(prefix, total, budget_bytes),
+            error_code="budget_exceeded")
         return None
 
     assets = manifest.get("assets") or {}

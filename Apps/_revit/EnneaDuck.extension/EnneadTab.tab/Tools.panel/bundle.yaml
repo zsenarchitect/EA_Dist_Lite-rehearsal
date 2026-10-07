@@ -15,7 +15,7 @@ layout:
   - translate_AI
   - ai_render
   - mcp_server
-  - generic_healthcare_tool
+  - project_config
   - ">>>" 
   - nyu_export_mapping
   - apply_panel_radius_UI 

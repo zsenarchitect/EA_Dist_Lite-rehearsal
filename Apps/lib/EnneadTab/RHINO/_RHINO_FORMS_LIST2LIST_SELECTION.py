@@ -27,7 +27,7 @@ graft = itertools.combinations
 # make modal dialog
 class List2ListSelectionDialog(REF_CLASS):
     # Initializer
-    def __init__(self, options_A, options_B, title, message, search_A_text, search_B_text, multi_select_A, multi_select_B, button_names , width, height):
+    def __init__(self, options_A, options_B, title, message, search_A_text, search_B_text, multi_select_A, multi_select_B, button_names , width, height, disabled_items_A = None, disabled_reason_A = None):
         # Eto initials
         self.Title = title
         self.Resizable = True
@@ -43,6 +43,8 @@ class List2ListSelectionDialog(REF_CLASS):
         self.Button_Names = button_names
         self.search_A_text = search_A_text
         self.search_B_text = search_B_text
+        self.Disabled_A = set(str(x) for x in (disabled_items_A or []))
+        self.Disabled_Reason_A = disabled_reason_A or "This item is disabled."
 
 
         # fields
@@ -175,6 +177,11 @@ class List2ListSelectionDialog(REF_CLASS):
 
         self.lb_A.SelectedRowsChanged += self.RowsChanged_A
         self.lb_A.CellClick  += self.event_cell_click_A
+        self.lb_A.CellFormatting += self.cell_formatting_A
+        try:
+            self.lb_A.CellToolTipNeeded += self.cell_tooltip_A
+        except Exception:
+            pass
 
         # Create Gridview Column
         column0 = Eto.Forms.GridColumn()
@@ -384,21 +391,45 @@ class List2ListSelectionDialog(REF_CLASS):
         return self.lb_B.SelectedRows
 
     def event_cell_click_A(self, sender, e):
-        return
-        if list(self.lb_A.SelectedItems) == []:
+        # keep a disabled row (e.g. the active layer) unchecked no matter how it is clicked
+        if e.Column != 0 or not self.Disabled_A:
             return
-        if e.Column == 0:
-            print ("column 0")
-            for checked , entry in list(self.lb_A.SelectedItems):
-                self.Record_A[entry] = not list(self.lb_A.SelectedItems)[0]
+        try:
+            entry = e.Item[1]
+        except Exception:
+            return
+        if str(entry) in self.Disabled_A:
+            e.Item[0] = False
+            self.Record_A[str(entry)] = False
             self.update_ListBox_A_DataStore(source_list = self.SearchedScriptList_A)
-        pass
 
     def event_cell_click_B(self, sender, e):
         return
         if list(self.lb_B.SelectedItems) == []:
             return
         pass
+
+    def cell_formatting_A(self, sender, e):
+        # grey out a disabled row (e.g. the active layer) so it reads as not pickable
+        if not self.Disabled_A:
+            return
+        try:
+            entry = e.Item[1]
+        except Exception:
+            return
+        if str(entry) in self.Disabled_A:
+            e.ForegroundColor = Eto.Drawing.Colors.Gray
+
+    def cell_tooltip_A(self, sender, e):
+        # tell the user why a disabled row (e.g. the active layer) is greyed out
+        if not self.Disabled_A:
+            return
+        try:
+            entry = e.Item[1]
+        except Exception:
+            return
+        if str(entry) in self.Disabled_A:
+            e.ToolTip = self.Disabled_Reason_A
 
     def update_record_A(self, reset = False):
 
@@ -431,7 +462,7 @@ class List2ListSelectionDialog(REF_CLASS):
         for A, change to all cheked item only
         """
         #print self.lb_A.DataStore
-        OUT_A = filter(lambda x: x[0], self.lb_A.DataStore)
+        OUT_A = filter(lambda x: x[0] and str(x[1]) not in self.Disabled_A, self.lb_A.DataStore)
         OUT_B = filter(lambda x: x[0], self.lb_B.DataStore)
         return OUT_A, OUT_B
 
@@ -476,6 +507,8 @@ class List2ListSelectionDialog(REF_CLASS):
 
     def unify_selection_A(self, target_boolean = True):
         for checked , entry in list(self.lb_A.SelectedItems):
+            if target_boolean and str(entry) in self.Disabled_A:
+                continue
             self.Record_A[entry] = target_boolean
         self.update_ListBox_A_DataStore(source_list = self.SearchedScriptList_A)
 
@@ -495,7 +528,9 @@ def ShowList2ListSelectionDialog(options_A,
                                 multi_select_B = True,
                                 button_names = ["Run"],
                                 width = 300,
-                                height = 200):
+                                height = 200,
+                                disabled_items_A = None,
+                                disabled_reason_A = None):
 
 
     # for reason not understood yet, value is not displayed in grid view if not contained by list, must convert list format: [1,2,3,"abc"] ----> [[1],[2],[3],["abd"]]
@@ -508,7 +543,7 @@ def ShowList2ListSelectionDialog(options_A,
         i += 1
     """
     print (formated_list_A)
-    dlg = List2ListSelectionDialog(formated_list_A, formated_list_B, title, message,search_A_text, search_B_text, multi_select_A, multi_select_B, button_names, width, height)
+    dlg = List2ListSelectionDialog(formated_list_A, formated_list_B, title, message,search_A_text, search_B_text, multi_select_A, multi_select_B, button_names, width, height, disabled_items_A, disabled_reason_A)
     rc = Rhino.UI.EtoExtensions.ShowSemiModal(dlg, Rhino.RhinoDoc.ActiveDoc, Rhino.UI.RhinoEtoApp.MainWindow)
 
     if (rc):

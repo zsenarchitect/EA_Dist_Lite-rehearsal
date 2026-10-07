@@ -12,6 +12,13 @@ from KnowledgeHandler import KnowledgeHandler
 
 from constants import PLUGIN_ABBR, PLUGIN_NAME, ECO_SYS_FOLDER
 
+# Single shared implementation (senzhang-todo #1470): the fork that used to
+# live in this file is deleted. constants.py already puts the EnneadTab lib
+# folder on sys.path, so this import resolves. The name is intentionally kept
+# at module level so existing callers (MacroHandler.__init__,
+# RuiWriter.handle_startup via MacroH.extract_global_variables) work unchanged.
+from DOCUMENTATION import extract_global_variables
+
 
 class MacroHandler(BaseHandler):
     """Note to self:
@@ -223,62 +230,6 @@ def get_macro(button_folder, click):
 
     return None
 
-def extract_global_variables(script_path):
-    # Scripts are saved as UTF-8; default locale encoding (cp1252 on the
-    # publisher machine) mojibakes any non-ASCII doc text into the RUI tooltip.
-    with open(script_path, 'r', encoding="utf-8") as file:
-        script_content = file.read()
-    
-    tree = ast.parse(script_content)
-    global_vars = {}
-    
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name):
-                    var_name = target.id
-                    # Initialize default value
-                    var_value = None
-                    
-                    # Handle different node value types
-                    if isinstance(node.value, ast.Constant):
-                        var_value = node.value.value  # Direct constant value
-                    elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute):
-                        # Handle string formatting cases like "abc {}".format(var)
-                        if node.value.func.attr == 'format':
-                            try:
-                                # Get the base string
-                                if isinstance(node.value.func.value, ast.Constant):
-                                    base_string = node.value.func.value.value
-                                else:
-                                    base_string = ast.literal_eval(node.value.func.value)
-                                
-                                # For format args, keep them as placeholders
-                                format_args = []
-                                for arg in node.value.args:
-                                    if isinstance(arg, ast.Name):
-                                        format_args.append(f"{{{arg.id}}}")
-                                    elif isinstance(arg, ast.Constant):
-                                        format_args.append(str(arg.value))
-                                    else:
-                                        format_args.append("{...}")
-                                
-                                var_value = base_string.format(*format_args)
-                            except:
-                                var_value = "Template string with dynamic values"
-                    else:
-                        try:
-                            # Fallback for other types using literal_eval
-                            var_value = ast.literal_eval(node.value)
-                        except ValueError:
-                            var_value = "Unsupported value for safe evaluation, ask Sen Z to fix this."
-                    
-                    # Only add to global_vars if we got a value
-                    if var_value is not None:
-                        global_vars[var_name] = var_value
-    
-    return global_vars
-    
 def generate_alias_script_name(alias):
     prefunction_name = """{}_Activate{}
 """.format(PLUGIN_ABBR, PLUGIN_NAME)

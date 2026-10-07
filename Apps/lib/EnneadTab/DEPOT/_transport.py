@@ -79,10 +79,41 @@ def is_route_offline(result):
     return result.status in (404, 410)
 
 
+# Non-interactive credential (D3/D5, EnneadTab-Depot DESIGN.md 4.2). Provisioned
+# at EA_Dist install time and cached to a MACHINE-WIDE (not per-user) location --
+# %ProgramData%, never %APPDATA% -- because a Task Scheduler / SYSTEM-context
+# caller has no user profile a browser could ever sign into, so AUTH.get_token()
+# returns None there and this is the only credential such a caller can present.
+_SERVICE_KEY_FILE = (
+    os.path.join(os.environ["PROGRAMDATA"], "EnneadTab", "depot_service_key")
+    if os.environ.get("PROGRAMDATA") else None
+)
+
+
+def _read_service_key():
+    """Best-effort read of the machine-wide non-interactive credential. A
+    missing file is not an error -- most machines have none provisioned yet
+    (todo #5023) -- this just returns None rather than raising."""
+    if not _SERVICE_KEY_FILE:
+        return None
+    try:
+        with open(_SERVICE_KEY_FILE, "r") as f:
+            value = f.read().strip()
+        return value or None
+    except Exception:
+        return None
+
+
 def _headers_with_auth(headers, token, if_none_match):
     out = dict(headers or {})
     if token:
         out["Authorization"] = "Bearer {0}".format(_common._safe_token(token))
+    else:
+        # No interactive session available -- fall back to the non-interactive
+        # service-key credential, if this machine has one provisioned.
+        service_key = _read_service_key()
+        if service_key:
+            out["X-Depot-Service-Key"] = service_key
     if if_none_match:
         # ETags are quoted per RFC; store/compare verbatim.
         out["If-None-Match"] = if_none_match
@@ -108,10 +139,39 @@ def put_json(url, body_str, token=None, headers=None, timeout_ms=30000):
     return _put_urllib(url, body_str, full_headers, timeout_ms)
 
 
+def post_json(url, body_str, token=None, headers=None, timeout_ms=30000):
+    """POST a JSON body. Same contract as put_json (200/201 success, 409 rev
+    conflict, transport_failed when offline) -- added for consumers whose
+    server routes are POST rather than PUT (e.g. EnneadTab-EnneadCity's
+    claim/release routes). Not DEPOT-specific; reuses the same hardened
+    request loop (no-redirect, WEB_GUARD) as every other function here."""
+    full_headers = _headers_with_auth(headers, token, None)
+    if _common._USE_DOTNET:
+        return _put_dotnet(url, body_str, full_headers, timeout_ms, method="POST")
+    return _put_urllib(url, body_str, full_headers, timeout_ms, method="POST")
+
+
+def upload_bytes(url, data_bytes, token=None, headers=None,
+                  content_type="application/octet-stream", timeout_ms=60000):
+    """POST raw bytes (e.g. a .3dm file) as the request body. Symmetric
+    counterpart to download() -- that reads bytes FROM a URL to a local file;
+    this sends bytes FROM a local file TO a URL. Returns a Result; on success
+    `body` holds the server's JSON response bytes."""
+    full_headers = _headers_with_auth(headers, token, None)
+    full_headers["Content-Type"] = content_type
+    if _common._USE_DOTNET:
+        return _upload_bytes_dotnet(url, data_bytes, full_headers, timeout_ms)
+    return _upload_bytes_urllib(url, data_bytes, full_headers, timeout_ms)
+
+
 def download(url, dest_path, token=None, headers=None, timeout_ms=30000):
-    """Download to `dest_path` atomically (temp file + os.rename). Returns a
-    Result whose `etag` is the server ETag when present. Transport failures set
-    transport_failed=True and leave no partial file behind."""
+    """Download to `dest_path` via temp file + os.rename. Returns a Result
+    whose `etag` is the server ETag when present. Transport failures set
+    transport_failed=True and leave no partial file behind.
+
+    NOT atomic: the destination is removed BEFORE the rename (Windows rename
+    will not overwrite), so there is a window where it does not exist. Do not
+    build on an atomicity guarantee here. senzhang-todo #3896."""
     full_headers = _headers_with_auth(headers, token, None)
     tmp = dest_path + ".part"
     if _common._USE_DOTNET:
@@ -119,8 +179,9 @@ def download(url, dest_path, token=None, headers=None, timeout_ms=30000):
     else:
         result = _download_urllib(url, tmp, full_headers, timeout_ms)
     if result.ok():
-        # Atomic publish: rename only after a complete write. os.rename is
-        # atomic within a volume on both Windows and POSIX.
+        # Publish only after a complete write. This is NOT atomic: the
+        # destination is removed before the rename, so there is a window where
+        # it does not exist. senzhang-todo #3896.
         try:
             if os.path.exists(dest_path):
                 os.remove(dest_path)      # Windows rename won't overwrite
@@ -176,7 +237,10 @@ def _get_dotnet(url, headers, timeout_ms):
         if status is None:
             # No HTTP response reached us at all -> transport failure (offline).
             return Result(transport_failed=True, error=str(e))
-        return Result(status=status, error=str(e))
+        # A protocol status (e.g. 401) carries the {"error": "<code>"} envelope
+        # body -- callers (STATE._error_code) need it to distinguish an expired
+        # token from a real outage (#5013).
+        return Result(status=status, body=_dotnet_response_body(e), error=str(e))
     except Exception as e:
         return Result(transport_failed=True, error=str(e))
 
@@ -277,7 +341,15 @@ def _get_urllib(url, headers, timeout_ms):
             except Exception:
                 pass
             return Result(status=304, etag=etag)
-        return Result(status=e.code, error=str(e))
+        # A protocol status (e.g. 401) carries the {"error": "<code>"} envelope
+        # body -- callers (STATE._error_code) need it to distinguish an expired
+        # token from a real outage (#5013).
+        rbody = None
+        try:
+            rbody = e.read()
+        except Exception:
+            pass
+        return Result(status=e.code, body=rbody, error=str(e))
     except URLError as e:
         # DNS failure / connection refused / timeout -> offline.
         return Result(transport_failed=True, error=str(e))
@@ -335,7 +407,7 @@ def _dotnet_response_body(web_exception):
         return None
 
 
-def _put_dotnet(url, body_str, headers, timeout_ms):
+def _put_dotnet(url, body_str, headers, timeout_ms, method="PUT"):
     from System.Net import (WebRequest, WebException,  # pyright: ignore
                             ServicePointManager, SecurityProtocolType)
     from System.IO import StreamReader  # pyright: ignore
@@ -343,7 +415,7 @@ def _put_dotnet(url, body_str, headers, timeout_ms):
     try:
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
         request = WebRequest.Create(url)
-        request.Method = "PUT"
+        request.Method = method
         WEB_GUARD.harden_dotnet_request(request)
         request.Timeout = timeout_ms
         request.ContentType = "application/json"
@@ -379,14 +451,14 @@ def _put_dotnet(url, body_str, headers, timeout_ms):
         return Result(transport_failed=True, error=str(e))
 
 
-def _put_urllib(url, body_str, headers, timeout_ms):
+def _put_urllib(url, body_str, headers, timeout_ms, method="PUT"):
     urlopen, Request, HTTPError, URLError = _urllib_mods()
     body_bytes = body_str.encode("utf-8")
     try:
         req = Request(url, data=body_bytes)
         for k, v in headers.items():
             req.add_header(k, v)
-        req.get_method = lambda: "PUT"   # Py2 + Py3
+        req.get_method = lambda: method   # Py2 + Py3
         resp = WEB_GUARD.urlopen_no_redirect(req, timeout_ms / 1000.0)
         try:
             status = getattr(resp, "status", None)
@@ -400,6 +472,81 @@ def _put_urllib(url, body_str, headers, timeout_ms):
         rbody = None
         try:
             rbody = e.read()   # 409 winning doc / error envelope
+        except Exception:
+            pass
+        return Result(status=e.code, body=rbody, error=str(e))
+    except URLError as e:
+        return Result(transport_failed=True, error=str(e))
+    except Exception as e:
+        return Result(transport_failed=True, error=str(e))
+
+
+# --- upload_bytes (raw binary POST, e.g. a .3dm file) -----------------------
+
+def _upload_bytes_dotnet(url, data_bytes, headers, timeout_ms):
+    from System.Net import (WebRequest, WebException,  # pyright: ignore
+                            ServicePointManager, SecurityProtocolType)
+    from System.IO import StreamReader  # pyright: ignore
+    from System.Text import Encoding  # pyright: ignore
+    import System  # pyright: ignore
+    try:
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
+        request = WebRequest.Create(url)
+        request.Method = "POST"
+        WEB_GUARD.harden_dotnet_request(request)
+        request.Timeout = timeout_ms
+        for k, v in headers.items():
+            if k.lower() == "content-type":
+                request.ContentType = v
+                continue
+            request.Headers.Add(k, v)
+        data = System.Array[System.Byte](bytearray(data_bytes))
+        request.ContentLength = data.Length
+        stream = request.GetRequestStream()
+        try:
+            stream.Write(data, 0, data.Length)
+        finally:
+            stream.Close()
+        response = request.GetResponse()
+        try:
+            reader = StreamReader(response.GetResponseStream(), Encoding.UTF8)
+            try:
+                text = reader.ReadToEnd()
+            finally:
+                reader.Close()
+            body = text.encode("utf-8") if hasattr(text, "encode") else text
+            return Result(status=200, body=body)
+        finally:
+            response.Close()
+    except WebException as e:
+        status = _common._status_from_exception(e)
+        if status is None:
+            return Result(transport_failed=True, error=str(e))
+        return Result(status=status, body=_dotnet_response_body(e), error=str(e))
+    except Exception as e:
+        return Result(transport_failed=True, error=str(e))
+
+
+def _upload_bytes_urllib(url, data_bytes, headers, timeout_ms):
+    urlopen, Request, HTTPError, URLError = _urllib_mods()
+    try:
+        req = Request(url, data=data_bytes)
+        for k, v in headers.items():
+            req.add_header(k, v)
+        req.get_method = lambda: "POST"
+        resp = WEB_GUARD.urlopen_no_redirect(req, timeout_ms / 1000.0)
+        try:
+            status = getattr(resp, "status", None)
+            if status is None:
+                status = resp.getcode()
+            rbody = resp.read()
+        finally:
+            resp.close()
+        return Result(status=status or 200, body=rbody)
+    except HTTPError as e:
+        rbody = None
+        try:
+            rbody = e.read()
         except Exception:
             pass
         return Result(status=e.code, body=rbody, error=str(e))

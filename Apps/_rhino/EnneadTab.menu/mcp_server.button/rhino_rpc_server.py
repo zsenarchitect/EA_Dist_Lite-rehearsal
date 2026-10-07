@@ -172,6 +172,18 @@ def _handle_request(context):
     # coordinated change across EnneadTab-OS + EnneadTab-RhinoAssistant. Tracked
     # separately -- do not read this guard as full authentication.
     #
+    # Measured 2026-08-21 (senzhang-todo #4676): switching this transport to
+    # rhinocode's own named-pipe IPC (rhinocode_remotepipe_<PID>) does NOT close
+    # that same gap. GetAccessControl() on a live pipe showed the Windows DEFAULT
+    # named-pipe ACL -- FullControl to SYSTEM/Administrators/the owning user, Read+
+    # Synchronize to Everyone/ANONYMOUS LOGON (confirmed as Windows' documented
+    # default, not a McNeel choice: learn.microsoft.com/windows/win32/ipc/
+    # named-pipe-security-and-access-rights). A hostile process running as the SAME
+    # Windows user has full write access to the pipe, identical exposure to this
+    # port. The only thing the pipe adds is write-isolation between DIFFERENT
+    # Windows accounts on the same box -- relevant on a multi-session AVD host, not
+    # on a single-user workstation, and not the threat this comment names.
+    #
     # DO NOT add "Sec-Fetch-Mode" to this list. Node/undici (the Electron MAIN-process
     # fetch used by RhinoAssistant, and every Node fetch) unconditionally attaches
     # `Sec-Fetch-Mode: cors` -- it is a non-removable default header (undici #1305), NOT
@@ -462,7 +474,17 @@ def _route(path, method, body, query):
 # ---------------------------------------------------------------------------
 
 def _handle_status():
-    """GET /enneadtab/status/ — Rhino version, active document info."""
+    """GET /enneadtab/status/ — Rhino version, active document info.
+
+    `pid` is this Rhino process's own OS pid. It exists so an OUTSIDE caller can
+    reconcile the instance it already resolved here (by port / document path)
+    with McNeel's rhinocode CLI, whose instance discovery is keyed on pid via the
+    named pipe rhinocode_remotepipe_<pid>. Without it there is no way to prove a
+    rhinocode-dispatched script lands in THIS Rhino rather than another open one
+    -- and a write executed against the wrong document is unrecoverable (see the
+    non-transactional note on _handle_execute_code). Added for senzhang-todo
+    #4773; consumed by EnneadTab-RhinoAssistant's run_script_rhinocode tool.
+    """
     doc = Rhino.RhinoDoc.ActiveDoc
     return {
         "app": "rhino",
@@ -470,6 +492,7 @@ def _handle_status():
         "document": doc.Name if doc else None,
         "path": doc.Path if doc else "",
         "server_port": _active_port,
+        "pid": System.Diagnostics.Process.GetCurrentProcess().Id,
     }
 
 
@@ -623,8 +646,24 @@ def _handle_views():
 def _handle_block_defs(data):
     """GET /enneadtab/blocks/ — list block definitions."""
     names = rs.BlockNames(sort=True) or []
+    try:
+        limit = int(data.get("limit", 500))
+    except (TypeError, ValueError):
+        limit = 500
+    if limit < 1:
+        limit = 1
+    if limit > 500:
+        limit = 500
+    try:
+        offset = int(data.get("offset", 0))
+    except (TypeError, ValueError):
+        offset = 0
+    if offset < 0:
+        offset = 0
+
+    page = names[offset:offset + limit]
     blocks = []
-    for name in names:
+    for name in page:
         count = rs.BlockInstanceCount(name)
         blocks.append({
             "name": name,
@@ -633,6 +672,9 @@ def _handle_block_defs(data):
 
     return {
         "count": len(blocks),
+        "offset": offset,
+        "limit": limit,
+        "truncated": (offset + len(page)) < len(names),
         "blocks": blocks,
     }
 
@@ -684,6 +726,15 @@ def _handle_execute_code(data):
     """POST /enneadtab/execute-code/ — run Python code in Rhino context.
 
     Body: {"code": "import rhinoscriptsyntax as rs\\nprint rs.DocumentName()"}
+
+    No timeout/sandbox here beyond the 30s WaitOne above (bounds the HTTP
+    response, not the exec() itself). Before reaching for `rhinocode script`
+    as a timeout-safe replacement: measured 2026-08-21 (docs/plans/
+    2026-08-05-getearth-dev-mode-automation.md sec 2.1) that rhinocode-driven
+    scripts block this exact UI-thread serialization point too, and Rhino's
+    documented `# async:true` directive does not change that when dispatched
+    via the CLI (it's Script-Editor-only). rhinocode is not an escape from
+    this hazard.
     """
     code = data.get("code", "")
     if not code:

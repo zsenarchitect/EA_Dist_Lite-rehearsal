@@ -45,6 +45,9 @@ from EnneadTab.AI.AI_TRANSLATE import (  # noqa: F401
 )
 
 from EnneadTab.AI.AI_RENDER import (  # noqa: F401
+    # Shared starter-prompt chips (Keep #459)
+    SUGGESTED_STARTER_PROMPTS,
+    get_suggested_starter_prompts,
     # Image render
     render_image,
     render_image_with_token,

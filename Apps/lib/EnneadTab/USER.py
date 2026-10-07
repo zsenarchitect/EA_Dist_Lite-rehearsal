@@ -33,7 +33,9 @@ except:
 
 
 
-USER_NAME = os.environ["USERPROFILE"].split("\\")[-1]
+# See ENVIRONMENT.py's USER_PROFILE_FOLDER comment (senzhang-todo #5247): never
+# bare-subscript os.environ at module top level.
+USER_NAME = (os.environ.get("USERPROFILE") or os.environ.get("HOME") or os.path.expanduser("~")).split("\\")[-1]
 
 
 # note: why has seperate system key and autodesk keys? becasue some 

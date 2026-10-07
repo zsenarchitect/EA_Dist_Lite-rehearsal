@@ -236,10 +236,14 @@ def send_blocks(
     reply_to=None,
     idempotency_key=None,
     tags=None,
+    is_silent=False,
 ):
     """Send gateway blocks. Returns a status dict, never a boolean.
 
     On 5xx / unknown fate the result includes mayHaveSent=True -- do not retry.
+
+    Set is_silent=True for scheduled/unattended sends (e.g. the monthly recap)
+    so the machine does not announce the send out loud.
     """
     if isinstance(to_list, str):
         to_list = [part.strip() for part in to_list.replace(";", ",").split(",") if part.strip()]
@@ -304,14 +308,15 @@ def send_blocks(
         return result
 
     if result["status"] in ("accepted", "queued", "delivered"):
-        try:
-            SPEAK.speak(
-                "enni-ed tab email is sent out. Subject line: {}".format(
-                    subject.lower().replace("ennead", "enni-ed ")
+        if not is_silent:
+            try:
+                SPEAK.speak(
+                    "enni-ed tab email is sent out. Subject line: {}".format(
+                        subject.lower().replace("ennead", "enni-ed ")
+                    )
                 )
-            )
-        except Exception:
-            pass
+            except Exception:
+                pass
         return result
 
     result["status"] = "failed"
@@ -367,6 +372,7 @@ def email(
     body_folder_link_list=None,
     body_image_link_list=None,
     attachment_list=None,
+    is_silent=False,
 ):
     """Send email through the gateway. Compatibility wrapper around send_blocks.
 
@@ -377,6 +383,7 @@ def email(
         body_folder_link_list (list, optional): Folder links as folderLink blocks.
         body_image_link_list (list, optional): Local image paths, CID-inlined when under 3 MB.
         attachment_list (list, optional): Local files attached when under 3 MB.
+        is_silent (bool, optional): Skip the SPEAK.speak confirmation (scheduled sends).
     """
     if not body:
         print("Missing body of the email.....")
@@ -428,6 +435,7 @@ def email(
         blocks=blocks,
         attachments=attachments or None,
         reply_to=USER.get_company_email_address(),
+        is_silent=is_silent,
     )
 
 

@@ -1,20 +1,67 @@
-import os
-
 import Rhino # pyright: ignore
 import Eto # pyright: ignore
 
 
 
-import fnmatch
 import textwrap
-import itertools
-flatten = itertools.chain.from_iterable
-graft = itertools.combinations
 
 
 
-from EnneadTab import  NOTIFICATION, DATA_FILE, SOUND, ENVIRONMENT, USER, NOTIFICATION
+from EnneadTab import NOTIFICATION, SOUND
 from EnneadTab.RHINO import RHINO_UI
+from EnneadTab.DEPOT import ASSET, LIBRARY_CATALOG
+
+# senzhang-todo #5511/#5773: this dialog used to browse a LOCAL folder
+# (ASSET.get_asset_folder('rhino/asset-library')), with per-asset .meta
+# sidecar files for tags/download-count, plus a "Manager Mode" UI that wrote
+# those sidecars. Upload/tag now happens on EnneadTab-Library's own website
+# (crowdsourced -- any office user, not one curator), so this dialog is a
+# pure READ consumer of Library's REST catalog: no local writes, no Manager
+# Mode, tags/download-count come straight from Library's JSON. The button's
+# own UI chrome (logo, icons, default preview placeholders) still lives in
+# the local Depot asset folder below -- that part is unrelated to the
+# catalog cutover and is unchanged.
+
+
+class LibraryAssetRow(object):
+    """One row = one EnneadTab-Library catalog asset, read-only. Mirrors
+    library_family_browser.pushbutton's LibraryAssetRow (senzhang-todo #5449)
+    -- holds only plain JSON data, never a Rhino API object, since this is
+    what a WPF/Eto grid selects and Eto's selection machinery can call
+    ToString/property-enumeration on a row outside any API context."""
+
+    def __init__(self, asset_dict):
+        self.data = asset_dict
+        self.asset_id = asset_dict.get("id", "N/A")
+        self.name = asset_dict.get("name") or "N/A"
+        self.category = asset_dict.get("category", "N/A")
+        self.tags = [t.lower() for t in (asset_dict.get("tags") or [])]
+        self.download_count = asset_dict.get("downloadCount", 0)
+
+        version_history = asset_dict.get("versionHistory") or []
+        latest = version_history[0] if version_history else {}
+        self.download_url = latest.get("downloadUrl")
+
+        self.preview_url = LIBRARY_CATALOG.resolve_media_url(asset_dict.get("previewUrl"))
+
+        self.block_name = _block_name_for_asset(self.download_url, self.name)
+
+    def matches_text(self, text):
+        haystack = "_".join([self.name, self.category] + self.tags).lower()
+        return text.lower() in haystack
+
+
+def _block_name_for_asset(download_url, fallback_name):
+    """The name used both as the Rhino InstanceDefinition name and as the
+    dedup key against blocks already in the doc (rs.IsBlock) -- keep it
+    stable and derived from the actual file, matching the old convention of
+    using the real filename (e.g. "Chair01.3dm"), not an opaque asset id."""
+    if download_url:
+        candidate = download_url.rstrip("/").split("/")[-1]
+        if candidate:
+            return candidate
+    return "{0}.3dm".format(fallback_name)
+
 
 # make modal dialog
 class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
@@ -31,69 +78,34 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         self.Resizable = True
         self.Padding = Eto.Drawing.Padding(5)
         self.Spacing = Eto.Drawing.Size(5, 5)
-        
+
         #self.Bounds = Eto.Drawing.Rectangle()
         self.listbox_height = 600
         self.left_layout_width = 400
         self.multi_select = False
 
         self.Button_Names = ["Place Asset!"]
-        self.FOLDER_PRIMARY = "{}\\00_Asset Library".format(ENVIRONMENT.DB_FOLDER)
+        # Still a local Depot asset folder -- this is the button's OWN UI
+        # chrome (logo/icons/placeholders), unrelated to the Library catalog
+        # cutover. There is no REST equivalent for "give me this button's
+        # icons", so this stays exactly as it was.
+        self.FOLDER_PRIMARY = ASSET.get_asset_folder('rhino/asset-library') or ""
         self.FOLDER_APP_IMAGES = "{}\Database\\app images".format(self.FOLDER_PRIMARY)
-        self.FOLDER_DATA = "{}\Database\\data".format(self.FOLDER_PRIMARY)
         self.DEFAULT_IMAGE_NOTHING_SELECTED = "{}\\DEFAULT PREVIEW_NOTHING SELECTED.png".format(self.FOLDER_APP_IMAGES)
         self.DEFAULT_IMAGE_CANNOT_FIND_PREVIEW_IMAGE = "{}\\DEFAULT PREVIEW_CANNOT FIND PREVIEW IMAGE.png".format(self.FOLDER_APP_IMAGES)
         self.LOGO_IMAGE = "{}\\Ennead_Architects_Logo.png".format(self.FOLDER_APP_IMAGES)
         self.SOUND_MUTE = False
         self.IMAGE_MAX_SIZE = 800
-        self.MANAGER_NAMES = ["szhang",
-                            "eshaw"]
-        if USER.USER_NAME in self.MANAGER_NAMES or True:
-            self.MANAGER_MODE = True
-        else:
-            self.MANAGER_MODE = False
 
-        """
-        add a button to toggle manager mode, show/not show the tag assignment groupbox
-
-        if:
-            self.MANAGER_MODE = True
-        else:
-            self.MANAGER_MODE = False
-        """
-        self.TAG_DEFAULT_LIST = ["Furn",
-                                "Setting",
-                                "Work",
-                                "Office",
-                                "Entourage",
-                                "Lab",
-                                "Education",
-                                "Commercial",
-                                "Medical",
-                                "Social",
-                                "Cafe",
-                                "Meet",
-                                "Privacy",
-                                "Focus",
-                                "Chair",
-                                "Seat",
-                                "Sofa",
-                                "Lounge",
-                                "Bar",
-                                "Table",
-                                "Door",
-                                "Stor",
-                                "Circle",
-                                "Rect",
-                                "Tree",
-                                "Car",
-                                "People"]
-        self.META_DATA  = dict()
-
-        # fields
+        # fields -- options is a list of LibraryAssetRow, one per Library
+        # catalog asset (see ShowImageSelectionDialog below).
         self.ScriptList = options
         self.SearchedScriptList = self.ScriptList[::]
-        #this searched script list is alway rhino file name only
+        self.ROWS_BY_NAME = dict((row.name, row) for row in self.ScriptList)
+        # tags are whatever Library's own curators/uploaders set per asset --
+        # no more hardcoded TAG_DEFAULT_LIST; the filter list is exactly the
+        # union of tags actually present in this fetch.
+        self.TAG_DEFAULT_LIST = sorted(set(tag for row in self.ScriptList for tag in row.tags))
 
 
         # initialize layout
@@ -147,13 +159,8 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         #preview_image_layout.BeginHorizontal()
         preview_image_layout.AddSeparateRow(None, self.CreateLogoImage())
         preview_image_layout.AddRow(None)
-        if self.MANAGER_MODE:
-            preview_image_layout.AddSeparateRow(*self.CreateDebugButton())
         preview_image_layout.AddSeparateRow(None, self.CreateCredit())
         preview_image_layout.AddSeparateRow(self.CreatePreviewImage())
-        if self.MANAGER_MODE:
-            preview_image_layout.AddSpace()
-            preview_image_layout.AddSeparateRow(self.CreateTagAssignment())
 
         #preview_image_layout.EndHorizontal()
 
@@ -163,7 +170,7 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
 
         # set content
         self.Content = layout
-        
+
         RHINO_UI.apply_dark_style(self)
 
     """
@@ -176,7 +183,7 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
     # create message bar function
     def CreateMessageBar(self):
         self.msg = Eto.Forms.Label()
-        self.msg.Text = "EnneadTab's Asset Search Tool. Features roadmap:\n-Simpler naming\n-Multiple selection and drop\n-Preview image listbox.\n-place asset and return to same window workflow\n-Interactive insertion.\n-Auto check and generate preview image when loading\n-exception catch for simultaneously writing\n-Make as Rhino dock panel"
+        self.msg.Text = "EnneadTab's Asset Search Tool. Browses EnneadTab-Library -- to add or tag an asset, use Library's website (crowdsourced: any office user can upload)."
         self.msg.Font = Eto.Drawing.Font("Arial", 5)#, TextColor = Eto.Drawing.Color(0,0,240))
         return self.msg
         #self.msg.HorizontalAlignment = Eto.Forms.HorizontalAlignment.Left
@@ -219,13 +226,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         self.lb.AllowColumnReordering = True
 
 
-
-
-        # inital a big dict for item tags data so later it is faster to lookup
-        self.update_item_tag_pool()
-
-        #self.lb.DataStore = sorted(self.ScriptList)
-        #self.lb.DataStore = self.SearchedScriptList
         self.update_ListBox_DataStore(source_list = self.SearchedScriptList)
 
 
@@ -300,8 +300,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         group_layout = Eto.Forms.DynamicLayout()
         group_layout.Spacing = Eto.Drawing.Size(6,6)
 
-
-        #self.TAG_DEFAULT_LIST = ["Asset Group", "Social", "Meet", "Work", "1 Person", "2 People", "3"]
 
         self.radiobutton_list_occupancy_filter = Eto.Forms.RadioButtonList()
         self.OCCUPANCY_DEFAULT_LIST = ["Any", "0", "1", "2", "3 ", "4", "5+"]
@@ -392,14 +390,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         self.credit.Font = Eto.Drawing.Font("Arial", 7, Eto.Drawing.FontStyle.Italic, Eto.Drawing.FontDecoration.Underline)
         return self.credit
 
-    def CreateDebugButton(self):
-        self.btn_debug = Eto.Forms.Button()
-        self.btn_debug.Text = "Debug"
-        self.btn_debug.Click += self.EVENT_DebugButton_Clicked
-
-
-        return [None,  self.btn_debug]
-
 
     # create preview image bar function
     def CreatePreviewImage(self):
@@ -409,154 +399,54 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         return self.preview_image
 
 
-
-    def CreateTagAssignment(self):
-
-
-        self.tag_assignment_groupbox = Eto.Forms.GroupBox()
-        self.tag_assignment_groupbox.Text = "For Asset Manager use only."
-        self.tag_assignment_groupbox.Padding = Eto.Drawing.Padding (10)
-        group_layout = Eto.Forms.DynamicLayout()
-        group_layout.Spacing = Eto.Drawing.Size(6,6)
-
-        self.description1_label = Eto.Forms.Label()
-        self.description1_label.Text = "Access Currently Allowed:{}".format(self.MANAGER_NAMES)
-        self.description2_label = Eto.Forms.Label()
-
-
-        self.tag_assignment_refresh_button = Eto.Forms.Button()
-        self.description2_label.Text = "All click below will auto record but won't update list in this runtime. Click 'Refresh' to force update on the list."
-        self.tag_assignment_refresh_button.Text = "Refresh Tag Data Pool"
-        self.tag_assignment_refresh_button.Image = Eto.Drawing.Bitmap(r"{}\update_data.png".format(self.FOLDER_APP_IMAGES))
-        self.btn_Run.ImagePosition = Eto.Forms.ButtonImagePosition.Right
-        self.tag_assignment_refresh_button.Click += self.EVENT_RefreshTagPoolDataButton_Clicked
-
-        self.next_listitem_button = Eto.Forms.Button()
-        self.next_listitem_button.Text = "Next Item >"
-        self.next_listitem_button.Click += self.EVENT_NextListboxItemButton_Clicked
-        self.prev_listitem_button = Eto.Forms.Button()
-        self.prev_listitem_button.Text = "< Previous Item"
-        self.prev_listitem_button.Click += self.EVENT_PrevListboxItemButton_Clicked
-
-        group_layout.AddSeparateRow(self.description1_label , None, self.prev_listitem_button, self.next_listitem_button)
-        group_layout.AddSeparateRow(self.description2_label , None, self.tag_assignment_refresh_button)
-
-
-
-        self.TAG_ASSIGN_BUTTONS = []
-        max_height = 50
-        tag_buttons = [None]
-        max_row_count = 13
-        row_count = 0
-        for b_name in self.TAG_DEFAULT_LIST:
-            if row_count > max_row_count:
-                tag_buttons.append(None)
-                group_layout.AddSeparateRow(*tag_buttons)
-                tag_buttons = [None]
-                row_count = 0
-            self.btn_Run = Eto.Forms.ToggleButton ()
-            self.btn_Run.Height = max_height
-            self.btn_Run.Text = b_name
-            self.btn_Run.Image = Eto.Drawing.Bitmap("{}\\checked_toggle_off.png".format(self.FOLDER_APP_IMAGES))
-            self.btn_Run.ImagePosition = Eto.Forms.ButtonImagePosition.Overlay#behind text
-            self.btn_Run.Click += self.EVENT_ManagerTagAssignButton_Clicked
-            #tag_buttons.append(None)
-            tag_buttons.append(self.btn_Run)
-            self.TAG_ASSIGN_BUTTONS.append(self.btn_Run)
-            row_count += 1
-
-        #for i in range(max_row_count-len(tag_buttons)):
-            #tag_buttons.append(None)
-        tag_buttons.append(None)
-        group_layout.AddSeparateRow(*tag_buttons)
-
-        self.tag_assignment_groupbox.Content = group_layout
-        return self.tag_assignment_groupbox
-
-
     # create a search function
     def Search(self):#################
 
         """
-        Searches self.ScriptList with a given string
-        Supports wildCards
+        Searches self.ScriptList with a given string.
+        Tag filter is include-all (an asset must carry every checked tag, or
+        have the tag as a substring of its name, same as before); text search
+        is now a plain case-insensitive substring match against name/category/
+        tags (get_item_tags never applied case-folding for tags either, so
+        this is at least as permissive as the old fnmatch("*text*") glob).
         """
         text = self.tB_Search.Text
         include_list = list(self.checkbox_list_tag_filter.SelectedValues)
-        exclude_list = list(set(self.TAG_DEFAULT_LIST) - set(include_list))
 
-        """
-        filter to has to include those keywords
-        """
-        def include_tag(x):
-            if include_list == []:
+        def include_real_tag(row):
+            if not include_list:
                 return True
             for tag in include_list:
-                if tag.lower() not in x[0].lower():
+                if tag.lower() not in row.tags and tag.lower() not in row.name.lower():
                     return False
-            else:
-                return True
+            return True
 
-        def include_real_tag(x):
-            if include_list == []:
-                return True
-            for tag in include_list:
-                if tag.lower() not in self.get_item_tags(x[0]) and tag.lower() not in x[0].lower():
-                    return False
-            else:
-                return True
-
-
-        reduced_pool = filter(include_real_tag, self.ScriptList)
-
+        reduced_pool = list(filter(include_real_tag, self.ScriptList))
 
         if text == "":
-            self.update_ListBox_DataStore(source_list = reduced_pool)
+            self.SearchedScriptList = reduced_pool
         else:
-            temp = [ [str(x[0])] for x in reduced_pool]
+            self.SearchedScriptList = [row for row in reduced_pool if row.matches_text(text)]
 
-
-            self.SearchedScriptList = list(graft(fnmatch.filter(flatten(temp), "*" + text + "*"), 1))
-
-            #self.lb.DataStore = self.SearchedScriptList
-            self.update_ListBox_DataStore(source_list = self.SearchedScriptList)
-
+        self.update_ListBox_DataStore(source_list = self.SearchedScriptList)
         self.update_available_tags_in_tag_filter()
-        #########################################################################################################################################
-        #########################################################################################################################################
-        #########################################################################################################################################
-        #########################################################################################################################################
 
 
     def update_available_tags_in_tag_filter(self):
         """
-        # dynamicaly find out what other tags can stay and update
-        #self.checkbox_list_tag_filter.DataStore = ["aaaa", "ggg"]
-
-        after the list is update, run a func and find what keyword tag is still possible to keep:
+        dynamically find out what other tags can stay and update:
         ex. if a tag is shown in any item in current list, it should stay, else gone.
 
         record the value that is currently check, make a new tag list, set select as record.
         """
         checked_tags = list(self.checkbox_list_tag_filter.SelectedValues)
         possible_tags_pool = set()
-        for entry in self.lb.DataStore:
+        for row in self.SearchedScriptList:
             for tag in self.TAG_DEFAULT_LIST:
-                #print tag, item_name[0]
-                rhino_name = entry[0]
-                if tag in checked_tags or tag.lower() in rhino_name.lower() or tag.lower() in self.get_item_tags(rhino_name):
+                if tag in checked_tags or tag.lower() in row.name.lower() or tag.lower() in row.tags:
                     possible_tags_pool.add(tag)
 
-
-        possible_tags = []
-        for tag in self.TAG_DEFAULT_LIST:
-            if tag in possible_tags_pool:
-                possible_tags.append(tag)
-
-        print("%%%%%%%%%")
-        print(possible_tags_pool)
-        print(possible_tags)
-        print(checked_tags)
+        possible_tags = [tag for tag in self.TAG_DEFAULT_LIST if tag in possible_tags_pool]
 
         self.IS_TAG_LIST_CHANGING = True
         self.checkbox_list_tag_filter.DataStore = possible_tags
@@ -565,17 +455,20 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
 
 
     def update_preview_image(self):
-        #print list(self.lb.SelectedItems)[0][0]
         if self.is_nothing_selected():
             image_path = self.DEFAULT_IMAGE_NOTHING_SELECTED
         else:
-            try:
+            row = self.get_selected_asset_row()
+            image_path = None
+            if row is not None and row.preview_url:
+                # Lazily downloaded on selection -- Library's REST API has no
+                # local-file preview to read anymore, so this is a real
+                # network round trip per row click (see PR notes: a known,
+                # accepted latency tradeoff, not solved in this pass).
+                image_path = LIBRARY_CATALOG.download_asset(row.preview_url)
+            if not image_path:
+                image_path = self.DEFAULT_IMAGE_CANNOT_FIND_PREVIEW_IMAGE
 
-                image_path = self.get_png_file_from_current_selection()
-            except IndexError:
-                image_path = self.DEFAULT_IMAGE_NOTHING_SELECTED
-
-        #print image_path
         try:
             temp_bitmap = Eto.Drawing.Bitmap(image_path)
         except Exception as e:
@@ -606,6 +499,13 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         return list(self.lb.SelectedItems)[0][1]
 
 
+    def get_selected_asset_row(self):
+        name = self.get_listbox_selected_items_column0()
+        if name is None:
+            return None
+        return self.ROWS_BY_NAME.get(name)
+
+
     def is_nothing_selected(self):
         if self.lb.SelectedItems is None:
             return True
@@ -616,135 +516,8 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         return False
 
 
-    def update_item_tag_pool(self):
-        self.ITEM_TAG_POOL = dict()
-        self.ITEM_DOWNLOADS = dict()
-        for item in self.ScriptList:
-            rhino = item[0]
-            self.ITEM_TAG_POOL[rhino] = self.read_item_tags(rhino)
-
-
-    def read_item_tags(self, rhino_file_name):
-
-        meta_data_file = "{}\\{}".format(self.FOLDER_DATA, rhino_file_name.replace("3dm", "meta"))
-        if os.path.exists(meta_data_file):
-            temp_dict = DATA_FILE.get_data(filepath = meta_data_file, use_encode = False)
-            self.ITEM_DOWNLOADS[rhino_file_name] = temp_dict["Download"]
-        else:
-            # assign a default no tag dict
-            self.ITEM_DOWNLOADS[rhino_file_name] = 0
-            self.default_tag_data_reset(item_name = rhino_file_name)
-            DATA_FILE.set_data(self.META_DATA, meta_data_file, end_with_new_line = False)
-            temp_dict = DATA_FILE.read_txt_as_dict(filepath = meta_data_file, use_encode = False)
-
-
-
-        OUT = []
-        for key, value in temp_dict.items():
-            if value == True:
-                OUT.append(key.lower())
-
-        return OUT
-
-
-    def force_update_tags_by_name(self):
-        for item in self.ScriptList:
-            rhino_file_name = item[0]
-            meta_data_file = "{}\\{}".format(self.FOLDER_DATA, rhino_file_name.replace("3dm", "meta"))
-
-            temp_dict = DATA_FILE.read_txt_as_dict(filepath = meta_data_file, use_encode = False)
-            mistake_found = False
-            for tag_name in self.TAG_DEFAULT_LIST:
-                if tag_name.lower() not in rhino_file_name and temp_dict[tag_name.lower()] == False:
-
-                    mistake_found = True
-                    temp_dict[tag_name.lower()] == True
-            if mistake_found:
-                DATA_FILE.set_data(temp_dict, meta_data_file, end_with_new_line = False)
-
-
-    def get_item_tags(self, rhino_file_name):
-        return self.ITEM_TAG_POOL[rhino_file_name]
-
-
-    def default_tag_data_reset(self, item_name = None):
-        data = dict()
-        for tag_name in self.TAG_DEFAULT_LIST:
-            data[tag_name] = False
-
-            if item_name is not None:
-                if tag_name.lower() in item_name.lower():
-                    data[tag_name] = True
-
-        data["Download"] = 0
-        data["Capacity"] = -1
-        self.META_DATA = data
-
-
-    def update_ManagerTagAssigningBar_status(self):
-        if not self.MANAGER_MODE:
-            return
-        datas = self.meta_data_read()
-        self.META_DATA = datas
-        if self.META_DATA is None:
-            return
-
-
-        for button in self.TAG_ASSIGN_BUTTONS:
-            if not self.META_DATA.has_key(button.Text):
-                self.META_DATA[button.Text] = False
-            button.Checked = self.META_DATA[button.Text]
-            if button.Checked:
-                image = "checked_toggle_on.png"
-            else:
-                image = "checked_toggle_off.png"
-
-            if self.is_nothing_selected() or datas is None or datas == []:
-                image = "checked_toggle_inactive.png"
-
-            button.Image = Eto.Drawing.Bitmap("{}\\{}".format(self.FOLDER_APP_IMAGES, image))
-
-
-    def get_file_from_current_selection(self, extension):
-        current_item = self.get_listbox_selected_items_column0()
-        meta_data_file = "{}\\{}".format(self.FOLDER_DATA, current_item.replace("3dm", extension))
-        return meta_data_file
-
-
-    def get_meta_file_from_current_selection(self):
-        return self.get_file_from_current_selection(extension = "meta")
-
-
-    def get_png_file_from_current_selection(self):
-        return self.get_file_from_current_selection(extension = "png")
-
-
-    def meta_data_write(self):
-        if self.is_nothing_selected():
-            return
-        meta_data_file = self.get_meta_file_from_current_selection()
-
-        try:
-            DATA_FILE.set_data(self.META_DATA, meta_data_file, end_with_new_line = False)
-        except Exception as e:
-            NOTIFICATION.messenger(main_text = str(e))
-
-
-    def meta_data_read(self):
-        if self.is_nothing_selected():
-            return
-
-        meta_data_file = self.get_meta_file_from_current_selection()
-        if os.path.exists(meta_data_file):
-            return DATA_FILE.get_data(filepath = meta_data_file, use_encode = False)
-        else:
-            # assign a default no tag dict
-            self.default_tag_data_reset()
-            self.meta_data_write()
-
-
     def update_ListBox_DataStore(self, source_list):
-        self.lb.DataStore = [[x[0], self.ITEM_DOWNLOADS[x[0]]] for x in sorted(source_list)]
+        self.lb.DataStore = [[row.name, row.download_count] for row in sorted(source_list, key = lambda r: r.name)]
 
     def set_new_listitem(self, increment = 1):
         current_rhino = self.get_listbox_selected_items_column0()
@@ -774,7 +547,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
     def EVENT_Listbox_SelectedRowChanged (self,sender,e):
 
         self.update_preview_image()
-        self.update_ManagerTagAssigningBar_status()
         self.sound_selected_item_changed()
         return self.lb.SelectedRows
 
@@ -786,20 +558,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
 
     def EVENT_ClearSearchBarButton_Clicked(self, sender, e):
         self.tB_Search.Text = ""
-
-
-    def EVENT_DebugButton_Clicked(self, sender, e):
-        # close window after double click action. Otherwise, run with error
-        print("#########DEBUG:")
-        #print self.get_listbox_selected_items()
-        #print self.get_listbox_selected_items_column0()
-        #print self.get_listbox_selected_items_column1()
-        print(self.lb.DataStore)
-        print(self.SearchedScriptList)
-
-
-
-
 
 
     # event handler handling clicking on the 'clear tag filter' button
@@ -829,44 +587,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         self.Search()
         pass
 
-    # event handler handling clicking on the 'tag' button
-    def EVENT_ManagerTagAssignButton_Clicked(self, sender, e):
-
-        data = dict()
-
-        for button in self.TAG_ASSIGN_BUTTONS:
-            if button.Checked:
-                image = "checked_toggle_on.png"
-            else:
-                image = "checked_toggle_off.png"
-
-            if self.is_nothing_selected():
-                image = "checked_toggle_inactive.png"
-
-            button.Image = Eto.Drawing.Bitmap(r"{}\{}".format(self.FOLDER_APP_IMAGES, image))
-
-            data[button.Text] = button.Checked
-
-
-        data["Download"] = 0
-        data["Capacity"] = -1
-        self.META_DATA = data
-
-
-        if self.is_nothing_selected():
-            return
-
-        #print self.META_DATA
-        self.meta_data_write()
-        self.sound_tag_button()
-
-
-    def EVENT_RefreshTagPoolDataButton_Clicked(self, sender, e):
-        # close window after double click action. Otherwise, run with error
-        self.update_item_tag_pool()
-        self.Search()
-        NOTIFICATION.messenger(main_text = "The tags data pool is updated.")
-
     def EVENT_NextListboxItemButton_Clicked(self, sender, e):
         self.set_new_listitem(increment = 1)
         self.sound_page_next()
@@ -876,15 +596,11 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         self.sound_page_prev()
 
 
-
-
-
     # event handler handling clicking on the 'run' button
     def EVENT_PlaceAssetButton_Clicked(self, sender, e):
         # close window after double click action. Otherwise, run with error
         self.Close(True)
         self.get_listbox_selected_items()
-
 
 
     # event handler handling clicking on the 'cancel' button
@@ -905,12 +621,6 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
         file = "sound_effect_menu_page_trun_forward.wav"
         SOUND.play_sound(file)
 
-    def sound_tag_button(self):
-        if self.SOUND_MUTE:
-            return
-        file = "sound_effect_menu_tap.wav"
-        SOUND.play_sound(file)
-
     def sound_selected_item_changed(self):
         if self.SOUND_MUTE:
             return
@@ -926,31 +636,25 @@ class ImageSelectionDialog(Eto.Forms.Dialog[bool]):
 #####################################################################################################################################################
 #####################################################################################################################################################
 """
-def ShowImageSelectionDialog(image_list):
+def ShowImageSelectionDialog(assets):
+    """assets: raw list of EnneadTab-Library catalog asset dicts, straight off
+    LIBRARY_CATALOG.list_assets(). Returns ([selected LibraryAssetRow, ...],
+    is_ref_block_method) on Place, or (None, None) if the dialog was closed
+    without placing."""
 
+    rows = [LibraryAssetRow(asset) for asset in assets]
 
-    # for reason not understood yet, value is not displayed in grid view if not contained by list, must convert list format: [1,2,3,"abc"] ----> [[1],[2],[3],["abd"]]
-    formated_list = [[x[1]] for x in image_list]
-
-
-    dlg = ImageSelectionDialog(formated_list)
+    dlg = ImageSelectionDialog(rows)
     rc = Rhino.UI.EtoExtensions.ShowSemiModal(dlg, Rhino.RhinoDoc.ActiveDoc, Rhino.UI.RhinoEtoApp.MainWindow)
 
     if (rc):
 
+        selected_names = [x[0] for x in dlg.get_listbox_selected_items()]
+        selected_rows = [dlg.ROWS_BY_NAME[name] for name in selected_names if name in dlg.ROWS_BY_NAME]
 
-        OUT = [x[0] for x in dlg.get_listbox_selected_items()]
-        OUT.sort()
-        #pickedLayers.append(dlg.get_listbox_selected_items())
-
-        #print OUT
         is_ref_block_method = False if "Embed" in dlg.radio_button_list_ref_block_method.SelectedValue else True
-        if dlg.META_DATA.has_key("Download"):
-            dlg.META_DATA["Download"] += 1
-            dlg.meta_data_write()
-        return OUT, is_ref_block_method
+        return selected_rows, is_ref_block_method
 
     else:
         print("Dialog did not run")
         return None, None
-

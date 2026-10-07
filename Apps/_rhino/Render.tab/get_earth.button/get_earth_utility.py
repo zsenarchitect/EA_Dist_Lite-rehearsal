@@ -221,3 +221,279 @@ def parse_coordinate(text):
             continue
         return (lat, lon)
     return None
+
+
+# --- Progress reporting -----------------------------------------------------
+#
+# GetEarth has TWO phases, and the UI's whole job is to be honest about which
+# one it is in:
+#
+#   1. GENERATION -- one blocking POST to /api/v1/model. There is NO progress
+#      channel; the service answers only when the merge is finished. Measured
+#      2026-08: about 1 s when the AOI is already cached server-side, 5-20 s
+#      for a new one (worst measured 16.4 s, a dense 750 m urban block). This
+#      phase gets WORDS and deliberately no bar. A synthetic percentage here
+#      would be a number the designer learns to distrust, which would then
+#      poison the one bar that IS real.
+#   2. DOWNLOAD -- the GLB off blob storage, ~8 MB for a typical 500 m AOI.
+#      Real bytes, therefore a real percentage.
+#
+# Everything below is pure and Rhino-free so it can be tested at the ~1s L1
+# layer; RhinoProgressMeter at the bottom is the only part that touches Rhino,
+# and it imports it inside its methods per this module's top rule.
+
+_MB = 1024.0 * 1024.0
+
+# Only repaint when the transfer has moved by this share of the whole. At
+# 8 KB per read an 8 MB file fires ~1000 callbacks, and each repaint also
+# pumps Rhino's message loop -- 100 repaints look identical to 1000 and cost a
+# tenth as much.
+PROGRESS_PERCENT_STEP = 1.0
+
+# With no Content-Length there is no percentage to step on, so fall back to a
+# byte cadence.
+PROGRESS_BYTE_STEP = 256 * 1024
+
+
+def format_bytes(num_bytes):
+    """Human-sized byte count, for a label a designer reads mid-download."""
+    n = float(num_bytes or 0)
+    if n < 1024.0:
+        return "{:.0f} B".format(n)
+    if n < _MB:
+        return "{:.0f} KB".format(n / 1024.0)
+    return "{:.1f} MB".format(n / _MB)
+
+
+def generation_status(size_m):
+    """Command-line text for the phase that has nothing measurable to report.
+
+    It names the expected duration instead of drawing a bar, because "roughly
+    how long" is the only thing anyone actually wants during a blocking wait.
+    """
+    return ("GetEarth: building {:.0f} m of site context on the server. "
+            "About a second if this area is already cached, otherwise "
+            "5-20 seconds. Rhino will be unresponsive until it lands."
+            ).format(float(size_m))
+
+
+def download_status():
+    """Command-line text at the moment the download starts.
+
+    Takes no size on purpose. This fires on `on_response`, which is the answer
+    to the POST -- the GLB's Content-Length does not exist yet and will not
+    until the separate GET is answered. Accepting a size here would be a
+    parameter nothing could ever fill; the byte counts start arriving one
+    chunk later, through download_label.
+    """
+    return "GetEarth: downloading the site model..."
+
+
+def download_label(done_bytes, total_bytes):
+    """Label shown while bytes move.
+
+    With no total there is no percentage, so it says the byte count and
+    nothing else -- the same honesty as the generation phase. Rhino draws the
+    percent itself for the meter; this is the words beside it.
+    """
+    if total_bytes:
+        return "GetEarth  {} / {}".format(
+            format_bytes(done_bytes), format_bytes(total_bytes))
+    return "GetEarth  {} downloaded".format(format_bytes(done_bytes))
+
+
+def progress_percent(done_bytes, total_bytes):
+    """0-100, clamped. None when there is no total to divide by.
+
+    Clamped rather than trusted: a proxy that sets Content-Length short would
+    otherwise drive the meter past its own upper limit.
+    """
+    if not total_bytes:
+        return None
+    pct = 100.0 * float(done_bytes) / float(total_bytes)
+    if pct < 0.0:
+        return 0.0
+    if pct > 100.0:
+        return 100.0
+    return pct
+
+
+def should_redraw(last_drawn_bytes, done_bytes, total_bytes):
+    """True when this progress event is worth a repaint.
+
+    `last_drawn_bytes` is the byte count at the previous repaint, or None if
+    nothing has been drawn yet. The first event and the final byte always
+    redraw, so the bar never starts late and never stops short of 100%.
+    """
+    if last_drawn_bytes is None:
+        return True
+    if total_bytes and done_bytes >= total_bytes:
+        return True
+    if total_bytes:
+        step = float(total_bytes) * PROGRESS_PERCENT_STEP / 100.0
+        if step < 1.0:
+            step = 1.0
+        return (done_bytes - last_drawn_bytes) >= step
+    return (done_bytes - last_drawn_bytes) >= PROGRESS_BYTE_STEP
+
+
+def completion_note(response_data):
+    """One line about what the request cost, or "" when the server did not say.
+
+    `cache_hit` and `cost_usd` are ADDITIVE OPTIONAL fields on the service's
+    ModelResponse (EnneadTab-EarthModel lib/contract.ts). Reading them must
+    never become a requirement: a server that predates them omits them, and
+    the button has to fall silent rather than announce "cost $None".
+    """
+    if not isinstance(response_data, dict):
+        return ""
+    if response_data.get("cache_hit"):
+        return "This area was already built, so the request cost nothing."
+    cost = response_data.get("cost_usd")
+    if cost is None:
+        return ""
+    try:
+        cost = float(cost)
+    except (TypeError, ValueError):
+        return ""
+    return "Freshly built. This request cost the office ${:.3f}.".format(cost)
+
+
+class RhinoProgressMeter(object):
+    """Status-bar progress for an operation that blocks Rhino's main thread.
+
+    Used as a context manager so the one invariant that matters cannot be
+    forgotten at a call site:
+
+        with RhinoProgressMeter() as meter:
+            ...
+        # hidden here, including when the body raised
+
+    A meter that survives an exception does not just look untidy -- it stays
+    in Rhino's status bar for the rest of the session. Hiding therefore lives
+    in __exit__, in THIS module, where a CPython test can prove it, rather
+    than in a `finally:` in the button, where nothing outside Rhino can.
+
+    Two Rhino facts shape the rest of it:
+
+    * Rhino repaints nothing while the main thread is blocked, so every update
+      pumps the message loop with RhinoApp.Wait(). Without that the bar is
+      painted once and then frozen, which is worse than no bar at all.
+    * The meter is only shown once a real total is known. An indeterminate
+      area gets words, never a bar sliding on a number nobody measured.
+
+    Rhino is imported INSIDE the methods per this module's top rule, and the
+    whole module can be swapped via `rhino_module=` so the lifecycle is
+    testable under plain CPython. Every Rhino call is guarded: an availability
+    or overload-resolution surprise degrades to no meter plus one printed line
+    for the operator, and never to a dead button.
+    """
+
+    def __init__(self, rhino_module=None):
+        self._rhino = rhino_module
+        self._shown = False        # the status-bar meter is up
+        self._prompt_set = False   # the command prompt carries our text
+        self._last_drawn = None
+        self._disabled = False
+
+    # -- context manager ----------------------------------------------------
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.hide()
+        return False   # never swallow the caller's exception
+
+    # -- internals ----------------------------------------------------------
+
+    def _get_rhino(self):
+        if self._disabled:
+            return None
+        if self._rhino is None:
+            try:
+                import Rhino  # pyright: ignore
+            except ImportError as e:
+                self._disable("Rhino is not importable here: {}".format(e))
+                return None
+            self._rhino = Rhino
+        return self._rhino
+
+    def _disable(self, reason):
+        """Give up on the display for good, and say so exactly once.
+
+        Graceful to the designer (the download carries on), never silent to
+        the operator (rule 13) -- and one line, not one per 8 KB chunk.
+        """
+        self._disabled = True
+        print("GetEarth: progress display unavailable ({}). The operation "
+              "itself is unaffected.".format(reason))
+
+    # -- public -------------------------------------------------------------
+
+    def set_status(self, text):
+        """Say what is happening during a phase with no measurable progress."""
+        rhino = self._get_rhino()
+        if rhino is None:
+            return
+        try:
+            rhino.RhinoApp.SetCommandPromptMessage(text)
+            rhino.RhinoApp.Wait()
+        except Exception as e:
+            self._disable(e)
+            return
+        self._prompt_set = True
+
+    def report(self, done_bytes, total_bytes):
+        """The on_progress callback handed to EARTH_MODEL.request_model."""
+        rhino = self._get_rhino()
+        if rhino is None:
+            return
+        if not should_redraw(self._last_drawn, done_bytes, total_bytes):
+            return
+        try:
+            if total_bytes and not self._shown:
+                # Full positional 5-arg form on purpose: RhinoCommon also
+                # carries doc-serial-number overloads of ShowProgressMeter and
+                # IronPython picks between them by arity, so leaving an
+                # argument to its default is not a safe economy here.
+                rhino.UI.StatusBar.ShowProgressMeter(
+                    0, 100, "GetEarth", True, True)
+                self._shown = True
+            if self._shown:
+                pct = progress_percent(done_bytes, total_bytes)
+                if pct is not None:
+                    rhino.UI.StatusBar.UpdateProgressMeter(int(pct), True)
+            rhino.RhinoApp.SetCommandPromptMessage(
+                download_label(done_bytes, total_bytes))
+            rhino.RhinoApp.Wait()
+        except Exception as e:
+            self._disable(e)
+            self.hide()
+            return
+        self._prompt_set = True
+        self._last_drawn = done_bytes
+
+    def hide(self):
+        """Take the meter and the status text back down. Called by __exit__.
+
+        Idempotent and never raises. Deliberately does NOT consult
+        self._disabled: whatever went wrong may well have happened AFTER the
+        meter went up, and a meter left standing -- which outlives the command
+        and sits in the status bar for the rest of the session -- is the one
+        outcome this class exists to prevent.
+        """
+        if not self._shown and not self._prompt_set:
+            return
+        was_shown = self._shown
+        self._shown = False
+        self._prompt_set = False
+        rhino = self._rhino
+        if rhino is None:
+            return
+        try:
+            if was_shown:
+                rhino.UI.StatusBar.HideProgressMeter()
+            rhino.RhinoApp.SetCommandPromptMessage("")
+        except Exception as e:
+            print("GetEarth: could not clear the progress meter: {}".format(e))

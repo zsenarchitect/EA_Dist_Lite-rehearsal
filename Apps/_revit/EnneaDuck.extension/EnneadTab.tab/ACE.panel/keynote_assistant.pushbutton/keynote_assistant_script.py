@@ -341,13 +341,25 @@ class EditRecordWindow(forms.WPFWindow):
         self.active_text = self.active_text.capitalize()
 
     def select_template(self, sender, args):
-        # TODO: get templates from config
         template = forms.SelectFromList.show(
-            [self.get_locale_string("TemplateReserved"), self.get_locale_string("TemplateDontUse")],
+            self._get_text_templates(),
             title=self.get_locale_string("SelectTemplate"),
             owner=self)
         if template:
             self.active_text = template
+
+    def _get_text_templates(self):
+        # read the text templates from the tool config (script.get_config())
+        # so users can customize the template list; fall back to the
+        # built-in locale templates when nothing is saved yet
+        defaults = [self.get_locale_string("TemplateReserved"),
+                    self.get_locale_string("TemplateDontUse")]
+        owner_config = getattr(self.Owner, '_config', None)
+        if owner_config is not None:
+            saved_templates = owner_config.get_option('text_templates', None)
+            if saved_templates:
+                return list(saved_templates)
+        return defaults
 
     def translate(self, sender, args):
         # use EnneadTab translator
@@ -931,9 +943,12 @@ class KeynoteManagerWindow(forms.WPFWindow):
             owner=self)
         return new_key
 
-    def _pick_category(self):
+    def _pick_category(self, exclude_key=None):
+        categories = self.all_categories
+        if exclude_key:
+            categories = [x for x in categories if x.key != exclude_key]
         return forms.SelectFromList.show(
-            self.all_categories,
+            categories,
             title=self.get_locale_string("SelectParentCategory"),
             name_attr='text',
             item_container_template=self.Resources["treeViewItem"],
@@ -1084,34 +1099,107 @@ class KeynoteManagerWindow(forms.WPFWindow):
                     if selected_keynote:
                         self._update_ktree_knotes()
 
+    def _resolve_remove_children(self, parent):
+        """Prompt the user what to do with the children of a record
+        that is being removed.
+
+        Offers moving the children to another category or deleting them.
+        Returns True if the children were moved/deleted and the caller may
+        proceed with removing the record; False if the user cancelled.
+        """
+        if any(x.locked for x in parent.children):
+            forms.alert(self.get_locale_string("RemoveChildrenLocked"))
+            return False
+        action = forms.alert(
+            self.get_locale_string("RemoveWithChildrenPrompt") % parent.key,
+            options=[self.get_locale_string("RemoveWithChildrenMove"),
+                     self.get_locale_string("RemoveWithChildrenDelete"),
+                     self.get_locale_string("RemoveWithChildrenCancel")])
+        if action == self.get_locale_string("RemoveWithChildrenMove"):
+            target = self._pick_category(exclude_key=parent.key)
+            if not target or target.key == parent.key:
+                # user cancelled the category picker
+                return False
+            try:
+                # move all children under the picked category,
+                # keeping their own sub-trees intact
+                with kdb.BulkAction(self._conn):
+                    for child in parent.children:
+                        kdb.move_keynote(self._conn, child.key, target.key)
+            except System.TimeoutException as toutex:
+                forms.alert(
+                    toutex.Message,
+                    expanded="{}::_resolve_remove_children() [timeout]".format(
+                        self.__class__.__name__))
+                return False
+            except Exception as ex:
+                forms.alert(str(ex),
+                            expanded="{}::_resolve_remove_children()".format(
+                                self.__class__.__name__))
+                return False
+            return True
+        elif action == self.get_locale_string("RemoveWithChildrenDelete"):
+            if not forms.alert(
+                    self.get_locale_string("PromptToDeleteChildren")
+                    % parent.key,
+                    yes=True, no=True):
+                # user did not confirm deleting the children
+                return False
+            try:
+                with kdb.BulkAction(self._conn):
+                    for child in parent.children:
+                        self._remove_keynote_subtree(child)
+            except System.TimeoutException as toutex:
+                forms.alert(
+                    toutex.Message,
+                    expanded="{}::_resolve_remove_children() [timeout]".format(
+                        self.__class__.__name__))
+                return False
+            except Exception as ex:
+                forms.alert(str(ex),
+                            expanded="{}::_resolve_remove_children()".format(
+                                self.__class__.__name__))
+                return False
+            return True
+        # user cancelled the prompt
+        return False
+
+    def _remove_keynote_subtree(self, keynote):
+        # delete deepest children first so no orphaned records remain
+        for child in keynote.children:
+            self._remove_keynote_subtree(child)
+        kdb.remove_keynote(self._conn, keynote.key)
+
     def remove_category(self, sender, args):
-        # TODO: ask user which category to move the subkeynotes or delete?
         selected_category = self.selected_category
         if selected_category:
             if selected_category.has_children():
-                forms.alert(self.get_locale_string("CategoryHasChildren")
-                            % selected_category.key)
+                # ask the user where to move the child keynotes,
+                # or delete them together with the category
+                if not self._resolve_remove_children(selected_category):
+                    # user cancelled
+                    return
             elif selected_category.used:
                 forms.alert(self.get_locale_string("CategoryUsed")
                             % selected_category.key)
-            else:
-                if forms.alert(self.get_locale_string("PromptToDeleteCategory") % selected_category.key,
-                               yes=True, no=True):
-                    try:
-                        kdb.remove_category(self._conn, selected_category.key)
-                        # make sure to reload on close
-                        self._needs_update = True
-                    except System.TimeoutException as toutex:
-                        forms.alert(
-                            toutex.Message,
-                            expanded="{}::remove_category() [timeout]".format(
-                                self.__class__.__name__))
-                    except Exception as ex:
-                        forms.alert(str(ex),
-                                    expanded="{}::remove_category()".format(
-                                        self.__class__.__name__))
-                    finally:
-                        self._update_ktree(active_catkey=self._allcat)
+                return
+            if forms.alert(self.get_locale_string("PromptToDeleteCategory") % selected_category.key,
+                           yes=True, no=True):
+                try:
+                    kdb.remove_category(self._conn, selected_category.key)
+                    # make sure to reload on close
+                    self._needs_update = True
+                except System.TimeoutException as toutex:
+                    forms.alert(
+                        toutex.Message,
+                        expanded="{}::remove_category() [timeout]".format(
+                            self.__class__.__name__))
+                except Exception as ex:
+                    forms.alert(str(ex),
+                                expanded="{}::remove_category()".format(
+                                    self.__class__.__name__))
+                finally:
+                    self._update_ktree(active_catkey=self._allcat)
 
     def add_keynote(self, sender, args):
         # try to get parent key from selected keynote or category
@@ -1187,34 +1275,36 @@ class KeynoteManagerWindow(forms.WPFWindow):
                 self._update_ktree_knotes()
 
     def remove_keynote(self, sender, args):
-        # TODO: ask user which category to move the subkeynotes or delete?
         selected_keynote = self.selected_keynote
         if selected_keynote:
             if selected_keynote.children:
-                forms.alert(self.get_locale_string("KeynoteHasChildren")
-                            % selected_keynote.key)
+                # ask the user where to move the sub-keynotes,
+                # or delete them together with the keynote
+                if not self._resolve_remove_children(selected_keynote):
+                    # user cancelled
+                    return
             elif selected_keynote.used:
                 forms.alert(self.get_locale_string("KeynoteUsed")
                             % selected_keynote.key)
-            else:
-                if forms.alert(self.get_locale_string("PromptToDeleteKeynote") % selected_keynote.key,
-                               yes=True, no=True):
-                    try:
-                        kdb.remove_keynote(self._conn, selected_keynote.key)
-                        # make sure to reload on close
-                        self._needs_update = True
-                    except System.TimeoutException as toutex:
-                        forms.alert(
-                            toutex.Message,
-                            expanded="{}::remove_keynote() [timeout]".format(
-                                self.__class__.__name__))
-                    except Exception as ex:
-                        forms.alert(
-                            str(ex),
-                            expanded="{}::remove_keynote()".format(
-                                self.__class__.__name__))
-                    finally:
-                        self._update_ktree_knotes()
+                return
+            if forms.alert(self.get_locale_string("PromptToDeleteKeynote") % selected_keynote.key,
+                           yes=True, no=True):
+                try:
+                    kdb.remove_keynote(self._conn, selected_keynote.key)
+                    # make sure to reload on close
+                    self._needs_update = True
+                except System.TimeoutException as toutex:
+                    forms.alert(
+                        toutex.Message,
+                        expanded="{}::remove_keynote() [timeout]".format(
+                            self.__class__.__name__))
+                except Exception as ex:
+                    forms.alert(
+                        str(ex),
+                        expanded="{}::remove_keynote()".format(
+                            self.__class__.__name__))
+                finally:
+                    self._update_ktree_knotes()
 
     def edit_keynote(self, sender, args):
         if self.selected_keynote:

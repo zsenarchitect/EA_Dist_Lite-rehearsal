@@ -192,8 +192,40 @@ class EnneadTabRevitInstallationManager:
     # ------------------------------------------------------------------
     # pyRevit config edits
     # ------------------------------------------------------------------
+    @staticmethod
+    def _normalize_path(path: str) -> str:
+        """Case/separator-insensitive key for comparing Windows paths."""
+        return os.path.normcase(os.path.normpath(path))
+
+    @staticmethod
+    def _read_userextensions(config: "configparser.ConfigParser") -> list:
+        """Read pyRevit's userextensions JSON array, guarding empty/malformed values.
+
+        pyRevit's `userextensions` is a JSON array and may legitimately hold
+        OTHER extensions' paths (a second EnneadTab-family product, or a
+        third-party pyRevit extension the user registered themselves). Every
+        caller of this must read-merge, never overwrite — see #5148.
+        """
+        if not config.has_option('core', 'userextensions'):
+            return []
+        raw = config.get('core', 'userextensions')
+        if not raw or not raw.strip():
+            return []
+        try:
+            paths = json.loads(raw)
+        except (ValueError, TypeError):
+            return []
+        if not isinstance(paths, list):
+            return []
+        return [p for p in paths if isinstance(p, str) and p]
+
     def clear_pyrevit_userextensions(self, file_path) -> bool:
-        """Detach: clear EnneadTab from pyRevit userextensions."""
+        """Detach: remove ONLY EnneadTab's own path from pyRevit userextensions.
+
+        Read-merge, not overwrite — a second registered extension (EnneadTab's
+        own EnneadTab-Simulation exporter, or any third-party pyRevit
+        extension) must survive this call untouched. See #5148.
+        """
         if not file_path or not os.path.exists(file_path):
             self.log("pyRevit config not found; nothing to detach.")
             return True
@@ -202,15 +234,32 @@ class EnneadTabRevitInstallationManager:
         config.read(file_path)
         if 'core' not in config:
             config.add_section('core')
-        config.set('core', 'userextensions', '[]')
+
+        existing_paths = self._read_userextensions(config)
+        own_path = self.find_enneadtab_revit_path()
+        own_key = self._normalize_path(own_path) if own_path else None
+        remaining_paths = [
+            p for p in existing_paths
+            if not (own_key and self._normalize_path(p) == own_key)
+        ]
+
+        config.set('core', 'userextensions', json.dumps(remaining_paths))
         with codecs.open(file_path, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
 
         self.log("{}-for-Revit has been detached from pyRevit.".format(_Exe_Util.PLUGIN_NAME))
+        if len(remaining_paths) != len(existing_paths):
+            self.log("Removed EnneadTab's own path; {} other extension(s) preserved.".format(len(remaining_paths)))
         return True
 
     def update_pyrevit_config(self, file_path) -> bool:
-        """Attach: register EnneadTab paths + color settings in pyRevit config."""
+        """Attach: register EnneadTab paths + color settings in pyRevit config.
+
+        Read-merge, not overwrite — any OTHER extension already registered in
+        pyRevit's userextensions array (a second EnneadTab-family product, or
+        a third-party pyRevit extension) must survive this call untouched.
+        See #5148.
+        """
         if not self.is_installing:
             return self.clear_pyrevit_userextensions(file_path)
 
@@ -224,13 +273,20 @@ class EnneadTabRevitInstallationManager:
         if 'core' not in config:
             config.add_section('core')
 
+        existing_paths = self._read_userextensions(config)
+        new_key = self._normalize_path(new_userextensions_path)
+        merged_paths = [p for p in existing_paths if self._normalize_path(p) != new_key]
+        merged_paths.append(new_userextensions_path)
+        if len(merged_paths) != len(existing_paths) + 1:
+            self.log("Preserved {} other registered extension(s).".format(len(merged_paths) - 1))
+
         # json.dumps, NOT an f-string. pyRevit reads this back with json.loads;
         # the path must be JSON-encoded (backslashes escaped as \\, non-ASCII as
         # \uXXXX). An f-string writes a raw Windows path whose \U is not valid
         # JSON, so json.loads fails and pyRevit's Py2 string-escape fallback
         # raises UnicodeEncodeError on non-ASCII usernames — the extension path
         # is then never registered and every button dies at `import proDUCKtion`.
-        config.set('core', 'userextensions', json.dumps([new_userextensions_path]))
+        config.set('core', 'userextensions', json.dumps(merged_paths))
         config.set('core', 'colorize_docs', 'true')
 
         if 'tabcoloring' not in config:

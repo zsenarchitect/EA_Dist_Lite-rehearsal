@@ -420,7 +420,7 @@ def update_area_tracking(doc):
         return
     
     try:
-        fullpath = "{}\\EnneadTab.tab\\Tools.panel\\generic_healthcare_tool.pushbutton\\dgsf_chart.py".format(
+        fullpath = "{}\\EnneadTab.tab\\Tools.panel\\project_config.pushbutton\\dgsf_chart.py".format(
             ENVIRONMENT.REVIT_PRIMARY_EXTENSION)
         ref_module = imp.load_source("dgsf_chart", fullpath)
         ref_module.dgsf_chart_update(doc, show_log=False)
@@ -638,10 +638,18 @@ def doc_synced(doc):
     play_success_sound()
     # The wait is over -- pull the arcade flag before anything slower runs, so a pending
     # watcher (armed in doc-syncing) sees the resolution and stands down. Import is local
-    # + guarded: this late-add must never break the sync-complete path.
+    # + guarded: this late-add must never break the sync-complete path. end_wait_watch
+    # returns the flag age so a long wait can earn a post-wait Get Arcade toast (never
+    # from the watcher; NotificationHost only -- see SYNC_SUMMARY.offer_arcade_after_wait).
+    wait_seconds = None
     try:
         from EnneadTab import ARCADE
-        ARCADE.end_wait_watch()
+        wait_seconds = ARCADE.end_wait_watch()
+    except Exception:
+        pass
+    try:
+        from EnneadTab import SYNC_SUMMARY
+        SYNC_SUMMARY.offer_arcade_after_wait(wait_seconds)
     except Exception:
         pass
 

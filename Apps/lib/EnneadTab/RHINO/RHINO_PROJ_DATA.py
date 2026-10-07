@@ -17,6 +17,7 @@ class DocKeys:
     PreferredGrasshopperFile = "Preferred Grasshopper File"
     GrasshopperInput = "Grasshopper Input"
     GFA_TARGET_DICT = "GFA Target Dict"
+    GFA_FONT_SIZE = "GFA Font Size"
     
 
 def inspect_document_data():

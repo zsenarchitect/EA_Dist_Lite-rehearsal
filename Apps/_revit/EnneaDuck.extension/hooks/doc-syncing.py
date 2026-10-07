@@ -269,8 +269,10 @@ def doc_syncing(doc):
 
     # Sync is about to freeze the UI thread. Arm the arcade wait-watcher LAST, so its 60s
     # clock measures the sync itself, not the queue/dialog steps above. If the sync ends in
-    # time, doc-synced deletes the flag and nothing happens. See EnneadTab/ARCADE.py for the
-    # full flag-file contract (installed-app-only, per-user opt-out, age-checked).
+    # time, doc-synced deletes the flag and nothing happens. The flag is written even when
+    # Arcade is not installed (so a long wait can earn the post-wait install toast); the
+    # watcher itself stays installed-exe-only. See EnneadTab/ARCADE.py for the full contract
+    # (opt-out, age-checked, never a browser mid-wait).
     ARCADE.start_wait_watch("sync", doc.Title)
 
 

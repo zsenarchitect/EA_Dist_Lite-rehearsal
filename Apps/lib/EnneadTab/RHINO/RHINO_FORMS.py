@@ -82,7 +82,9 @@ def select_from_list2list(options_A,
                         multi_select_B = True,
                         button_names = ["Select"],
                         width = 300,
-                        height = 200):
+                        height = 200,
+                        disabled_items_A = None,
+                        disabled_reason_A = None):
     """Display a dual-list selection dialog allowing transfers between two lists.
 
     Args:
@@ -97,6 +99,10 @@ def select_from_list2list(options_A,
         button_names (list, optional): List of button labels. Defaults to ["Select"].
         width (int, optional): Dialog width in pixels. Defaults to 300.
         height (int, optional): Dialog height in pixels. Defaults to 200.
+        disabled_items_A (list, optional): Items in the first list to show greyed out
+            and excluded from selection. Defaults to None.
+        disabled_reason_A (str, optional): Tooltip text shown when hovering a disabled
+            item in the first list, explaining why it cannot be picked. Defaults to None.
 
     Returns:
         tuple: Selected items from both lists (list_A_selection, list_B_selection).
@@ -115,4 +121,6 @@ def select_from_list2list(options_A,
                                                 multi_select_B,
                                                 button_names,
                                                 width,
-                                                height)
+                                                height,
+                                                disabled_items_A,
+                                                disabled_reason_A)

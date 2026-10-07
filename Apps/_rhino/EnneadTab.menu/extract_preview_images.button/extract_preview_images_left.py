@@ -13,19 +13,25 @@ import os.path as op
 import os
 import System # pyright: ignore
 
-from EnneadTab import ENVIRONMENT, LOG, ERROR_HANDLE
+from EnneadTab import LOG, ERROR_HANDLE
+from EnneadTab.DEPOT import ASSET
 
 
 @LOG.log(__file__, __title__)
 @ERROR_HANDLE.try_catch_error()
 def extract_preview_images():
-    if not ENVIRONMENT.require_shared_root("Extract Preview Images"):
+    main_folder = ASSET.get_asset_folder('rhino/asset-library')
+    if not main_folder:
         return
-
-    main_folder = os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "00_Asset Library")
     file_paths = ["{}\{}".format(main_folder, x) for x in os.listdir(main_folder) if ".3dm" in x[-4:].lower()]
 
-    target_folder = os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "00_Asset Library", "Database", "data")
+    # NOTE: this writes generated .png previews back into the local depot
+    # cache folder, not to the server -- "asset" is a read-only, cacheable
+    # namespace (plan 5.1). Previews saved here are local-only and will not
+    # be visible to other users; that is an open design question this
+    # migration does not resolve (unlike EA_SharedParam.txt/D1), flagged for
+    # a follow-up decision.
+    target_folder = os.path.join(main_folder, "Database", "data")
 
     total_count = len(file_paths)
     LOG_TEXT = ""

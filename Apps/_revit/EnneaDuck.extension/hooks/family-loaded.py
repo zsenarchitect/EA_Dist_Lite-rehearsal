@@ -10,18 +10,31 @@ from pyrevit import script
 from pyrevit import EXEC_PARAMS
 import io
 
-#from pyrevit.coreutils import appdata
 import json
-from pyrevit.coreutils import envvars
 import time
+from pyrevit.coreutils import envvars
+try:
+    unicode
+except NameError:
+    unicode = str
 # pyRevit hook engines do not inherit the .lib search path that button scripts get,
 # so put KingDuck.lib on sys.path before importing proDUCKtion (the EnneadTab bootstrap).
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "KingDuck.lib")))
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
+from Autodesk.Revit import DB # pyright: ignore
 from EnneadTab import ERROR_HANDLE, SOUND, NOTIFICATION, TIME, OUTPUT, DATA_CONVERSION, DATA_FILE, USER
 from EnneadTab.REVIT import REVIT_FORMS, REVIT_EVENT, REVIT_CATEGORY
+
+
+def _cleanup_datafile(datafile):
+    """Safely remove the baseline temp file so it cannot leak to subsequent loads."""
+    try:
+        if datafile and os.path.exists(datafile):
+            os.remove(datafile)
+    except Exception:
+        pass
 
 
 def has_required_lib(module, attr_name):
@@ -92,50 +105,108 @@ def main():
     if not has_required_lib(REVIT_CATEGORY, "get_subcategory_signatures"):
         return
 
-    SOUND.play_sound("sound_effect_mario_coin.wav")
-
-
-    doc = EXEC_PARAMS.event_args.Document
-    if doc.IsFamilyDocument:
-
+    event_args = EXEC_PARAMS.event_args
+    doc = getattr(event_args, "Document", None)
+    if not doc or not doc.IsValidObject:
         return
 
-    start_time = envvars.get_pyrevit_env_var("FAMILY_LOAD_BEGIN")
-    time_pass = time.time() - start_time
-    NOTIFICATION.messenger("Family load finished!!\n<{}> Uses {}".format(EXEC_PARAMS.event_args.FamilyName, TIME.get_readable_time(time_pass)))
-
-
-
-    #output.print_md("this loaded script")
+    if doc.IsFamilyDocument:
+        return
 
     datafile = script.get_instance_data_file("sub_c_list")
 
-    # json, not pickle: IronPython's protocol-0 pickle emits raw high bytes for
-    # non-ASCII category names (0xC3...), which broke text-mode round-trips
-    # fleet-wide (UnicodeDecodeError). json with ensure_ascii stays pure ASCII.
-    # A file written by the old pickle code (or a missing/partial file) lands
-    # in the except branch -> None baseline -> the guard below skips the diff
-    # (with a visible note) instead of dumping the whole object-style list.
+    # If the family load was cancelled or failed, discard the baseline and return early
+    if hasattr(event_args, "Status"):
+        try:
+            if hasattr(DB, "Events") and hasattr(DB.Events, "RevitAPIEventStatus"):
+                if event_args.Status != DB.Events.RevitAPIEventStatus.Succeeded:
+                    _cleanup_datafile(datafile)
+                    return
+        except Exception:
+            pass
+
+    SOUND.play_sound("sound_effect_mario_coin.wav")
+
+    start_time = envvars.get_pyrevit_env_var("FAMILY_LOAD_BEGIN")
+    if start_time:
+        time_pass = time.time() - start_time
+        NOTIFICATION.messenger("Family load finished!!\n<{}> Uses {}".format(
+            event_args.FamilyName, TIME.get_readable_time(time_pass)))
+
+    # Read and immediately consume / remove the baseline file so it can NEVER leak to a subsequent load
+    baseline_data = None
     try:
-        with io.open(datafile, 'r', encoding="utf-8") as f:
-            old_sub_c_list = json.load(f)
+        if os.path.exists(datafile):
+            with io.open(datafile, 'r', encoding="utf-8") as f:
+                baseline_data = json.load(f)
     except Exception:
-        # None (not []) so the guard below can distinguish "no baseline at all"
-        # from a genuine "baseline present, nothing new" case.
-        old_sub_c_list = None
+        baseline_data = None
+    finally:
+        _cleanup_datafile(datafile)
 
-    current_sub_c_list = REVIT_CATEGORY.get_subcategory_signatures(doc)
-
-    if not old_sub_c_list:
+    if not baseline_data:
         # No usable before-snapshot from the pre-load hook (missing / empty /
         # corrupt file, or the pre-hook failed to write one). Without a baseline
-        # we CANNOT compute which subcategories are new -- the old code dumped
-        # the ENTIRE object-style list here, wrongly labelled as "brought to the
-        # project". Surface a concise, visible note instead of a silent skip
-        # (never-silent-to-operator) and return without the whole-OST dump.
-        NOTIFICATION.messenger("Subcategory diff unavailable for <{}>: no baseline snapshot from the pre-load hook. Reload pyRevit if this repeats.".format(EXEC_PARAMS.event_args.FamilyName))
-        ERROR_HANDLE.print_note("family-loaded hook: empty/missing baseline for {}; skipped whole-OST dump.".format(EXEC_PARAMS.event_args.FamilyName))
+        # we CANNOT compute which subcategories are new -- skip diff instead of dumping whole OST.
+        NOTIFICATION.messenger("Subcategory diff unavailable for <{}>: no baseline snapshot from the pre-load hook. Reload pyRevit if this repeats.".format(event_args.FamilyName))
+        ERROR_HANDLE.print_note("family-loaded hook: empty/missing baseline for {}; skipped whole-OST dump.".format(event_args.FamilyName))
         return
+
+    # Parse baseline with document & family identity validation
+    old_sub_c_list = None
+    if isinstance(baseline_data, dict):
+        base_doc_title = baseline_data.get("doc_title")
+        base_doc_hash = baseline_data.get("doc_hash")
+        base_family_name = baseline_data.get("family_name")
+        base_timestamp = baseline_data.get("timestamp", 0)
+
+        # Document title check
+        if base_doc_title and base_doc_title != doc.Title:
+            ERROR_HANDLE.print_note(
+                "family-loaded hook: baseline document mismatch ('{}' vs '{}'); skipped diff.".format(
+                    base_doc_title, doc.Title))
+            return
+
+        # Document hash check
+        if base_doc_hash is not None:
+            try:
+                if int(base_doc_hash) != doc.GetHashCode():
+                    ERROR_HANDLE.print_note(
+                        "family-loaded hook: baseline document hash mismatch; skipped diff.")
+                    return
+            except (ValueError, TypeError):
+                pass
+
+        # Family name check (only if both non-empty)
+        curr_family_name = getattr(event_args, "FamilyName", "")
+        if base_family_name and curr_family_name and base_family_name != curr_family_name:
+            ERROR_HANDLE.print_note(
+                "family-loaded hook: baseline family mismatch ('{}' vs '{}'); skipped diff.".format(
+                    base_family_name, curr_family_name))
+            return
+
+        # Expiration check: baseline must not be older than 120 seconds
+        if base_timestamp and (time.time() - base_timestamp) > 120.0:
+            ERROR_HANDLE.print_note(
+                "family-loaded hook: baseline snapshot expired ({:.1f}s old); skipped diff.".format(
+                    time.time() - base_timestamp))
+            return
+
+        old_sub_c_list = baseline_data.get("signatures")
+    elif isinstance(baseline_data, list):
+        # Legacy list fallback
+        old_sub_c_list = baseline_data
+
+    if not old_sub_c_list:
+        NOTIFICATION.messenger(
+            "Subcategory diff unavailable for <{}>: empty baseline snapshot from the pre-load hook.".format(
+                event_args.FamilyName))
+        ERROR_HANDLE.print_note(
+            "family-loaded hook: empty baseline signatures for {}; skipped diff.".format(
+                event_args.FamilyName))
+        return
+
+    current_sub_c_list = REVIT_CATEGORY.get_subcategory_signatures(doc)
 
     # Directional diff: only subcategories present NOW but not before are "new".
     # (The old symmetric difference also reported REMOVED subcategories as
@@ -145,11 +216,29 @@ def main():
 
     if len(new_sub_c_list) == 0:
         return
+
+    # Plausibility / sanity guard:
+    # A single family load introduces at most a handful of subcategories under a few parent categories.
+    # An OST dump / invalid baseline shows dozens of parent categories and huge lists.
+    root_categories = set()
+    for sig in new_sub_c_list:
+        if sig.startswith(u"[") and u"]--->[" in sig:
+            root_categories.add(sig[1:sig.index(u"]--->[")])
+
+    if len(root_categories) > 5 or len(new_sub_c_list) > 30:
+        ERROR_HANDLE.print_note(
+            "family-loaded hook: suspicious diff ({} subcategories across {} root categories) for <{}>; suppressed whole-OST dump.".format(
+                len(new_sub_c_list), len(root_categories), event_args.FamilyName))
+        NOTIFICATION.messenger(
+            "Subcategory check: <{}> loaded, but diff was unusually large ({} items across {} categories). Output suppressed to prevent OST dump.".format(
+                event_args.FamilyName, len(new_sub_c_list), len(root_categories)))
+        return
+
     output = OUTPUT.get_output()
  
     output.insert_divider()
-    output.write("The following new subCategory(s) are brought to the project [{}] while loading the family [{}]".format(doc.Title, EXEC_PARAMS.event_args.FamilyName), OUTPUT.Style.Subtitle)
-    output.write("<{}>".format(EXEC_PARAMS.event_args.FamilyName), OUTPUT.Style.Title)
+    output.write("The following new subCategory(s) are brought to the project [{}] while loading the family [{}]".format(doc.Title, event_args.FamilyName), OUTPUT.Style.Subtitle)
+    output.write("<{}>".format(event_args.FamilyName), OUTPUT.Style.Title)
     output.write(new_sub_c_list)
     
     

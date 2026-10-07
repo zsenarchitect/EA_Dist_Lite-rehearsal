@@ -15,6 +15,10 @@ from pyrevit import EXEC_PARAMS
 from pyrevit.coreutils import envvars
 import time
 import json
+try:
+    unicode
+except NameError:
+    unicode = str
 # pyRevit hook engines do not inherit the .lib search path that button scripts get,
 # so put KingDuck.lib on sys.path before importing proDUCKtion (the EnneadTab bootstrap).
 import os, sys
@@ -23,10 +27,6 @@ import proDUCKtion # pyright: ignore
 proDUCKtion.validify()
 from EnneadTab import ERROR_HANDLE, NOTIFICATION, DATA_FILE, USER
 from EnneadTab.REVIT import REVIT_EVENT, REVIT_CATEGORY
-envvars.set_pyrevit_env_var("FAMILY_LOAD_BEGIN", time.time())
-datafile = script.get_instance_data_file("sub_c_list")
-
-# print datafile
 
 
 def has_required_lib(module, attr_name):
@@ -97,11 +97,32 @@ def main():
     if not has_required_lib(REVIT_CATEGORY, "get_subcategory_signatures"):
         return
 
-    doc = EXEC_PARAMS.event_args.Document
+    doc = getattr(EXEC_PARAMS.event_args, "Document", None)
+    if not doc or not doc.IsValidObject:
+        return
+
+    # Skip family documents -- this hook only tracks subcategories introduced to project documents.
+    # Diffing or snapshotting a family document pollutes the baseline and causes a whole-OST dump on subsequent loads.
+    if doc.IsFamilyDocument:
+        return
+
+    envvars.set_pyrevit_env_var("FAMILY_LOAD_BEGIN", time.time())
+    datafile = script.get_instance_data_file("sub_c_list")
 
     # Shared snapshot helper (unicode-coerced signatures) -- kept in one place so
     # the pre (writer) and post (reader) hooks can never drift on the format.
     data = REVIT_CATEGORY.get_subcategory_signatures(doc)
+
+    family_name = getattr(EXEC_PARAMS.event_args, "FamilyName", "") or ""
+
+    baseline_payload = {
+        "version": 2,
+        "doc_title": doc.Title,
+        "doc_hash": doc.GetHashCode(),
+        "family_name": family_name,
+        "timestamp": time.time(),
+        "signatures": data
+    }
 
     # json, not pickle: IronPython's protocol-0 pickle emits raw high bytes
     # for non-ASCII category names (0xC3...), corrupting text-mode files and
@@ -113,7 +134,7 @@ def main():
     # crash) the file was left at 0 bytes -- wiping a previously-good baseline and
     # making the reader dump the whole OST. Building the payload first keeps the
     # write-in-place safe: if dumps ever raises again, the old baseline survives.
-    payload = unicode(json.dumps(data, ensure_ascii=True))
+    payload = unicode(json.dumps(baseline_payload, ensure_ascii=True))
     with io.open(datafile, 'w', encoding="utf-8") as f:
         f.write(payload)
 ############### main ###################

@@ -1,5 +1,20 @@
 {
-  "_comment": "Service-factory standalone products whose SIGNED installer is mirrored into Apps/lib/ExeProducts on each publish, so EA_Dist ships it to the fleet as a quick-onboarding convenience. Driver for _mirror_service_factory_installers() in ________publish.py. SOURCE OF TRUTH for the product roster + slugs is the service-factory skill's references/service-registry.md (Slug column, byte-for-byte) — when a new product is registered there at Phase 7b, add a row HERE too. 'slug' is the exact enneadtab.com/<slug>/updates/ feed segment (NOT the repo name: KeynoteExporter's slug is 'keynote', OneDriveResolver's is 'one-drive-resolver'). 'installer' is the stable de-versioned target name (all-underscore, matches existing ExeProducts convention e.g. EnneadTab_For_Revit_Installer.exe); overwrite = keep-latest. EXCLUDED on purpose: WatchMe (no updater wired) and For-Indesign (UXP plugin, no NSIS installer, feed is latest.json).",
+  "_comment": "Service-factory standalone products whose SIGNED installer is mirrored into Apps/lib/ExeProducts on each publish, so EA_Dist ships it to the fleet as a quick-onboarding convenience. Driver for _mirror_service_factory_installers() in ________publish.py. SOURCE OF TRUTH for the product roster + slugs is the service-factory skill's references/service-registry.md (Slug column, byte-for-byte) — when a new product is registered there at Phase 7b, add a row HERE too. 'slug' is the exact enneadtab.com/<slug>/updates/ feed segment (NOT the repo name: KeynoteExporter's slug is 'keynote', OneDriveResolver's is 'one-drive-resolver'). 'installer' is the stable de-versioned target name (all-underscore, matches existing ExeProducts convention e.g. EnneadTab_For_Revit_Installer.exe); overwrite = keep-latest. This file is ONLY for NSIS/electron-builder desktop installers with a live updates feed. See _excluded for products that must NOT be added to products[].",
+  "_excluded": [
+    {
+      "name": "WatchMe",
+      "reason": "No updater wired — no products[] row until a signed installer + updates feed exists."
+    },
+    {
+      "name": "For-Indesign",
+      "reason": "UXP plugin, no NSIS installer; feed is latest.json, not electron-builder latest.yml."
+    },
+    {
+      "name": "GetEarth / EnneadTab-EarthModel",
+      "slug_if_any": "earth-model",
+      "reason": "NOT a desktop installer product. GetEarth is a Rhino toolbar button (Apps/_rhino/Render.tab/get_earth.button/) calling the EnneadTab-EarthModel Vercel web service (proxied at enneadtab.com/earth-model) via Apps/lib/EnneadTab/EARTH_MODEL.py — same shape as AI Render -> RenderPolisher. Wiki #517 / TODO-7264 asked why it is missing from this roster: absence is correct. Do NOT add an earth-model row unless a real signed NSIS installer ships. Portal/wiki visibility (if wanted) lives in EnneadTab-Home apps-config / wiki catalog, not here. Architecture: docs/plans/2026-08-05-getearth-earth-model-service.md §2."
+    }
+  ],
   "products": [
     { "slug": "indesign-repather",   "product": "EnneadTab-IndesignRepather",  "installer": "EnneadTab_IndesignRepather_Installer.exe" },
     { "slug": "render-asset-editor",  "product": "EnneadTab-RenderAssetEditor", "installer": "EnneadTab_RenderAssetEditor_Installer.exe" },

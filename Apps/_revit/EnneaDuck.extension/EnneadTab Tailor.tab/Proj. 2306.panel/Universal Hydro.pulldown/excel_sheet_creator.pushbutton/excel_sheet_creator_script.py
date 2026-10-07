@@ -10,20 +10,21 @@ __title__ = "Excel Sheet Creator"
 from pyrevit import script #
 
 
-import proDUCKtion # pyright: ignore 
+import proDUCKtion # pyright: ignore
 proDUCKtion.validify()
-from Autodesk.Revit import DB # pyright: ignore 
+from EnneadTab import SHAREPOINT
+from Autodesk.Revit import DB # pyright: ignore
 # from Autodesk.Revit import UI # pyright: ignore
 doc = __revit__.ActiveUIDocument.Document # pyright: ignore
-        
+
 def get_titleblock_id():
     all_ids = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_TitleBlocks).WhereElementIsElementType().ToElements()
     return filter(lambda x: x.Family.Name == "Consaultant Sheet Placeholder", list(all_ids))[0].Id
-            
+
 @ERROR_HANDLE.try_catch_error()
 def excel_sheet_creator():
     pass
-    excel_path = r"J:\2306\2_Record\2023-07-31 SD Submission\SD Sheetlist_REV00.xlsx"
+    excel_path = SHAREPOINT.get_project_file("2306/2_Record/2023-07-31 SD Submission/SD Sheetlist_REV00.xlsx")
     data = EnneadTab.EXCEL.read_data_from_excel(excel_path, worksheet = "Sheet1")
     data = [x for x in data if x[0] == "YES"]
     # print (data)

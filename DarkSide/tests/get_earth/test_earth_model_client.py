@@ -75,6 +75,16 @@ def test_source_is_forwarded_only_when_asked(stub):
     assert stub_server.requests_seen[-1]["payload"]["source"] == "osm3dep"
 
 
+def test_rotation_is_forwarded_only_when_asked(stub):
+    """#4857: rotation_deg is additive on the wire, same pattern as `source`
+    just above -- a plain request must look byte-for-byte like it did before
+    this parameter existed."""
+    EM.request_model_with_token(TOKEN, LAT, LON, SIZE)
+    assert "rotation_deg" not in stub_server.requests_seen[-1]["payload"]
+    EM.request_model_with_token(TOKEN, LAT, LON, SIZE, rotation_deg=29, force=True)
+    assert stub_server.requests_seen[-1]["payload"]["rotation_deg"] == pytest.approx(29.0)
+
+
 # --- cache ------------------------------------------------------------------
 
 def test_second_call_is_served_from_cache_without_hitting_the_server(stub):
@@ -100,6 +110,46 @@ def test_different_aoi_is_a_different_cache_entry():
 def test_negligible_coordinate_jitter_reuses_one_cache_entry():
     # Sub-0.1 m differences must not re-bill a fresh server-side merge.
     assert EM.cache_key(LAT, LON, SIZE) == EM.cache_key(LAT + 1e-9, LON, SIZE)
+
+
+# --- rotation (#4857) --------------------------------------------------------
+
+def test_zero_rotation_cache_key_is_byte_identical_to_pre_rotation():
+    """The one invariant that matters most: a local cache built before
+    rotation_deg existed must stay a hit after this ships. Pinned against the
+    same hash DarkSide/tests/get_earth/rhino_l3_aoi_ironpython.py hardcodes
+    for the cross-runtime (IronPython vs CPython) agreement check -- if this
+    ever drifts, that live-Rhino test is the other place it would be caught."""
+    assert EM.cache_key(40.7484, -73.9857, 500.0) == "f1873085255f7559"
+    assert EM.cache_key(40.7484, -73.9857, 500.0, rotation_deg=0) == "f1873085255f7559"
+
+
+def test_rotated_aoi_is_a_different_cache_entry():
+    a = EM.cache_key(LAT, LON, SIZE)
+    assert a != EM.cache_key(LAT, LON, SIZE, rotation_deg=29)
+    assert EM.cache_key(LAT, LON, SIZE, rotation_deg=29) != EM.cache_key(LAT, LON, SIZE, rotation_deg=90)
+
+
+def test_rotation_travels_from_request_into_a_distinct_cache_file(stub):
+    unrotated = EM.request_model_with_token(TOKEN, LAT, LON, SIZE)
+    rotated = EM.request_model_with_token(TOKEN, LAT, LON, SIZE, rotation_deg=29)
+    assert unrotated != rotated
+    assert len(stub_server.requests_seen) == 2, "a different rotation must not be served from the other's cache"
+
+
+def test_serve_stale_offline_fallback_respects_rotation(stub, monkeypatch):
+    """_serve_stale must look up the SAME rotation-aware path
+    request_model_with_token wrote to, or an offline fallback would silently
+    serve the wrong (unrotated) mesh for a rotated request. Only the rotated
+    AOI is ever downloaded here -- the offline lookup for the UNROTATED one
+    must come back empty, not fall back to the rotated file that happens to
+    share a lat/lon/size."""
+    rotated_path = EM.request_model_with_token(TOKEN, LAT, LON, SIZE, rotation_deg=29)
+    assert os.path.exists(rotated_path)
+
+    monkeypatch.setenv(EM.EARTH_MODEL_URL_ENV_VAR, "http://127.0.0.1:9")
+    assert EM._serve_stale(LAT, LON, SIZE, EM.FORMAT_GLB, 29) == rotated_path
+    assert EM._serve_stale(LAT, LON, SIZE, EM.FORMAT_GLB) is None
 
 
 # --- failure matrix ---------------------------------------------------------

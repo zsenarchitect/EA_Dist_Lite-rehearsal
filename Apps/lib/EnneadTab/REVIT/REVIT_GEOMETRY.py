@@ -9,10 +9,20 @@ except:
 
 def get_element_center(element):
     """get the center of the element
+
+    Returns None instead of raising when the geometry (or its bounding box)
+    cannot be computed -- e.g. hidden/invisible elements, or elements with
+    no meaningful bounding box. Callers already check for None; this used to
+    raise AttributeError on '.GetBoundingBox' / '.Min' of a None value instead.
     """
     geo = element.Geometry[DB.Options()]
+    if geo is None:
+        return None
 
     b_box = geo.GetBoundingBox()
+    if b_box is None:
+        return None
+
     min_pt = b_box.Min
     max_pt = b_box.Max
     return DB.XYZ((min_pt.X + max_pt.X) * 0.5,

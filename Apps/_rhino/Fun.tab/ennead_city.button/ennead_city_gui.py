@@ -15,7 +15,7 @@ import Eto.Forms as forms
 import Eto.Drawing as drawing
 
 # Import EnneadTab modules
-from EnneadTab import ERROR_HANDLE, LOG
+from EnneadTab import ERROR_HANDLE, LOG, NOTIFICATION
 
 # Get current script file directory
 my_directory = os.path.dirname(os.path.realpath(__file__))
@@ -77,12 +77,25 @@ class EnneadCityForm(forms.Dialog[bool]):
         self.select_plot_btn.Text = "Select New Plot"
         self.select_plot_btn.Size = drawing.Size(150, 30)
         self.select_plot_btn.Click += self.OnSelectNewPlot
-        
+
+        # Release current plot button
+        self.release_current_btn = forms.Button()
+        self.release_current_btn.Text = "Release My Plot"
+        self.release_current_btn.Size = drawing.Size(150, 30)
+        self.release_current_btn.Click += self.OnReleaseCurrentPlot
+
         # Load all plots button
         self.load_all_btn = forms.Button()
         self.load_all_btn.Text = "Load All Plots (Session)"
         self.load_all_btn.Size = drawing.Size(150, 30)
         self.load_all_btn.Click += self.OnLoadAllPlots
+
+        # Admin: split masterplan button (infrequent admin action, visually
+        # separated from the main claim/release/load flow)
+        self.admin_split_btn = forms.Button()
+        self.admin_split_btn.Text = "Admin: Split Masterplan"
+        self.admin_split_btn.Size = drawing.Size(150, 30)
+        self.admin_split_btn.Click += self.OnAdminSplitMasterplan
         
         # Available plots info
         self.available_plots_label = forms.Label()
@@ -123,9 +136,11 @@ class EnneadCityForm(forms.Dialog[bool]):
         button_row = forms.TableRow()
         button_row.Cells.Add(self.open_current_btn)
         button_row.Cells.Add(self.select_plot_btn)
+        button_row.Cells.Add(self.release_current_btn)
         self.main_layout.Rows.Add(button_row)
-        
+
         self.main_layout.Rows.Add(forms.TableRow(self.load_all_btn))
+        self.main_layout.Rows.Add(forms.TableRow(self.admin_split_btn))
         self.main_layout.Rows.Add(forms.TableRow())  # Spacer
         
         self.main_layout.Rows.Add(forms.TableRow(self.available_plots_label))
@@ -161,7 +176,11 @@ class EnneadCityForm(forms.Dialog[bool]):
         except Exception as e:
             self.status_label.Text = "Error loading plots: {}".format(str(e))
             self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
-    
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(e), "UpdatePlotsList", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
     def OnOpenCurrentPlot(self, sender, e):
         """Handle opening current user's plot"""
         try:
@@ -178,7 +197,42 @@ class EnneadCityForm(forms.Dialog[bool]):
         except Exception as ex:
             self.status_label.Text = "Error opening plot: {}".format(str(ex))
             self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
-    
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(ex), "OnOpenCurrentPlot", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
+    def OnReleaseCurrentPlot(self, sender, e):
+        """Handle releasing current user's claimed plot"""
+        try:
+            plot_file = city_utility.get_current_user_plot_file()
+            if not plot_file:
+                self.status_label.Text = "No current plot assigned to release"
+                self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+                return
+
+            plot_id = os.path.splitext(os.path.basename(plot_file))[0]
+            success = city_utility.release_current_user_plot_file(plot_id)
+
+            if success:
+                self.status_label.Text = "Released plot: {}".format(plot_id)
+                self.status_label.TextColor = drawing.Color.FromArgb(0, 128, 0)  # Green
+
+                self.current_plot_label.Text = "No plot assigned"
+                self.current_plot_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+
+                self.UpdatePlotsList()
+            else:
+                self.status_label.Text = "Failed to release plot: {}".format(plot_id)
+                self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+        except Exception as ex:
+            self.status_label.Text = "Error releasing plot: {}".format(str(ex))
+            self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(ex), "OnReleaseCurrentPlot", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
     def OnSelectNewPlot(self, sender, e):
         """Handle selecting a new plot"""
         try:
@@ -200,8 +254,18 @@ class EnneadCityForm(forms.Dialog[bool]):
             
             # Set the selected plot
             plot_file = os.path.join(city_utility.PLOT_FILES_FOLDER, "{}.3dm".format(plot_number))
-            city_utility.set_current_user_plot_file(plot_file)
-            
+            claimed = city_utility.set_current_user_plot_file(plot_file)
+            if not claimed:
+                # Claim failed (already claimed by someone else / network /
+                # auth failure) -- city_utility already reported the real
+                # cause via ErrorDump + NOTIFICATION. Do NOT proceed to open a
+                # file that was never actually claimed/downloaded, and do NOT
+                # report false success.
+                self.status_label.Text = "Could not claim plot {}. See notification for details.".format(plot_number)
+                self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+                self.UpdatePlotsList()
+                return
+
             # Open the plot
             import clr # pyright: ignore
             is_open = clr.StrongBox[bool](False)
@@ -221,35 +285,85 @@ class EnneadCityForm(forms.Dialog[bool]):
         except Exception as ex:
             self.status_label.Text = "Error selecting plot: {}".format(str(ex))
             self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
-    
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(ex), "OnSelectNewPlot", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
     def OnLoadAllPlots(self, sender, e):
-        """Handle loading all plots into a session"""
+        """Handle loading all plots into a session.
+
+        Strict all-or-nothing per docs/plans/cloud-to-local-bridge.md and
+        MENTAL-MODEL.md's Invariants: attempt to download EVERY required file
+        first (every plot with an uploaded .3dm, plus every background file).
+        If ANY of them fails, abort the whole action -- never build or run
+        -WorkSession with a partial set, and never silently skip a missing
+        file. Only on 100% success is the Attach command string built and run.
+        """
         try:
-            plot_files = city_utility.get_all_plot_files()
-            
-            file_string_link = ""
-            for file in plot_files:
-                if os.path.exists(file):
-                    file_string_link += " Attach \"{}\"".format(file)
-            
-            for file in city_utility.CITY_BACKGROUND_FILES:
-                if os.path.exists(file):
-                    file_string_link += " Attach \"{}\"".format(file)
-            
-            if file_string_link:
-                rs.Command("-WorkSession  {}  Enter".format(file_string_link))
-                rs.ZoomExtents(view=None, all=True)
-                rs.Command("_SetLinetypeScale 500 _Enter")
-                self.status_label.Text = "Loaded all plots into session"
-                self.status_label.TextColor = drawing.Color.FromArgb(0, 128, 0)  # Green
-            else:
+            plot_paths, background_paths, failures = city_utility.download_all_required_files()
+
+            if failures:
+                detail = "; ".join("{}: {}".format(name, reason) for name, reason in failures)
+                message = "Cannot load all plots -- {} file(s) failed to download ({}). No WorkSession was opened.".format(
+                    len(failures), detail)
+                self.status_label.Text = message
+                self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+                try:
+                    ERROR_HANDLE.send_error_to_error_dump(message, "OnLoadAllPlots", city_utility.USER.USER_NAME)
+                except Exception:
+                    pass
+                try:
+                    NOTIFICATION.messenger(main_text=message)
+                except Exception:
+                    pass
+                return
+
+            all_files = plot_paths + background_paths
+            if not all_files:
                 self.status_label.Text = "No plot files or background files found to attach"
                 self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
-                
+                return
+
+            file_string_link = ""
+            for file in all_files:
+                file_string_link += " Attach \"{}\"".format(file)
+
+            rs.Command("-WorkSession  {}  Enter".format(file_string_link))
+            rs.ZoomExtents(view=None, all=True)
+            rs.Command("_SetLinetypeScale 500 _Enter")
+            self.status_label.Text = "Loaded all plots into session"
+            self.status_label.TextColor = drawing.Color.FromArgb(0, 128, 0)  # Green
+
         except Exception as ex:
             self.status_label.Text = "Error loading all plots: {}".format(str(ex))
             self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
-    
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(ex), "OnLoadAllPlots", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
+    def OnAdminSplitMasterplan(self, sender, e):
+        """Admin action: split the currently OPEN master-plan Rhino document
+        into per-plot files and upload each to the cloud API. Needs an open
+        Rhino document with the master plan visible -- this is a desktop-side,
+        infrequent admin action, not part of the main claim/release flow."""
+        try:
+            import export_from_masterplan # pyright: ignore
+            export_from_masterplan.export_from_masterplan()
+
+            self.status_label.Text = "Masterplan split complete (see ErrorDump for any per-plot upload failures)"
+            self.status_label.TextColor = drawing.Color.FromArgb(0, 128, 0)  # Green
+
+            self.UpdatePlotsList()
+        except Exception as ex:
+            self.status_label.Text = "Error splitting masterplan: {}".format(str(ex))
+            self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(ex), "OnAdminSplitMasterplan", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
     def OnRefresh(self, sender, e):
         """Handle refresh button click"""
         try:
@@ -271,7 +385,11 @@ class EnneadCityForm(forms.Dialog[bool]):
         except Exception as ex:
             self.status_label.Text = "Error refreshing: {}".format(str(ex))
             self.status_label.TextColor = drawing.Color.FromArgb(255, 0, 0)  # Red
-    
+            try:
+                ERROR_HANDLE.send_error_to_error_dump(str(ex), "OnRefresh", city_utility.USER.USER_NAME)
+            except Exception:
+                pass
+
     def OnClose(self, sender, e):
         """Handle close button click"""
         self.Close(True)
@@ -282,12 +400,23 @@ class EnneadCityForm(forms.Dialog[bool]):
 def ennead_city_gui():
     """Main function to show the EnneadCity GUI"""
     try:
+        # Cached files are scratch -- sweep anything older than 7 days on each
+        # GUI launch (best-effort, never raises).
+        try:
+            city_utility.cleanup_stale_cache()
+        except Exception:
+            pass
+
         # Create and show the form
         form = EnneadCityForm()
         form.ShowModal(Rhino.UI.RhinoEtoApp.MainWindow)
         return True
     except Exception as e:
         print("Error showing EnneadCity GUI: {}".format(str(e)))
+        try:
+            ERROR_HANDLE.send_error_to_error_dump(str(e), "ennead_city_gui", city_utility.USER.USER_NAME)
+        except Exception:
+            pass
         return False
 
 

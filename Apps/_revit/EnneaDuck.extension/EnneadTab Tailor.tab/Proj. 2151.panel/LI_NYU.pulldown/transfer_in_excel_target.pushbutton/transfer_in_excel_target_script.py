@@ -7,7 +7,7 @@ __title__ = "Transfer In Excel Target"
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
 
-from EnneadTab import ERROR_HANDLE, LOG, EXCEL, TEXT, DATA_FILE, FOLDER
+from EnneadTab import ERROR_HANDLE, LOG, EXCEL, TEXT, DATA_FILE, FOLDER, SHAREPOINT
 from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_SELECTION
 from Autodesk.Revit import DB # pyright: ignore 
 import re
@@ -108,7 +108,7 @@ def transfer_in_excel_target(doc):
     
 
 def get_program_target_dict():
-    excel_path = "J:\\2151\\2_Master File\\B-70_Programming\\04_Area\\2025-03-06 Program Comparison 549 BED.xlsx"
+    excel_path = SHAREPOINT.get_project_file("2151/2_Master File/B-70_Programming/04_Area/2025-03-06 Program Comparison 549 BED.xlsx")
     
     data = EXCEL.read_data_from_excel(excel_path, 
                                       worksheet="Hospital Program 549 bed",

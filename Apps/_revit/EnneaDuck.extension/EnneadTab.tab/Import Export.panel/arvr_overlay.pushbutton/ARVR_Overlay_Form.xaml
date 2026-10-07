@@ -1,0 +1,272 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EnneadTab-ARVR Mobile Camera Overlay"
+        Width="580"
+        Height="760"
+        MinWidth="480"
+        MinHeight="420"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResizeWithGrip"
+        Background="#0A0E1A"
+        Foreground="#E2E8F0">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </Window.Resources>
+
+    <!-- ScrollViewer: when the dual-QR card expands (or the window is short),
+         content scrolls instead of being cropped by the modal frame.
+         Same intent as the Rhino Eto Scrollable (Wiki FR #511). -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Background="#0A0E1A">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="[ AR/VR SPATIAL OVERLAY ]"
+                           FontFamily="Consolas"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="#00F0FF"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Zero-install mobile camera AR overlay for Revit 3D models"
+                           FontFamily="Segoe UI"
+                           FontSize="11"
+                           Foreground="#8A99AD"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+
+            <!-- Info / Room card -->
+            <Border Grid.Row="1"
+                    Background="#121829"
+                    BorderBrush="#1E293B"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="12"
+                    Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock x:Name="status_text"
+                               Text=">> Ready to beam 3D model into mobile AR room"
+                               FontFamily="Consolas"
+                               FontSize="11"
+                               Foreground="#00FF66"
+                               TextWrapping="Wrap" />
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Room Code:"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe UI"
+                                   FontSize="11"
+                                   Foreground="#94A3B8"
+                                   Margin="0,0,8,0" />
+                        <TextBox x:Name="room_textbox"
+                                 Grid.Column="1"
+                                 Height="26"
+                                 Background="#0A0E1A"
+                                 Foreground="#FFE600"
+                                 BorderBrush="#334155"
+                                 Padding="6,2"
+                                 FontFamily="Consolas"
+                                 FontSize="12" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="2">
+                <Button x:Name="btn_export_view"
+                        Content="EXPORT CURRENT 3D VIEW &amp; BEAM TO AR"
+                        Height="40"
+                        Background="#FF007F"
+                        Foreground="#FFFFFF"
+                        BorderThickness="0"
+                        Margin="0,0,0,10"
+                        Click="on_export_view_clicked" />
+
+                <Button x:Name="btn_browse_model"
+                        Content="BROWSE 3D MODEL (.GLB/.GLTF/.USDZ) &amp; BEAM"
+                        Height="34"
+                        Background="#1E293B"
+                        Foreground="#00F0FF"
+                        BorderThickness="1"
+                        BorderBrush="#334155"
+                        Margin="0,0,0,10"
+                        Click="on_browse_model_clicked" />
+
+                <Button x:Name="btn_open_web"
+                        Content="OPEN AR/VR WEB HUB (BROWSER)"
+                        Height="34"
+                        Background="#121829"
+                        Foreground="#FFE600"
+                        BorderThickness="1"
+                        BorderBrush="#334155"
+                        Margin="0,0,0,10"
+                        Click="on_open_web_clicked" />
+            </StackPanel>
+
+            <!-- Share Link / inline Dual QR: shared Grid rows so title / QR /
+                 link / COPY button stay Y-aligned across columns (independent
+                 StackPanels previously let the 100px QR sit higher than the
+                 160px one and drifted the CTAs). -->
+            <Border x:Name="share_link_card"
+                    Grid.Row="3"
+                    Background="#121829"
+                    BorderBrush="#1E293B"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="12"
+                    Margin="0,0,0,10"
+                    Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="[ SCAN QR CODES &amp; SHARE LINKS ]"
+                               FontFamily="Consolas"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="#00FF66"
+                               Margin="0,0,0,10"
+                               HorizontalAlignment="Center" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="180" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Titles -->
+                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                   Text="[ 1. MOBILE AR VIEW ]"
+                                   FontFamily="Consolas"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="#00FF66"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                   Text="[ 2. ROOM CONTROL PAGE ]"
+                                   FontFamily="Consolas"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="#FFE600"
+                                   HorizontalAlignment="Center" />
+
+                        <!-- Descriptions -->
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                   Text="Big QR - scan on phone"
+                                   FontFamily="Segoe UI"
+                                   FontSize="9"
+                                   Foreground="#8A99AD"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,2,0,6" />
+                        <TextBlock Grid.Row="1" Grid.Column="2"
+                                   Text="Small QR - desktop hub"
+                                   FontFamily="Segoe UI"
+                                   FontSize="9"
+                                   Foreground="#8A99AD"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,2,0,6" />
+
+                        <!-- QR images centered in equal-height slots -->
+                        <Image x:Name="qr_mobile_image"
+                               Grid.Row="2" Grid.Column="0"
+                               Width="160"
+                               Height="160"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                        <Image x:Name="qr_room_image"
+                               Grid.Row="2" Grid.Column="2"
+                               Width="100"
+                               Height="100"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+
+                        <!-- Link boxes -->
+                        <TextBox x:Name="mobile_link_textbox"
+                                 Grid.Row="3" Grid.Column="0"
+                                 IsReadOnly="True"
+                                 Height="24"
+                                 Margin="0,6,0,4"
+                                 Background="#121829"
+                                 Foreground="#00F0FF"
+                                 BorderBrush="#334155"
+                                 Padding="4,2"
+                                 FontFamily="Consolas"
+                                 FontSize="9" />
+                        <TextBox x:Name="room_link_textbox"
+                                 Grid.Row="3" Grid.Column="2"
+                                 IsReadOnly="True"
+                                 Height="24"
+                                 Margin="0,6,0,4"
+                                 Background="#121829"
+                                 Foreground="#FFE600"
+                                 BorderBrush="#334155"
+                                 Padding="4,2"
+                                 FontFamily="Consolas"
+                                 FontSize="9" />
+
+                        <!-- COPY buttons -->
+                        <Button x:Name="btn_copy_mobile"
+                                Grid.Row="4" Grid.Column="0"
+                                Content="COPY AR LINK"
+                                Height="24"
+                                Background="#0A0E1A"
+                                Foreground="#00FF66"
+                                BorderBrush="#334155"
+                                BorderThickness="1"
+                                FontSize="9"
+                                Click="on_copy_mobile_clicked" />
+                        <Button x:Name="btn_copy_room"
+                                Grid.Row="4" Grid.Column="2"
+                                Content="COPY ROOM LINK"
+                                Height="24"
+                                Background="#0A0E1A"
+                                Foreground="#FFE600"
+                                BorderBrush="#334155"
+                                BorderThickness="1"
+                                FontSize="9"
+                                Click="on_copy_room_clicked" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <Grid Grid.Row="4" Margin="0,6,0,0">
+                <TextBlock Text="enneadtab.com/arvr"
+                           FontFamily="Consolas"
+                           FontSize="10"
+                           Foreground="#475569"
+                           VerticalAlignment="Center" />
+                <Button x:Name="btn_close"
+                        Content="CLOSE"
+                        Width="80"
+                        Height="26"
+                        Background="#0A0E1A"
+                        Foreground="#64748B"
+                        BorderBrush="#334155"
+                        BorderThickness="1"
+                        HorizontalAlignment="Right"
+                        Click="on_close_clicked" />
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Window>

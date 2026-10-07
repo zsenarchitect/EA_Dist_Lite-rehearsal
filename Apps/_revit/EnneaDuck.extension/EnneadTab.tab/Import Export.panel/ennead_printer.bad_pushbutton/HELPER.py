@@ -1,6 +1,7 @@
 
 import os
-from EnneadTab import ENVIRONMENT, NOTIFICATION
+from EnneadTab import NOTIFICATION
+from EnneadTab.DEPOT import ASSET
 from Autodesk.Revit import DB # pyright: ignore
 
 
@@ -25,28 +26,22 @@ def create_color_setting_to_sheet(doc):
     shared_para_file = doc.Application.OpenSharedParameterFile()
     if not shared_para_file:
         NOTIFICATION.messenger('[{}]\nneed to have a valid shared parameter file'.format(doc.Title))
-        if not ENVIRONMENT.require_shared_root("Shared Parameters"):
-            return
-        filepath = "{}\\01_Revit\\03_Library\\{}_SharedParam.txt".format(ENVIRONMENT.L_DRIVE_HOST_FOLDER, ENVIRONMENT.PLUGIN_ABBR)
-        if not os.path.exists(filepath):
-            NOTIFICATION.messenger('Cannot locate shared parameter file on the shared network folder.')
+        filepath = ASSET.get_asset_path('revit/library/EA_SharedParam.txt')
+        if not filepath or not os.path.exists(filepath):
+            NOTIFICATION.messenger('Cannot locate the shared parameter file from the depot.')
             return
         doc.Application.SharedParametersFilename = filepath
 
     definition = find_definition_by_name(doc, "Print_In_Color")
-    
-            
+
+
     if definition is None:
-        option = DB.ExternalDefinitionCreationOptions ("Print_In_Color", DB.SpecTypeId.Boolean.YesNo)
-        shared_para_file = doc.Application.OpenSharedParameterFile()
-        if shared_para_file is None:
-            NOTIFICATION.messenger('Cannot open shared parameter file. Please check if the shared parameter file is properly configured.')
-            return
-        if len(shared_para_file.Groups) == 0:
-            NOTIFICATION.messenger('No groups found in shared parameter file.')
-            return
-        definition_group = list(shared_para_file.Groups)[0]
-        definition = definition_group.Definitions.Create(option)
+        # EA_SharedParam.txt is a read-only depot asset (server-managed). A
+        # missing definition is not something this tool creates locally --
+        # request it through the admin process instead.
+        NOTIFICATION.messenger('[Print_In_Color] is not defined in the shared parameter file yet. '
+                                'Request it be added via the EnneadTab admin process, then try again.')
+        return
     
   
     
@@ -91,28 +86,22 @@ def create_issue_para_to_sheet(doc, issue_name):
     shared_para_file = doc.Application.OpenSharedParameterFile()
     if not shared_para_file:
         NOTIFICATION.messenger('[{}]\nneed to have a valid shared parameter file'.format(doc.Title))
-        if not ENVIRONMENT.require_shared_root("Shared Parameters"):
-            return
-        filepath = "{}\\01_Revit\\03_Library\\{}_SharedParam.txt".format(ENVIRONMENT.L_DRIVE_HOST_FOLDER, ENVIRONMENT.PLUGIN_ABBR)
-        if not os.path.exists(filepath):
-            NOTIFICATION.messenger('Cannot locate a good shared parameter file.')
+        filepath = ASSET.get_asset_path('revit/library/EA_SharedParam.txt')
+        if not filepath or not os.path.exists(filepath):
+            NOTIFICATION.messenger('Cannot locate the shared parameter file from the depot.')
             return
         doc.Application.SharedParametersFilename = filepath
 
     definition = find_definition_by_name(doc, issue_name)
-    
-            
+
+
     if definition is None:
-        option = DB.ExternalDefinitionCreationOptions (issue_name, DB.SpecTypeId.String.Text)
-        shared_para_file = doc.Application.OpenSharedParameterFile()
-        if shared_para_file is None:
-            NOTIFICATION.messenger('Cannot open shared parameter file. Please check if the shared parameter file is properly configured.')
-            return
-        if len(shared_para_file.Groups) == 0:
-            NOTIFICATION.messenger('No groups found in shared parameter file.')
-            return
-        definition_group = list(shared_para_file.Groups)[0]
-        definition = definition_group.Definitions.Create(option)
+        # EA_SharedParam.txt is a read-only depot asset (server-managed). A
+        # missing definition is not something this tool creates locally --
+        # request it through the admin process instead.
+        NOTIFICATION.messenger('[{}] is not defined in the shared parameter file yet. '
+                                'Request it be added via the EnneadTab admin process, then try again.'.format(issue_name))
+        return
     
   
     

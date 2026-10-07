@@ -1,4 +1,193 @@
 {
+    "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py": {
+        "script": "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py",
+        "icon": "EnneadTab.menu\\activate_enneadtab.button\\icon.png",
+        "alias": "ActivateEnneadTab",
+        "doc": "Restore EnneadTab functionality.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- System path verification\n- Component activation\n- Path configuration\n- Startup script setup",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\app_store.button\\app_store_left.py": {
+        "script": "EnneadTab.menu\\app_store.button\\app_store_left.py",
+        "icon": "EnneadTab.menu\\app_store.button\\icon.png",
+        "alias": "AppStore",
+        "doc": "Access EnneadTab's centralized tool repository.\n\nKey Features:\n- Complete tool collection\n- Category organization\n- Installation management\n- Update notifications\n- Tool documentation access",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py": {
+        "script": "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py",
+        "icon": "EnneadTab.menu\\check_error_log.button\\icon.png",
+        "alias": "CheckErrorLog",
+        "doc": "Opens the Google error log URL in the default browser",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\create_new_button.button\\new_button_left.py": {
+        "script": "EnneadTab.menu\\create_new_button.button\\new_button_left.py",
+        "icon": "EnneadTab.menu\\create_new_button.button\\icon.png",
+        "alias": "MakeANewButton",
+        "doc": "Create new EnneadTab button components.\n\nKey Features:\n- Interactive button creation\n- Template generation\n- File structure setup\n- Icon integration support\n- Documentation templates",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py": {
+        "script": "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py",
+        "icon": "EnneadTab.menu\\extract_preview_images.button\\icon.png",
+        "alias": "ExtractPreviewImages",
+        "doc": "Extract preview images from Rhino files.\n\nKey Features:\n- Batch image extraction\n- Multiple file support\n- Automatic naming convention\n- Progress tracking",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\get_engine.button\\get_engine_left.py": {
+        "script": "EnneadTab.menu\\get_engine.button\\get_engine_left.py",
+        "icon": "EnneadTab.menu\\get_engine.button\\icon.png",
+        "alias": "GetEngine",
+        "doc": "Ensure that you have a localized Python engine installed",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\get_latest.button\\get_latest_left.py": {
+        "script": "EnneadTab.menu\\get_latest.button\\get_latest_left.py",
+        "icon": "EnneadTab.menu\\get_latest.button\\icon.png",
+        "alias": "GetLatest",
+        "doc": "Update EnneadTab to latest version.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- Automatic version detection\n- Core module updates\n- System path configuration\n- Component synchronization\n- Installation verification",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py": {
+        "script": "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py",
+        "icon": "EnneadTab.menu\\how_to_install.button\\icon.png",
+        "alias": "HowToInstall",
+        "doc": "Access EnneadTab installation documentation.\n\nKey Features:\n- Step-by-step installation guide\n- System requirements\n- Troubleshooting tips\n- Configuration instructions\n- Team deployment guidance",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py": {
+        "script": "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py",
+        "icon": "EnneadTab.menu\\mcp_server.button\\icon.png",
+        "alias": "MCPServer",
+        "doc": "Start the EnneadTab AI bridge for this Rhino session.\n\nWhile it is running, an AI assistant can look at the open model and carry out changes for\nyou in this session. Only the Rhino session you started it from is exposed, and the bridge\nstops when you close Rhino.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py": {
+        "script": "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py",
+        "icon": "EnneadTab.menu\\open_autosave_folder.button\\icon.png",
+        "alias": "OpenAutosaveFolder",
+        "doc": "Open the Rhino autosave folder lcoations.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py": {
+        "script": "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py",
+        "icon": "EnneadTab.menu\\open_ecosystem_folder.button\\icon.png",
+        "alias": "OpenEcosystemFolder",
+        "doc": "Access the EnneadTab Ecosystem directory.\n\nKey Features:\n- Direct folder access\n- System file management\n- Resource exploration\n- Configuration access\n- Template management",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py": {
+        "script": "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py",
+        "icon": "EnneadTab.menu\\reload_engine.button\\icon.png",
+        "alias": "ReloadEngine",
+        "doc": "Reload all EnneadTab modules to ensure latest changes are applied.\n\nThis script will:\n1. Import all EnneadTab modules\n2. Reload each module to apply latest changes\n3. Handle any import errors gracefully",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py": {
+        "script": "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py",
+        "icon": "EnneadTab.menu\\remote_fix_code.button\\icon.png",
+        "alias": "RemoteFixCode",
+        "doc": "Launches VS Code Dev for emergency remote code editing and debugging",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py": {
+        "script": "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py",
+        "icon": "EnneadTab.menu\\reset_all_conduit.button\\icon.png",
+        "alias": "ResetAllConduit",
+        "doc": "Reset all display conduits to default state.\n\nKey Features:\n- Complete conduit cleanup\n- Memory optimization\n- Display pipeline reset\n- System performance improvement\n- Debug assistance",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py": {
+        "script": "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py",
+        "icon": "EnneadTab.menu\\restart_rhino.button\\icon.png",
+        "alias": "RestartRhino",
+        "doc": "Restart Rhino to apply core updates.\n\nKey Features:\n- Safe application restart\n- Update implementation\n- Session state preservation\n- Automatic core reloading\n- System verification",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py": {
+        "script": "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py",
+        "icon": "EnneadTab.menu\\secret_key_binding.button\\icon.png",
+        "alias": "SecretKeyBinding",
+        "doc": "Setup some secrete shortcut based on Sen's preference.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\self_repair.button\\self_repair_left.py": {
+        "script": "EnneadTab.menu\\self_repair.button\\self_repair_left.py",
+        "icon": "EnneadTab.menu\\self_repair.button\\icon.png",
+        "alias": "SelfRepair",
+        "doc": "Repair a stale EnneadTab installation and pull the latest version.\n\nRun it when buttons are missing, point at the wrong tool, or still carry an old name.\nThe toolbars are checked for out-of-date entries and, if any are found, the newest\nEnneadTab is fetched and installed for you.\n\nFeatures:\n- Spots toolbars left over from an older EnneadTab release\n- Fetches and installs the current version automatically\n- Nothing happens if your installation is already current",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py": {
+        "script": "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py",
+        "icon": "EnneadTab.menu\\tell_me_version.button\\icon.png",
+        "alias": "TellMeVersion",
+        "doc": "Display current EnneadTab Rhino version.\n\nKey Features:\n- Version number display\n- Update status information\n- Installation verification\n- Component compatibility check\n- Release notes access",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py": {
+        "script": "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py",
+        "icon": "EnneadTab.menu\\Uninstall.button\\icon.png",
+        "alias": "Uninstall EnneadTab",
+        "doc": "Completely uninstall EnneadTab from the system",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\unit_test.button\\unit_test_left.py": {
+        "script": "EnneadTab.menu\\unit_test.button\\unit_test_left.py",
+        "icon": "EnneadTab.menu\\unit_test.button\\icon.png",
+        "alias": "UnitTest",
+        "doc": "Execute unit tests for EnneadTab components.\n\nKey Features:\n- Comprehensive module testing\n- Automated error detection\n- System integrity verification\n- Performance validation",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
+    "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py": {
+        "script": "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py",
+        "icon": "EnneadTab.menu\\youtube_playlist.button\\icon.png",
+        "alias": "YoutubePlaylist",
+        "doc": "Access EnneadTab's video tutorial library.\n\nOpens the official EnneadTab YouTube playlist containing tutorials, \ndemonstrations and workflow guides.",
+        "tab": "EnneadTab.menu",
+        "tab_icon": "EnneadTab.menu\\icon.png",
+        "is_popular": false
+    },
     "Block.tab\\batch_rename_blocks.button\\batch_rename_blocks_left.py": {
         "script": "Block.tab\\batch_rename_blocks.button\\batch_rename_blocks_left.py",
         "icon": "Block.tab\\batch_rename_blocks.button\\icon.png",
@@ -83,20 +272,20 @@
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
     },
-    "Block.tab\\random_blocks_on_srfs.button\\random_blocks_on_srfs_left.py": {
-        "script": "Block.tab\\random_blocks_on_srfs.button\\random_blocks_on_srfs_left.py",
-        "icon": "Block.tab\\random_blocks_on_srfs.button\\icon.png",
-        "alias": "RandomBlocksOnSrfs",
-        "doc": "Advanced block distribution utility for surfaces.\n\nFeatures:\n- Distributes blocks randomly across target surfaces\n- Configurable edge distance and spacing controls\n- Optional edge-guided or curve-guided placement\n- Real-time preview of block placement\n- Supports multiple distribution patterns:\n  - Random interior placement\n  - Edge-aligned placement\n  - Even edge distribution\n\nUsage:\n1. Select target surfaces and sample blocks\n2. Configure placement parameters\n3. Choose distribution pattern\n4. Preview and adjust as needed",
-        "tab": "Block.tab",
-        "tab_icon": "Block.tab\\icon.png",
-        "is_popular": true
-    },
     "Block.tab\\randomize_block_transformation.button\\randomize_block_transformation_left.py": {
         "script": "Block.tab\\randomize_block_transformation.button\\randomize_block_transformation_left.py",
         "icon": "Block.tab\\randomize_block_transformation.button\\icon.png",
         "alias": "RandomizeBlockTransformation",
         "doc": "Randomly transform block transformation for rotation and scale.\n\nFeatures:\n- Rotates blocks randomly\n- Scales blocks 1D height softly or taller\n- Scales 3D dimensions evenly\n- Animates transformation process",
+        "tab": "Block.tab",
+        "tab_icon": "Block.tab\\icon.png",
+        "is_popular": true
+    },
+    "Block.tab\\random_blocks_on_srfs.button\\random_blocks_on_srfs_left.py": {
+        "script": "Block.tab\\random_blocks_on_srfs.button\\random_blocks_on_srfs_left.py",
+        "icon": "Block.tab\\random_blocks_on_srfs.button\\icon.png",
+        "alias": "RandomBlocksOnSrfs",
+        "doc": "Advanced block distribution utility for surfaces.\n\nFeatures:\n- Distributes blocks randomly across target surfaces\n- Configurable edge distance and spacing controls\n- Optional edge-guided or curve-guided placement\n- Real-time preview of block placement\n- Supports multiple distribution patterns:\n  - Random interior placement\n  - Edge-aligned placement\n  - Even edge distribution\n\nUsage:\n1. Select target surfaces and sample blocks\n2. Configure placement parameters\n3. Choose distribution pattern\n4. Preview and adjust as needed",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": true
@@ -132,10 +321,19 @@
         "script": "Block.tab\\simplify_blocks.button\\simplify_blocks_left.py",
         "icon": "Block.tab\\simplify_blocks.button\\icon.png",
         "alias": "SimplifyBlocks",
-        "doc": "This button does SimplifyBlocks when left click",
+        "doc": "Lighten a heavy model by reducing the mesh density inside block definitions.\n\nPick the blocks and set how much of the original mesh to keep with a slider. Each unique\nblock definition is simplified once, and every instance of it in the model gets lighter at\nthe same time.\n\nFeatures:\n- Slider control over how much detail is kept\n- Reduction happens once per definition, not once per instance\n- Placement, scale and rotation of every instance are preserved",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
+    },
+    "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py": {
+        "script": "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py",
+        "icon": "Block.tab\\toggle_block_color_display.button\\icon.png",
+        "alias": "ToggleBlockColorDisplay",
+        "doc": "Give every block type its own display color so you can tell them apart at a glance.\n\nUseful when a model is full of near-identical block variations and you need to see which is\nwhich. Run it again to switch the coloring back off and restore the normal display.",
+        "tab": "Block.tab",
+        "tab_icon": "Block.tab\\icon.png",
+        "is_popular": true
     },
     "Block.tab\\toggle_block_color_display.button\\display_setting_right.py": {
         "script": "Block.tab\\toggle_block_color_display.button\\display_setting_right.py",
@@ -146,20 +344,11 @@
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
     },
-    "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py": {
-        "script": "Block.tab\\toggle_block_color_display.button\\toggle_block_color_display_left.py",
-        "icon": "Block.tab\\toggle_block_color_display.button\\icon.png",
-        "alias": "ToggleBlockColorDisplay",
-        "doc": "Toggle on/off for highlighting the different block type. Very helpful when you have many block variation.",
-        "tab": "Block.tab",
-        "tab_icon": "Block.tab\\icon.png",
-        "is_popular": true
-    },
     "Block.tab\\uniform_transform_geos.button\\uniform_transform_geos_left.py": {
         "script": "Block.tab\\uniform_transform_geos.button\\uniform_transform_geos_left.py",
         "icon": "Block.tab\\uniform_transform_geos.button\\icon.png",
         "alias": "UniformTransformGeos",
-        "doc": "Apply the same rotation and/or uniform scale to blocks or geometries. Helpful when reorienting or resizing many instances, such as changing direction or size of cars on a street.",
+        "doc": "Rotate or uniformly scale many objects at once, each about its own center.\n\nEvery selected block or object turns and resizes in place rather than orbiting a shared\norigin, so a street full of cars can all be spun or shrunk together without drifting out of\nposition.\n\nUsage:\n1. Select the blocks or geometry to change\n2. Enter the rotation angle, the scale factor, or both",
         "tab": "Block.tab",
         "tab_icon": "Block.tab\\icon.png",
         "is_popular": false
@@ -204,7 +393,7 @@
         "script": "Drafting.tab\\color_picker.button\\color_picker_left.py",
         "icon": "Drafting.tab\\color_picker.button\\icon.png",
         "alias": "ColorPicker",
-        "doc": "Opens Coolors.co color palette generator in default web browser for color scheme inspiration",
+        "doc": "Open an online color palette generator in your browser for scheme inspiration.\n\nStarts you off on a preset EnneadTab palette that you can shuffle and lock until the mix\nfeels right, then take the codes back into Rhino, Revit or a presentation.",
         "tab": "Drafting.tab",
         "tab_icon": "Drafting.tab\\icon.png",
         "is_popular": false
@@ -223,6 +412,15 @@
         "icon": "Drafting.tab\\export_selected_pages.button\\icon.png",
         "alias": "ExportSelectedLayout",
         "doc": "Export selected layouts to PDF format.\n\nKey Features:\n- Multiple layout selection support\n- Customizable output location\n- Maintains print settings and quality\n- Optional automatic PDF opening\n- Batch processing capability",
+        "tab": "Drafting.tab",
+        "tab_icon": "Drafting.tab\\icon.png",
+        "is_popular": false
+    },
+    "Drafting.tab\\phone_scanner.button\\phone_scanner_left.py": {
+        "script": "Drafting.tab\\phone_scanner.button\\phone_scanner_left.py",
+        "icon": "Drafting.tab\\phone_scanner.button\\icon.png",
+        "alias": "PhoneScanner",
+        "doc": "Connect your phone camera to Rhino for instant photo & sketch scanning.\n\nFeatures:\n- Open pairing portal with QR code & PIN\n- Real-time staging dock in Rhino for incoming photos\n- One-click PictureFrame insertion into active Rhino document\n- One-click copy image to system clipboard\n- Batch insert multiple scans\n- Automatic cleanup of ephemeral images\n",
         "tab": "Drafting.tab",
         "tab_icon": "Drafting.tab\\icon.png",
         "is_popular": false
@@ -252,195 +450,6 @@
         "doc": "Access sample Excel template for area visualization.\n\nKey Features:\n- Pre-formatted Excel template\n- Example data structure\n- Color coding guidelines\n- Area calculation formulas\n- Category organization samples",
         "tab": "Drafting.tab",
         "tab_icon": "Drafting.tab\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py": {
-        "script": "EnneadTab.menu\\Uninstall.button\\Uninstall_left.py",
-        "icon": "EnneadTab.menu\\Uninstall.button\\icon.png",
-        "alias": "Uninstall EnneadTab",
-        "doc": "Completely uninstall EnneadTab from the system",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py": {
-        "script": "EnneadTab.menu\\activate_enneadtab.button\\activate_enneadtab_left.py",
-        "icon": "EnneadTab.menu\\activate_enneadtab.button\\icon.png",
-        "alias": "ActivateEnneadTab",
-        "doc": "Restore EnneadTab functionality.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- System path verification\n- Component activation\n- Path configuration\n- Startup script setup",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\app_store.button\\app_store_left.py": {
-        "script": "EnneadTab.menu\\app_store.button\\app_store_left.py",
-        "icon": "EnneadTab.menu\\app_store.button\\icon.png",
-        "alias": "AppStore",
-        "doc": "Access EnneadTab's centralized tool repository.\n\nKey Features:\n- Complete tool collection\n- Category organization\n- Installation management\n- Update notifications\n- Tool documentation access",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py": {
-        "script": "EnneadTab.menu\\check_error_log.button\\check_error_log_left.py",
-        "icon": "EnneadTab.menu\\check_error_log.button\\icon.png",
-        "alias": "CheckErrorLog",
-        "doc": "Opens the Google error log URL in the default browser",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\create_new_button.button\\new_button_left.py": {
-        "script": "EnneadTab.menu\\create_new_button.button\\new_button_left.py",
-        "icon": "EnneadTab.menu\\create_new_button.button\\icon.png",
-        "alias": "MakeANewButton",
-        "doc": "Create new EnneadTab button components.\n\nKey Features:\n- Interactive button creation\n- Template generation\n- File structure setup\n- Icon integration support\n- Documentation templates",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py": {
-        "script": "EnneadTab.menu\\extract_preview_images.button\\extract_preview_images_left.py",
-        "icon": "EnneadTab.menu\\extract_preview_images.button\\icon.png",
-        "alias": "ExtractPreviewImages",
-        "doc": "Extract preview images from Rhino files.\n\nKey Features:\n- Batch image extraction\n- Multiple file support\n- Automatic naming convention\n- Progress tracking",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\get_engine.button\\get_engine_left.py": {
-        "script": "EnneadTab.menu\\get_engine.button\\get_engine_left.py",
-        "icon": "EnneadTab.menu\\get_engine.button\\icon.png",
-        "alias": "GetEngine",
-        "doc": "Ensure that you have a localized Python engine installed",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\get_latest.button\\get_latest_left.py": {
-        "script": "EnneadTab.menu\\get_latest.button\\get_latest_left.py",
-        "icon": "EnneadTab.menu\\get_latest.button\\icon.png",
-        "alias": "GetLatest",
-        "doc": "Update EnneadTab to latest version.\n\nKey Features:\n- Prefers git repo (developers) over EA_Dist (users)\n- Automatic version detection\n- Core module updates\n- System path configuration\n- Component synchronization\n- Installation verification",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py": {
-        "script": "EnneadTab.menu\\how_to_install.button\\how_to_install_left.py",
-        "icon": "EnneadTab.menu\\how_to_install.button\\icon.png",
-        "alias": "HowToInstall",
-        "doc": "Access EnneadTab installation documentation.\n\nKey Features:\n- Step-by-step installation guide\n- System requirements\n- Troubleshooting tips\n- Configuration instructions\n- Team deployment guidance",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py": {
-        "script": "EnneadTab.menu\\mcp_server.button\\mcp_server_left.py",
-        "icon": "EnneadTab.menu\\mcp_server.button\\icon.png",
-        "alias": "MCPServer",
-        "doc": "Start the EnneadTab MCP Server for Rhino. When running, Claude Code can query and control this Rhino session via MCP protocol.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py": {
-        "script": "EnneadTab.menu\\open_autosave_folder.button\\open_autosave_folder_left.py",
-        "icon": "EnneadTab.menu\\open_autosave_folder.button\\icon.png",
-        "alias": "OpenAutosaveFolder",
-        "doc": "Open the Rhino autosave folder lcoations.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py": {
-        "script": "EnneadTab.menu\\open_ecosystem_folder.button\\open_ecosystem_folder_left.py",
-        "icon": "EnneadTab.menu\\open_ecosystem_folder.button\\icon.png",
-        "alias": "OpenEcosystemFolder",
-        "doc": "Access the EnneadTab Ecosystem directory.\n\nKey Features:\n- Direct folder access\n- System file management\n- Resource exploration\n- Configuration access\n- Template management",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py": {
-        "script": "EnneadTab.menu\\reload_engine.button\\reload_engine_left.py",
-        "icon": "EnneadTab.menu\\reload_engine.button\\icon.png",
-        "alias": "ReloadEngine",
-        "doc": "Reload all EnneadTab modules to ensure latest changes are applied.\n\nThis script will:\n1. Import all EnneadTab modules\n2. Reload each module to apply latest changes\n3. Handle any import errors gracefully",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py": {
-        "script": "EnneadTab.menu\\remote_fix_code.button\\remote_fix_code_left.py",
-        "icon": "EnneadTab.menu\\remote_fix_code.button\\icon.png",
-        "alias": "RemoteFixCode",
-        "doc": "Launches VS Code Dev for emergency remote code editing and debugging",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py": {
-        "script": "EnneadTab.menu\\reset_all_conduit.button\\reset_all_conduit_left.py",
-        "icon": "EnneadTab.menu\\reset_all_conduit.button\\icon.png",
-        "alias": "ResetAllConduit",
-        "doc": "Reset all display conduits to default state.\n\nKey Features:\n- Complete conduit cleanup\n- Memory optimization\n- Display pipeline reset\n- System performance improvement\n- Debug assistance",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py": {
-        "script": "EnneadTab.menu\\restart_rhino.button\\restart_rhino_left.py",
-        "icon": "EnneadTab.menu\\restart_rhino.button\\icon.png",
-        "alias": "RestartRhino",
-        "doc": "Restart Rhino to apply core updates.\n\nKey Features:\n- Safe application restart\n- Update implementation\n- Session state preservation\n- Automatic core reloading\n- System verification",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py": {
-        "script": "EnneadTab.menu\\secret_key_binding.button\\secret_key_binding_left.py",
-        "icon": "EnneadTab.menu\\secret_key_binding.button\\icon.png",
-        "alias": "SecretKeyBinding",
-        "doc": "Setup some secrete shortcut based on Sen's preference.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\self_repair.button\\self_repair_left.py": {
-        "script": "EnneadTab.menu\\self_repair.button\\self_repair_left.py",
-        "icon": "EnneadTab.menu\\self_repair.button\\icon.png",
-        "alias": "SelfRepair",
-        "doc": "Automatically repair and update EnneadTab installation.\n\nKey Features:\n- Legacy RUI detection and repair\n- Automatic version updates\n- System path verification\n- Component synchronization\n- Installation validation",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py": {
-        "script": "EnneadTab.menu\\tell_me_version.button\\tell_me_version_left.py",
-        "icon": "EnneadTab.menu\\tell_me_version.button\\icon.png",
-        "alias": "TellMeVersion",
-        "doc": "Display current EnneadTab Rhino version.\n\nKey Features:\n- Version number display\n- Update status information\n- Installation verification\n- Component compatibility check\n- Release notes access",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\unit_test.button\\unit_test_left.py": {
-        "script": "EnneadTab.menu\\unit_test.button\\unit_test_left.py",
-        "icon": "EnneadTab.menu\\unit_test.button\\icon.png",
-        "alias": "UnitTest",
-        "doc": "Execute unit tests for EnneadTab components.\n\nKey Features:\n- Comprehensive module testing\n- Automated error detection\n- System integrity verification\n- Performance validation",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
-        "is_popular": false
-    },
-    "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py": {
-        "script": "EnneadTab.menu\\youtube_playlist.button\\youtube_playlist_left.py",
-        "icon": "EnneadTab.menu\\youtube_playlist.button\\icon.png",
-        "alias": "YoutubePlaylist",
-        "doc": "Access EnneadTab's video tutorial library.\n\nOpens the official EnneadTab YouTube playlist containing tutorials, \ndemonstrations and workflow guides.",
-        "tab": "EnneadTab.menu",
-        "tab_icon": "EnneadTab.menu\\icon.png",
         "is_popular": false
     },
     "File.tab\\archive_file.button\\archive_file_left.py": {
@@ -491,7 +500,7 @@
     "File.tab\\external_trimmer.button\\external_trimmer_right.py": {
         "script": "File.tab\\external_trimmer.button\\external_trimmer_right.py",
         "icon": "File.tab\\external_trimmer.button\\icon.png",
-        "alias": "ExternalTrimmer",
+        "alias": "RefreshExternalLink",
         "doc": "Update external linked references.\n\nKey Features:\n- External block updating\n- Link synchronization\n- Reference management\n- File dependency tracking\n- Automatic refresh handling",
         "tab": "File.tab",
         "tab_icon": "File.tab\\icon.png",
@@ -564,7 +573,16 @@
         "script": "Knowledge.tab\\china_code_ref.button\\china_code_ref_left.py",
         "icon": "Knowledge.tab\\china_code_ref.button\\icon.png",
         "alias": "ChinaCodeRef",
-        "doc": "This button does ChinaCodeRef when left click",
+        "doc": "Open a China building code reference PDF without leaving Rhino.\n\nPick a document from the list and it opens straight away, or jump to the folder to drop in\ncodes that are not there yet. The folder is created for you the first time you run it.\n\nUsage:\n1. Run the button and pick a code document from the list\n2. Choose to open the folder instead if you want to add more PDFs",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_sort.button\\library_sort_left.py": {
+        "script": "Knowledge.tab\\library_sort.button\\library_sort_left.py",
+        "icon": "Knowledge.tab\\library_sort.button\\icon.png",
+        "alias": "LibrarySort",
+        "doc": "Sort the local library catalog by title, category, or path.\n\nKey Features:\n- Ascending / descending sort on title, category, or path\n- Remembers the last sort choice in the library settings\n- Shows the sorted catalog in a pick list\n\nPorts EnneadTab-For-Grasshopper#13 (SortBy/SortDirection).",
         "tab": "Knowledge.tab",
         "tab_icon": "Knowledge.tab\\icon.png",
         "is_popular": false
@@ -604,7 +622,7 @@
         "script": "Knowledge.tab\\slope_calculator.button\\slope_calculator_left.py",
         "icon": "Knowledge.tab\\slope_calculator.button\\icon.png",
         "alias": "SlopeCalculator",
-        "doc": "This button does SlopeCalculator when left click",
+        "doc": "Open an online slope calculator in your browser.\n\nConverts between slope angle, percentage and ratio, which is the conversion you want when\nchecking a ramp against accessibility limits or working out a road or roof pitch.",
         "tab": "Knowledge.tab",
         "tab_icon": "Knowledge.tab\\icon.png",
         "is_popular": false
@@ -618,11 +636,20 @@
         "tab_icon": "Knowledge.tab\\icon.png",
         "is_popular": false
     },
+    "Knowledge.tab\\open_grasshopper_library.button\\open_grasshopper_library_left.py": {
+        "script": "Knowledge.tab\\open_grasshopper_library.button\\open_grasshopper_library_left.py",
+        "icon": "Knowledge.tab\\open_grasshopper_library.button\\icon.png",
+        "alias": "EnneadTabGrasshopper",
+        "doc": "Launch the EnneadTab Grasshopper Library Explorer from inside Rhino.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": true
+    },
     "Lab.tab\\anything.button\\anything_left.py": {
         "script": "Lab.tab\\anything.button\\anything_left.py",
         "icon": "Lab.tab\\anything.button\\icon.png",
         "alias": "Anything",
-        "doc": "A sandbox utility for quick testing and prototyping in Rhino. Use this button to run experimental code snippets, debug features, or validate new ideas without creating a dedicated tool.",
+        "doc": "Run the EnneadTab Lab scratch script, a sandbox for trying out ideas in Rhino.\n\nKept as a testing ground for behavior that is still being explored, so it does not read or\nchange anything in your model. Whatever it does is reported on the Rhino command line.",
         "tab": "Lab.tab",
         "tab_icon": "Lab.tab\\icon.png",
         "is_popular": false
@@ -649,7 +676,7 @@
         "script": "Lab.tab\\text2script.button\\text2script_right.py",
         "icon": "Lab.tab\\text2script.button\\icon.png",
         "alias": "Text2ScriptSetting",
-        "doc": "Opens the settings panel for the Text2Script tool, allowing users to configure AI model preferences, API keys, and script generation options for converting natural language to Python scripts in Rhino.",
+        "doc": "Report the current settings of the Text2Script generator on the Rhino command line.\n\nRight-click companion to Text2Script, the tool that turns a plain-English request into a\nrunnable Rhino script. Nothing in your model is read or changed.",
         "tab": "Lab.tab",
         "tab_icon": "Lab.tab\\icon.png",
         "is_popular": false
@@ -663,11 +690,20 @@
         "tab_icon": "Lab.tab\\icon.png",
         "is_popular": false
     },
+    "Layer.tab\\apply_color_book.button\\apply_color_book_left.py": {
+        "script": "Layer.tab\\apply_color_book.button\\apply_color_book_left.py",
+        "icon": "Layer.tab\\apply_color_book.button\\icon.png",
+        "alias": "ApplyColorBook",
+        "doc": "Apply the office Color Book to Rhino layer colors - no Excel needed.\n\nPulls the project's resolved color book from enneadtab.com (Department + Program swatches) and\nrecolors every layer whose name or abbreviation matches a swatch. Sign in once when prompted.\n\nKey Features:\n- Online source: colors live at enneadtab.com/color-book, not a scattered Excel\n- Matches layers by name OR abbreviation (case-insensitive, exact)\n- Reports how many layers were recolored\n- Same office standard the Revit ColorScheme tool uses (shared COLOR library)",
+        "tab": "Layer.tab",
+        "tab_icon": "Layer.tab\\icon.png",
+        "is_popular": true
+    },
     "Layer.tab\\destroy_layer.button\\destroy_layer_left.py": {
         "script": "Layer.tab\\destroy_layer.button\\destroy_layer_left.py",
         "icon": "Layer.tab\\destroy_layer.button\\icon.png",
         "alias": "DestroyLayer",
-        "doc": "Delete selected layers, even if there are objs in it. Helpful when layer tree is constrainted by block usage.",
+        "doc": "Delete layers outright, even when they still hold objects.\n\nRhino normally refuses to remove a layer that is in use, especially when a block definition\nis holding it hostage. This clears the objects out and takes the layer with them, so a\nbloated layer tree can finally be pruned.\n\nUsage:\n1. Run the button and pick the layers to remove\n2. The layers and everything on them are gone once you confirm",
         "tab": "Layer.tab",
         "tab_icon": "Layer.tab\\icon.png",
         "is_popular": false
@@ -744,15 +780,6 @@
         "tab_icon": "Layer.tab\\icon.png",
         "is_popular": false
     },
-    "Layer.tab\\random_layer_color.button\\color_setting_right.py": {
-        "script": "Layer.tab\\random_layer_color.button\\color_setting_right.py",
-        "icon": "Layer.tab\\random_layer_color.button\\icon.png",
-        "alias": "RandomLayerColorSetting",
-        "doc": "Change the setting of color style.",
-        "tab": "Layer.tab",
-        "tab_icon": "Layer.tab\\icon.png",
-        "is_popular": false
-    },
     "Layer.tab\\random_layer_color.button\\random_layer_color_left.py": {
         "script": "Layer.tab\\random_layer_color.button\\random_layer_color_left.py",
         "icon": "Layer.tab\\random_layer_color.button\\icon.png",
@@ -761,6 +788,15 @@
         "tab": "Layer.tab",
         "tab_icon": "Layer.tab\\icon.png",
         "is_popular": true
+    },
+    "Layer.tab\\random_layer_color.button\\color_setting_right.py": {
+        "script": "Layer.tab\\random_layer_color.button\\color_setting_right.py",
+        "icon": "Layer.tab\\random_layer_color.button\\icon.png",
+        "alias": "RandomLayerColorSetting",
+        "doc": "Change the setting of color style.",
+        "tab": "Layer.tab",
+        "tab_icon": "Layer.tab\\icon.png",
+        "is_popular": false
     },
     "Material.tab\\assign_empty_material_to_layer.button\\assign_empty_material_to_layer_left.py": {
         "script": "Material.tab\\assign_empty_material_to_layer.button\\assign_empty_material_to_layer_left.py",
@@ -865,7 +901,7 @@
         "script": "Modify.tab\\offset_floor_border.button\\offset_floor_border_left.py",
         "icon": "Modify.tab\\offset_floor_border.button\\icon.png",
         "alias": "OffsetFloorBorder",
-        "doc": "Shrink/Expand the border of floor for input srf or polysrfs. The thickness is retained if using polysrf.",
+        "doc": "Shrink or expand the outline of a floor plate by the distance you type.\n\nFeed it flat surfaces or solid slabs and the edge moves in or out, which is how you rough\nout a setback, a balcony line or a shaved core without redrawing the boundary. Solid slabs\nkeep their thickness.\n\nUsage:\n1. Select the floor surfaces or solids\n2. Enter the offset distance; a negative value pulls the edge inward",
         "tab": "Modify.tab",
         "tab_icon": "Modify.tab\\icon.png",
         "is_popular": true
@@ -906,23 +942,41 @@
         "tab_icon": "Modify.tab\\icon.png",
         "is_popular": false
     },
-    "Render.tab\\ai_render.button\\render_upscale_right.py": {
-        "script": "Render.tab\\ai_render.button\\render_upscale_right.py",
-        "icon": "Render.tab\\ai_render.button\\icon.png",
-        "alias": "AiRenderUpscale",
-        "doc": "Upscale AI generated images.",
-        "tab": "Render.tab",
-        "tab_icon": "Render.tab\\icon.png",
-        "is_popular": false
-    },
     "Render.tab\\ai_render.button\\view2render_left.py": {
         "script": "Render.tab\\ai_render.button\\view2render_left.py",
         "icon": "Render.tab\\ai_render.button\\icon.png",
         "alias": "AiRenderingFromView",
-        "doc": "Renders Rhino views using Gemini AI via EnneaDuck.\n\nCaptures current viewport, sends it with a style prompt to ennead-ai.com,\nand returns a polished architectural rendering. No local GPU required.\n",
+        "doc": "View rendering for Rhino through Ennead's in-house style library.\n\nCapture the active viewport, queue prompts, and see your full cloud Gallery\nacross every device (Revit, Rhino, mobile web, desktop web - same items).\n\nAll features call the live ennead-ai.com web API. No local fallbacks: when\nthe web product improves, this dialog improves automatically.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
+    },
+    "Render.tab\\ai_render.button\\render_upscale_right.py": {
+        "script": "Render.tab\\ai_render.button\\render_upscale_right.py",
+        "icon": "Render.tab\\ai_render.button\\icon.png",
+        "alias": "AiRenderUpscale",
+        "doc": "Upscale tool is being rebuilt - see in-app message for status.",
+        "tab": "Render.tab",
+        "tab_icon": "Render.tab\\icon.png",
+        "is_popular": false
+    },
+    "Render.tab\\arvr_overlay.button\\arvr_overlay_left.py": {
+        "script": "Render.tab\\arvr_overlay.button\\arvr_overlay_left.py",
+        "icon": "Render.tab\\arvr_overlay.button\\icon.png",
+        "alias": "ARVROverlay",
+        "doc": "EnneadTab-ARVR: Zero-Install Mobile Camera AR Overlay for 3D Models.\n\nBeam your 3D models onto your smartphone camera in augmented reality:\n- Export selected Rhino objects to .GLB\n- Stage model in local temp folder\n- Direct upload to cloud room session\n- Pick existing local .GLB / .GLTF / .USDZ file to beam\n- Launch Web Hub (https://enneadtab.com/arvr)\n",
+        "tab": "Render.tab",
+        "tab_icon": "Render.tab\\icon.png",
+        "is_popular": true
+    },
+    "Render.tab\\fly_through.button\\fly_through_left.py": {
+        "script": "Render.tab\\fly_through.button\\fly_through_left.py",
+        "icon": "Render.tab\\fly_through.button\\icon.png",
+        "alias": "FlyThrough",
+        "doc": "Precise fly-through content pipeline (senzhang-todo #452).\n\nLocks a camera path in the LIVE Rhino 3D viewport (operator-controlled, not\nAI-guessed), exports keyframe stills for debug/approval, then renders a final\nimage set + optional video. Progress and failures land in Dump/FlyThrough/\nmonitor.log + job_status.json.\n\nHow to run\n----------\n1. Frame the start pose in a Perspective viewport.\n2. Click this button -> Lock keyframe. Orbit/walk, lock again. Repeat.\n   (Or Import named views to reuse cameras you already saved.)\n3. Export keyframe stills and review before spending time on a full render.\n4. Render final video + images. Opens the job folder when done.\n\nAlias: FlyThrough / EA_FlyThrough\n\nNote: This is EnneadTab-OS Rhino tooling. It is NOT the RenderPolisher\nAI-from-stills / Veo path (deliberately repointed off RenderPolisher).\n",
+        "tab": "Render.tab",
+        "tab_icon": "Render.tab\\icon.png",
+        "is_popular": true
     },
     "Render.tab\\assign_empty_material.button\\assign_empty_material_left.py": {
         "script": "Render.tab\\assign_empty_material.button\\assign_empty_material_left.py",
@@ -937,7 +991,7 @@
         "script": "Render.tab\\d5_asset_locator.button\\d5_asset_locator_left.py",
         "icon": "Render.tab\\d5_asset_locator.button\\icon.png",
         "alias": "D5AssetLocator",
-        "doc": "Your personal detective for hunting down elusive D5 assets!\n\nThis handy tool launches the D5AssetChanger application that helps you:\n- Locate hidden D5 asset folders across your system\n- Access and modify materials on D5 objects\n- Customize properties of those beautiful D5 trees, furniture and people\n- Save hours of searching through obscure file directories\n\nPerfect for visualization specialists who need precise control over their D5 assets.\n",
+        "doc": "Open the Render Asset Editor - the EnneadTab app for D5 and Enscape assets.\n\nThis tool has moved out of EnneadTab into its own standalone, auto-updating application, so it can\nship fixes without waiting on an EnneadTab release. It now covers D5 AND Enscape in one place. This\nbutton opens its page in your browser; install it once and it keeps itself up to date from then on.\n\nWhat it does:\n- Locate hidden D5 asset folders across your system\n- Access and modify materials on D5 objects\n- Customize properties of those beautiful D5 trees, furniture and people\n- Save hours of searching through obscure file directories\n\nhttps://enneadtab.com/render-asset-editor\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
@@ -946,14 +1000,14 @@
         "script": "Render.tab\\enscape_asset_locator.button\\enscape_asset_locator_left.py",
         "icon": "Render.tab\\enscape_asset_locator.button\\icon.png",
         "alias": "EnscapeAssetLocator",
-        "doc": "Your personal detective for hunting down elusive Enscape assets!\n\nThis handy tool launches the EnscapeAssetChanger application that helps you:\n- Locate hidden Enscape asset folders across your system\n- Access and modify materials on Enscape objects\n- Customize properties of those beautiful Enscape trees, furniture and people\n- Save hours of searching through obscure file directories\n\nPerfect for visualization specialists who need precise control over their Enscape assets.\n",
+        "doc": "Open the Render Asset Editor - the EnneadTab app for Enscape and D5 assets.\n\nThis tool has moved out of EnneadTab into its own standalone, auto-updating application, so it can\nship fixes without waiting on an EnneadTab release. It now covers Enscape AND D5 in one place. This\nbutton opens its page in your browser; install it once and it keeps itself up to date from then on.\n\nWhat it does:\n- Locate hidden Enscape asset folders across your system\n- Access and modify materials on Enscape objects\n- Customize properties of those beautiful Enscape trees, furniture and people\n- Save hours of searching through obscure file directories\n\nhttps://enneadtab.com/render-asset-editor\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
     },
     "Render.tab\\get_earth.button\\get_earth_left.py": {
         "script": "Render.tab\\get_earth.button\\get_earth_left.py",
-        "icon": "Render.tab\\get_earth.button\\icon.png",
+        "icon": null,
         "alias": "GetEarth",
         "doc": "Pull a real-world site context model into Rhino from a coordinate.\n\nPaste a Google Maps link (or a \"lat, lon\" pair), give it a size, and the\nEnneadTab EarthModel service returns a georeferenced textured mesh you can\nrender against. No Blender detour, no plugin to install, no API key of your own.\n\nHow to use:\n1. Paste a Google Maps URL, or type \"40.7128, -74.0060\".\n2. Give a square size in metres.\n3. The model arrives on its own layer, anchored to the file's EarthAnchorPoint.\n\nNotes:\n- Good enough to RENDER. Not survey geometry, and deliberately so: do not snap,\n  section, or measure against it.\n- Google attribution is attached to the layer and must not be stripped.\n- Right-click this button for the diagnostic (is the service up, am I signed in,\n  what is cached) and for cache purge.\n- The boundary-curve sizing mode described in the service plan is NOT built yet;\n  only the square-from-a-point mode ships here. get_earth_utility already has\n  the bbox_from_points math it will need.\n- Not to be confused with GoogleEarthTutorial in the Render tab. That one is the\n  older MANUAL route: it opens a Blender walkthrough video. This button is the\n  automatic one. They are separate tools, not two versions of the same thing.\n",
         "tab": "Render.tab",
@@ -962,7 +1016,7 @@
     },
     "Render.tab\\get_earth.button\\get_earth_right.py": {
         "script": "Render.tab\\get_earth.button\\get_earth_right.py",
-        "icon": "Render.tab\\get_earth.button\\icon.png",
+        "icon": null,
         "alias": "GetEarthSettings",
         "doc": "Diagnose and configure GetEarth.\n\nRun this first when GetEarth misbehaves. It answers the four questions that\nactually explain a failure:\n\n- Can this machine reach the EarthModel service?\n- Am I signed in to EnneadTab?\n- What is cached locally, and how big has it got?\n- Which contract version is this client speaking?\n\nAlso sets the default site size and purges the local cache.\n\nThis diagnostic SHIPS on purpose. DarkSide/ is stripped at publish, so the test\nharness, the stub server and every developer driver are gone on a designer's\nmachine. Without this, a failing GetEarth button has nothing to run at all.\n",
         "tab": "Render.tab",
@@ -1009,7 +1063,7 @@
         "script": "Render.tab\\make_crv_pipe.button\\make_crv_pipe_left.py",
         "icon": "Render.tab\\make_crv_pipe.button\\icon.png",
         "alias": "MakeCrvPipe",
-        "doc": "Make/Update a small pipe along crvs in layers that has '[EDGE]' in it. So coplanar face in enscape can show edge.",
+        "doc": "Draw thin pipes along the curves on your [EDGE] layers so Enscape renders the edge.\n\nEnscape will not show a line where two coplanar faces meet, which flattens joints and reveals\nseams that should read as crisp. A slim pipe on the curve gives it something solid to shade.\n\nUsage:\n1. Put the curves you want to read as edges on a layer with [EDGE] in its name\n2. Run the button; existing pipes are rebuilt rather than duplicated",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -1018,7 +1072,7 @@
         "script": "Render.tab\\material_shop.button\\material_shop_left.py",
         "icon": "Render.tab\\material_shop.button\\icon.png",
         "alias": "MaterialShop",
-        "doc": "Your gateway to a treasure trove of high-quality materials! Opens AmbientCG, a fantastic resource offering hundreds of free PBR materials perfect for architectural visualization. Quickly find textures, HDRIs, and 3D models to elevate your renderings without spending a penny.",
+        "doc": "Open AmbientCG in your browser, a free library of rendering materials.\n\nHundreds of ready-to-use textures, HDRI skies and props, all free to download and drop into\na Rhino or Enscape scene. Good first stop when a render needs a convincing surface.",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": false
@@ -1036,7 +1090,7 @@
         "script": "Render.tab\\render_polisher.button\\render_polisher_left.py",
         "icon": "Render.tab\\render_polisher.button\\icon.png",
         "alias": "EnneaDuckRenderStudio",
-        "doc": "Open e.AI \u00e2\u20ac\u201d EnneaDuck's rendering studio.\n\nAI-powered rendering and video generation for architectural visualization:\n- Multi-style image generation (Gemini + Imagen)\n- Image editing and style transfer\n- Video generation from stills\n- Iterative conversational refinement\n\nOpens ennead-ai.com in your default browser.\n",
+        "doc": "Open e.AI \u2014 EnneaDuck's rendering studio.\n\nAI-powered rendering and video generation for architectural visualization:\n- Multi-style image generation (Gemini + Imagen)\n- Image editing and style transfer\n- Video generation from stills\n- Iterative conversational refinement\n\nOpens ennead-ai.com in your default browser.\n",
         "tab": "Render.tab",
         "tab_icon": "Render.tab\\icon.png",
         "is_popular": true
@@ -1045,7 +1099,7 @@
         "script": "Revit.tab\\block2family.button\\block2family_left.py",
         "icon": "Revit.tab\\block2family.button\\icon.png",
         "alias": "Block2Family",
-        "doc": "Convert rhino blocks to revit families and place them in project. This tool different from standard Rhino2Revit because you do not need to manage family creation and it can batch process.",
+        "doc": "Turn Rhino blocks into Revit families and place them in the project.\n\nUnlike the standard Rhino-to-Revit route, you never have to build or manage the families\nyourself, and a whole selection of blocks can cross over in one batch. Each block definition\nbecomes one family, so repeated instances stay lightweight in Revit.\n\nUsage:\n1. Select the blocks you want to send over\n2. Run the button and let it batch the conversion\n3. Pick up the families on the Revit side",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": true
@@ -1063,7 +1117,7 @@
         "script": "Revit.tab\\draft_insulation_batting.button\\draft_insulation_batting_left.py",
         "icon": "Revit.tab\\draft_insulation_batting.button\\icon.png",
         "alias": "DraftInsulationBatting",
-        "doc": "Given base crvs and thickness, it makes a 2D insulation batting graphic that can be any shape. ",
+        "doc": "Draw the zig-zag insulation batting graphic along any curve you give it.\n\nUnlike a straight hatch, the batting follows a curved or irregular path, so a detail can\nshow insulation wrapping a corner or a rounded edge and still read correctly.\n\nUsage:\n1. Select the base curves the batting should follow\n2. Enter the batting thickness",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1085,6 +1139,15 @@
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": true
+    },
+    "Revit.tab\\revit2rhino.button\\revit2rhino_left.py": {
+        "script": "Revit.tab\\revit2rhino.button\\revit2rhino_left.py",
+        "icon": "Revit.tab\\revit2rhino.button\\icon.png",
+        "alias": "Revit2RhinoImport",
+        "doc": "Brings the geometry exported by the Revit2Rhino button into this Rhino file.\n\nFinds the latest export by itself, so there is no file to browse for.\nThe new objects are grouped under one layer and selected so you can move them right away.\n\nFeatures:\n- Imports the newest export made by the Revit2Rhino button\n- Asks before importing an export that is more than half a day old\n- Warns when blocks with the same names already exist in this file\n\nUsage:\n1. In Revit, run Revit2Rhino on the view you want\n2. Come here and run this command",
+        "tab": "Revit.tab",
+        "tab_icon": "Revit.tab\\icon.png",
+        "is_popular": false
     },
     "Revit.tab\\export_material_by_layer.button\\export_material_by_layer_left.py": {
         "script": "Revit.tab\\export_material_by_layer.button\\export_material_by_layer_left.py",
@@ -1117,7 +1180,7 @@
         "script": "Revit.tab\\live_selection.button\\live_selection_left.py",
         "icon": "Revit.tab\\live_selection.button\\icon.png",
         "alias": "LiveSelection",
-        "doc": "Enables real-time selection synchronization between Rhino and Revit. Allows users to select objects in Rhino and have the selection reflected in Revit, streamlining cross-platform workflows and coordination.",
+        "doc": "Mirror your Rhino selection over to Revit so both models highlight the same thing.\n\nSaves hunting for the Revit counterpart of an object by hand when you are coordinating\nbetween the two, which is where most cross-platform mistakes creep in.",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1126,7 +1189,7 @@
         "script": "Revit.tab\\map_block_transform.button\\map_block_transform_left.py",
         "icon": "Revit.tab\\map_block_transform.button\\icon.png",
         "alias": "MapBlockTransform",
-        "doc": "Send the transformation of the blocks to Revit to be used by space adaptive family. This is the only known way of doing true free 3D orientation in Revit.",
+        "doc": "Send the position and orientation of your Rhino blocks over to Revit.\n\nRevit families cannot normally be tilted freely in three dimensions. Handing the block\ntransforms to an adaptive family on the Revit side is the one route that gets true free 3D\norientation, so a panel or louvre can sit at any angle it does in Rhino.\n\nUsage:\n1. Select the blocks whose placement you want to carry over\n2. Run the button, then pick the transforms up from the Revit side",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1135,7 +1198,7 @@
         "script": "Revit.tab\\map_revit_subc_material.button\\map_revit_subc_material_left.py",
         "icon": "Revit.tab\\map_revit_subc_material.button\\icon.png",
         "alias": "MapRevitSubCategoryMaterial",
-        "doc": "Work with ExportSubCategoryMaterialTable on revit side. After you export the OST mapping there, this button help you create and map layer material based on layer name, if found in the OST mapping",
+        "doc": "Give your Rhino layers the materials that the matching Revit subcategories use.\n\nExport the subcategory material table from Revit first, then run this. Any layer whose name\nappears in that table gets the corresponding material created and assigned, so a model\nbrought over from Revit shades the way it does there instead of arriving flat and grey.\n\nUsage:\n1. On the Revit side, run Export SubCategory Material Table\n2. Run this button; layers that match a name in the table are mapped",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1162,7 +1225,7 @@
         "script": "Revit.tab\\shape2revit.button\\shape2revit_left.py",
         "icon": "Revit.tab\\shape2revit.button\\icon.png",
         "alias": "Shape2Revit",
-        "doc": "Convert EACH and EVERY selected geometry to INDIVIDUAL Revit families via temporary blocks.\nNot to be confused with the block2family button, which exports better defined blocks to Revit families and is much more memory efficient.\nOnly use this button sparingly so you do not introduce too many families to Revit.\n\nFeatures:\n- Converts surfaces, polysurfaces and meshes to blocks\n- Creates temporary blocks with unique names\n- Exports blocks to Revit families\n- Cleans up temporary blocks after export\n- Maintains original geometry properties",
+        "doc": "Send loose Rhino geometry to Revit, turning each object into its own family.\n\nFor one-off shapes that were never organised into blocks. Every selected surface, solid or\nmesh becomes a separate Revit family, so use it sparingly or the Revit file ends up carrying\nhundreds of them. When your geometry is already blocked, reach for Block2Family instead: it\nreuses one family per definition and keeps the Revit model far lighter.\n\nFeatures:\n- Works with surfaces, polysurfaces and meshes\n- Original shape and placement are preserved\n- Your Rhino model is left exactly as you had it",
         "tab": "Revit.tab",
         "tab_icon": "Revit.tab\\icon.png",
         "is_popular": false
@@ -1207,16 +1270,7 @@
         "script": "Tailor.tab\\2425_replace_blocks.button\\2425_replace_blocks_left.py",
         "icon": "Tailor.tab\\2425_replace_blocks.button\\icon.png",
         "alias": "2425ReplaceBlocks",
-        "doc": "Block Replacement Tool for 2425 Project\n\nReplaces blocks between Twinmotion and Enscape versions based on Excel mapping data.\nFeatures:\n- Supports bidirectional block replacement (Twinmotion \u00e2\u2020\u201d Enscape)\n- Uses Excel mapping file for block name relationships\n- Processes entire document with progress tracking\n- Maintains block transformations and properties\n- Provides user selection for replacement direction\n- Automatically redraws viewport after replacement\n\nReplacement Options:\n1. Twinmotion block \u00e2\u2020\u2019 Enscape block\n2. Enscape block \u00e2\u2020\u2019 Twinmotion block\n\nExcel Mapping:\n- Reads from 'enscape_twinmotion_block_mapping.xlsx'\n- Uses 'EnneadTab Helper' worksheet\n- Maps block names in columns A and B\n- Supports multiple block mappings\n\nWorkflow:\n1. User selects replacement direction\n2. Reads block mapping from Excel file\n3. Iterates through mapping data\n4. Replaces blocks using RHINO_BLOCK utility\n5. Redraws viewport to show changes\n\nUsage:\n- Select replacement direction when prompted\n- Tool processes all mapped blocks automatically\n- Maintains block positions and transformations\n- Provides completion feedback",
-        "tab": "Tailor.tab",
-        "tab_icon": "Tailor.tab\\icon.png",
-        "is_popular": false
-    },
-    "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py": {
-        "script": "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py",
-        "icon": "Tailor.tab\\SAIF_panel_mapping.button\\icon.png",
-        "alias": "SaifPanelMapping",
-        "doc": "Maps SAIF panels using new naming convention CW01_SOLID X_YYYY_ZZZZ and CW06_SOLID X_YYYY_ZZZZ, extracting pier width (X) as-is",
+        "doc": "Block Replacement Tool for 2425 Project\n\nReplaces blocks between Twinmotion and Enscape versions based on Excel mapping data.\nFeatures:\n- Supports bidirectional block replacement (Twinmotion \u2194 Enscape)\n- Uses Excel mapping file for block name relationships\n- Processes entire document with progress tracking\n- Maintains block transformations and properties\n- Provides user selection for replacement direction\n- Automatically redraws viewport after replacement\n\nReplacement Options:\n1. Twinmotion block \u2192 Enscape block\n2. Enscape block \u2192 Twinmotion block\n\nExcel Mapping:\n- Reads from 'enscape_twinmotion_block_mapping.xlsx'\n- Uses 'EnneadTab Helper' worksheet\n- Maps block names in columns A and B\n- Supports multiple block mappings\n\nWorkflow:\n1. User selects replacement direction\n2. Reads block mapping from Excel file\n3. Iterates through mapping data\n4. Replaces blocks using RHINO_BLOCK utility\n5. Redraws viewport to show changes\n\nUsage:\n- Select replacement direction when prompted\n- Tool processes all mapped blocks automatically\n- Maintains block positions and transformations\n- Provides completion feedback",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1234,7 +1288,7 @@
         "script": "Tailor.tab\\export_without_crv.button\\export_without_crv_left.py",
         "icon": "Tailor.tab\\export_without_crv.button\\icon.png",
         "alias": "ExportWithoutCrv_1643",
-        "doc": "Export Tool for 1643 Project - Solids Only\n\nExports Rhino file as DWG with all blocks exploded and curves removed.\nFeatures:\n- Explodes all block instances to individual geometry\n- Removes all curve objects from export\n- Keeps only solid geometry for CAD export\n- Handles nested block instances automatically\n- Provides progress tracking for large files\n- Supports project-specific file naming\n\nWorkflow:\n1. Collects all block instances in the document\n2. Explodes blocks to individual geometry objects\n3. Filters out curves and block references\n4. Selects only solid geometry for export\n5. Exports as DWG with \"2007 Solids\" scheme\n6. Cleans up temporary exploded geometry\n\nFile Naming:\n- MotherBabyLobby.3dm \u00e2\u2020\u2019 TempStudy_MotherBabyLobby.dwg\n- Other files \u00e2\u2020\u2019 TempStudy.dwg\n\nUsage:\n- Run tool to prepare geometry for CAD export\n- Only solid geometry will be exported\n- Curves and blocks are automatically removed\n- Provides completion notification",
+        "doc": "Export Tool for 1643 Project - Solids Only\n\nExports Rhino file as DWG with all blocks exploded and curves removed.\nFeatures:\n- Explodes all block instances to individual geometry\n- Removes all curve objects from export\n- Keeps only solid geometry for CAD export\n- Handles nested block instances automatically\n- Provides progress tracking for large files\n- Supports project-specific file naming\n\nWorkflow:\n1. Collects all block instances in the document\n2. Explodes blocks to individual geometry objects\n3. Filters out curves and block references\n4. Selects only solid geometry for export\n5. Exports as DWG with \"2007 Solids\" scheme\n6. Cleans up temporary exploded geometry\n\nFile Naming:\n- MotherBabyLobby.3dm \u2192 TempStudy_MotherBabyLobby.dwg\n- Other files \u2192 TempStudy.dwg\n\nUsage:\n- Run tool to prepare geometry for CAD export\n- Only solid geometry will be exported\n- Curves and blocks are automatically removed\n- Provides completion notification",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1266,11 +1320,11 @@
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
     },
-    "Tailor.tab\\stack_enscape.button\\move_img_right.py": {
-        "script": "Tailor.tab\\stack_enscape.button\\move_img_right.py",
-        "icon": "Tailor.tab\\stack_enscape.button\\icon.png",
-        "alias": "MoveImg_1643",
-        "doc": "Image Relocation Tool for 1643 Project\n\nLaunches the file organizer GUI for relocating rendering images between study versions.\nFeatures:\n- Opens interactive file organizer interface\n- Supports study selection (angled_frame, sawtooth, solar_panel, etc.)\n- Handles glass/chrome version organization\n- Automates file cleanup and relocation\n- Maintains project-specific folder structure\n\nUsage:\n- Right-click to open file organizer GUI\n- Select target study and version\n- Automatically relocates PNG files to appropriate folders",
+    "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py": {
+        "script": "Tailor.tab\\SAIF_panel_mapping.button\\SAIF panel mapping_left.py",
+        "icon": "Tailor.tab\\SAIF_panel_mapping.button\\icon.png",
+        "alias": "SaifPanelMapping",
+        "doc": "Read the SAIF curtain wall panel names and work out which Revit family each one needs.\n\nPanel blocks named to the SAIF convention are decoded into their tower or podium family,\ntheir pier width and any special condition such as a fire rescue window or a corner. The\nresult is handed to the Revit side so the panels come across already sorted.\n\nFeatures:\n- Handles both the tower and the podium panel families\n- Pulls the pier width straight out of the panel name\n- Flags special panels such as fire rescue windows, piers and corners",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1284,11 +1338,20 @@
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
     },
+    "Tailor.tab\\stack_enscape.button\\move_img_right.py": {
+        "script": "Tailor.tab\\stack_enscape.button\\move_img_right.py",
+        "icon": "Tailor.tab\\stack_enscape.button\\icon.png",
+        "alias": "MoveImg_1643",
+        "doc": "Image Relocation Tool for 1643 Project\n\nLaunches the file organizer GUI for relocating rendering images between study versions.\nFeatures:\n- Opens interactive file organizer interface\n- Supports study selection (angled_frame, sawtooth, solar_panel, etc.)\n- Handles glass/chrome version organization\n- Automates file cleanup and relocation\n- Maintains project-specific folder structure\n\nUsage:\n- Right-click to open file organizer GUI\n- Select target study and version\n- Automatically relocates PNG files to appropriate folders",
+        "tab": "Tailor.tab",
+        "tab_icon": "Tailor.tab\\icon.png",
+        "is_popular": false
+    },
     "Tailor.tab\\xiong_an_facade_hori.button\\xiong_an_facade_hori_left.py": {
         "script": "Tailor.tab\\xiong_an_facade_hori.button\\xiong_an_facade_hori_left.py",
         "icon": "Tailor.tab\\xiong_an_facade_hori.button\\icon.png",
         "alias": "2419_FacadeMove",
-        "doc": "Xiong'an Facade Movement Tool\n\nProcesses facade curves to extract specific points for facade movement operations.\nFeatures:\n- Works with Grasshopper input/output for facade geometry\n- Extracts points at 20% and 80% along curve domains\n- Handles curve parameterization for facade manipulation\n- Supports multiple curve sets for batch processing\n- Designed for Xiong'an project facade studies\n\nUsage:\n- Input: Two sets of curves (crv_set_1, crv_set_2)\n- Output: Points at 20% and 80% positions along curves\n- Designed for facade movement and positioning workflows",
+        "doc": "Find the anchor points that drive the facade panel movement on the Xiong'an study.\n\nRuns inside Grasshopper. Feed it the facade curve sets and it hands back a point set part\nway along each curve, which is what the facade panels are shifted from. Rerun it whenever\nthe curves change and the panels follow.\n\nUsage:\n1. Wire the two facade curve sets into the Grasshopper component\n2. Take the returned points as the move anchors for the panels",
         "tab": "Tailor.tab",
         "tab_icon": "Tailor.tab\\icon.png",
         "is_popular": false
@@ -1378,7 +1441,7 @@
         "script": "View.tab\\view_block_diagram.button\\view_block_diagram_left.py",
         "icon": "View.tab\\view_block_diagram.button\\icon.png",
         "alias": "ViewBlockDiagram",
-        "doc": "Generate view block diagrams by casting rays from a viewer point to identify unobstructed view areas.\n\nThis tool creates 3D surfaces representing the visible areas from a specified viewer point, \ntaking into account obstacles that block the view rays. Perfect for:\n- Site analysis and view studies\n- Building massing and urban planning\n- Landscape design and sightline analysis\n- Solar access and shadow studies\n\nThe process involves:\n1. Configuring ray casting parameters (resolution and ray length)\n2. Selecting obstacle objects that block the view\n3. Picking a viewer point location\n4. Automatic generation of view block surfaces\n\nThe tool automatically groups consecutive unobstructed rays and creates \nbounded surfaces using arcs and radius lines for accurate representation.",
+        "doc": "Draw the view fan from a chosen viewpoint, showing what is visible and what is blocked.\n\nSight lines are traced outward from the viewer and stopped wherever a building or other\nobstacle gets in the way. The clear sweeps come back as surfaces you can present, so a\nwindow, a terrace or a public space can be argued for on the strength of what it actually\nsees.\n\nUsage:\n1. Set the sweep resolution and how far the view should reach\n2. Select the objects that block the view\n3. Pick the viewer point; the visible fans are drawn for you",
         "tab": "View.tab",
         "tab_icon": "View.tab\\icon.png",
         "is_popular": false
@@ -1387,7 +1450,7 @@
         "script": "View.tab\\view_toggle.button\\view_toggle_left.py",
         "icon": "View.tab\\view_toggle.button\\icon.png",
         "alias": "ViewToggle",
-        "doc": "Quick view navigation tool for Rhino.\n\nFeatures:\n- Toggles between Top and Perspective views\n- Left click to switch between views\n- Keyboard shortcut: {KEY}\n- Optimizes modeling workflow with rapid view changes\n\nUsage:\nClick button to toggle between views.",
+        "doc": "Flip the active viewport between Top and Perspective with one click.\n\nSaves reaching for the viewport tabs every time you want to check a plan relationship and\nthen get back to the model. Running it also binds the F4 key to the same toggle, so from\nthen on you can switch with the keyboard alone.",
         "tab": "View.tab",
         "tab_icon": "View.tab\\icon.png",
         "is_popular": false
@@ -1414,9 +1477,574 @@
         "script": "startup.py",
         "icon": null,
         "alias": "EnneadTab_Startup",
-        "doc": "The friendly welcome wagon for EnneadTab in Rhino! This startup script springs into action with each new Rhino session, quietly setting up your environment with all the EnneadTab goodness. It registers aliases, checks for updates, sets up event hooks, and ensures all your favorite tools are ready to use - so you can focus on creating amazing designs.",
+        "doc": "Get EnneadTab ready the moment a new Rhino session opens.\n\nRuns by itself in the background, so every tool, command alias and shortcut is in place\nbefore you start modeling and you never have to load anything by hand.\n\nFeatures:\n- Registers the EnneadTab command aliases you can type on the command line\n- Checks whether a newer EnneadTab is available\n- Wires up the background helpers the tools rely on",
         "tab": null,
         "tab_icon": null,
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_search.button\\library_search_left.py": {
+        "script": "Knowledge.tab\\library_search.button\\library_search_left.py",
+        "icon": "Knowledge.tab\\library_search.button\\icon.png",
+        "alias": [
+            "ET_LIB",
+            "LibrarySearch"
+        ],
+        "doc": "Search the local library catalog with faceted chips.\n\nKey Features:\n- One search box: free text plus tag:/category:/author: facet chips\n- Quoted values supported, e.g. tag:\"panel unit\"\n- Unknown key:value tokens are kept as free text, never dropped\n- author: chips match the sidecar author (the shared lib has no author facet)\n\nPorts EnneadTab-For-Grasshopper#35 (faceted search).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": true
+    },
+    "Knowledge.tab\\library_views.button\\library_views_left.py": {
+        "script": "Knowledge.tab\\library_views.button\\library_views_left.py",
+        "icon": "Knowledge.tab\\library_views.button\\icon.png",
+        "alias": "LibraryViews",
+        "doc": "Saved named filtered views of the local library catalog.\n\nKey Features:\n- Save the current search (free text + tag:/category:/author: chips) as a named view\n  (author: chips match the sidecar author; the shared lib has no author facet)\n- Apply a saved view to filter the catalog\n- Delete saved views; views persist in the library settings\n\nPorts EnneadTab-For-Grasshopper#32 (bookmarkable filtered views).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_copy.button\\library_copy_left.py": {
+        "script": "Knowledge.tab\\library_copy.button\\library_copy_left.py",
+        "icon": "Knowledge.tab\\library_copy.button\\icon.png",
+        "alias": "LibraryCopy",
+        "doc": "Copy a catalog entry's path or JSON to the clipboard.\n\nKey Features:\n- Pick an entry from the library catalog\n- Copy Path: the entry's source path\n- Copy JSON: the entry's full JSON (id, title, description, path, tags,\n  category, parameters, sidecar)\n\nPorts EnneadTab-For-Grasshopper#19 (explorer copy actions).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "File.tab\\attach_refresh_worksession.button\\attach_refresh_worksession_left.py": {
+        "script": "File.tab\\attach_refresh_worksession.button\\attach_refresh_worksession_left.py",
+        "icon": "File.tab\\attach_refresh_worksession.button\\icon.png",
+        "alias": "AttachRefreshWorksession",
+        "doc": "Attach worksession files or refresh the current worksession.\n\nKey Features:\n- Lists the files currently attached to the worksession\n- Attach one or more .3dm / .rws files to the current worksession\n- Refresh attached worksession files in one click\n- Skips files that are already attached\n\nMirrors the widely-shared dharman Discourse snippets\n('-Worksession Attach / Refresh' via rs.Command).",
+        "tab": "File.tab",
+        "tab_icon": "File.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_export.button\\library_export_left.py": {
+        "script": "Knowledge.tab\\library_export.button\\library_export_left.py",
+        "icon": "Knowledge.tab\\library_export.button\\icon.png",
+        "alias": "LibraryExport",
+        "doc": "Export the filtered library catalog to a portable JSON file.\n\nKey Features:\n- Optional filter: free text plus tag:/category:/author: facet chips\n- Portable shape: id, title, sourcePath, tags, category, parameters\n- Save dialog; creates parent folders; UTF-8 JSON\n\nPorts EnneadTab-For-Grasshopper#16 (catalog export).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\clean_stale_usertext.button\\clean_stale_usertext_left.py": {
+        "script": "Modify.tab\\clean_stale_usertext.button\\clean_stale_usertext_left.py",
+        "icon": "Modify.tab\\clean_stale_usertext.button\\icon.png",
+        "alias": "CleanStaleUserText",
+        "doc": "Audit and clean stale attribute user-text keys in the active model.\n\nKey Features:\n- Audits object + document user-text keys before changing anything\n- Flags stale 'Grasshopper Bake Data' leftovers (known file-bloat cause)\n- Flags empty-valued orphaned keys no definition reads anymore\n- Checklist UI: you pick exactly which keys to remove\n- Reports how many objects each key was removed from\n\nMirrors the community 'Grasshopper Bake Data' hygiene scripts and\nElefront's Remove User Text.",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\bake_with_attributes.button\\bake_with_attributes_left.py": {
+        "script": "Modify.tab\\bake_with_attributes.button\\bake_with_attributes_left.py",
+        "icon": "Modify.tab\\bake_with_attributes.button\\icon.png",
+        "alias": "BakeWithAttributes",
+        "doc": "Bake selected objects with an explicit name / layer / color mapping.\n\nKey Features:\n- One dialog for the full attribute mapping, no hidden defaults\n- Name template with {i} index token (e.g. 'Panel_{i}')\n- Layer path with '::' nesting, created on demand\n- Display color applied per object (color source = object)\n- Copies the selection; originals are untouched\n\nRhino-side equivalent of the Grasshopper ModelObject -> ObjectAttributes\ntranslation fallback: name, layer path and display color are documented\nin the contract before anything is baked.",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "Material.tab\\layer_material_swatch_report.button\\layer_material_swatch_report_left.py": {
+        "script": "Material.tab\\layer_material_swatch_report.button\\layer_material_swatch_report_left.py",
+        "icon": "Material.tab\\layer_material_swatch_report.button\\icon.png",
+        "alias": "LayerMaterialSwatchReport",
+        "doc": "Per-layer material swatch report with optional assignment.\n\nKey Features:\n- Lists every layer with its material name\n- Shows diffuse color hex per material\n- Flags layers falling back to the default material\n- Optional one-click material assignment to layers",
+        "tab": "Material.tab",
+        "tab_icon": "Material.tab\\icon.png",
+        "is_popular": false
+    },
+    "Drafting.tab\\tag_annotation_objects.button\\tag_annotation_objects_left.py": {
+        "script": "Drafting.tab\\tag_annotation_objects.button\\tag_annotation_objects_left.py",
+        "icon": "Drafting.tab\\tag_annotation_objects.button\\icon.png",
+        "alias": "TagAnnotationObjects",
+        "doc": "Count and tag annotation objects (dimensions, hatches, text, leaders, text dots) in the active document.",
+        "tab": "Drafting.tab",
+        "tab_icon": "Drafting.tab\\icon.png",
+        "is_popular": false
+    },
+    "Selection.tab\\pick_selection_contract.button\\pick_selection_contract_left.py": {
+        "script": "Selection.tab\\pick_selection_contract.button\\pick_selection_contract_left.py",
+        "icon": "Selection.tab\\pick_selection_contract.button\\icon.png",
+        "alias": "PickSelectionContract",
+        "doc": "Pick-selection contract: capture viewport picks as GUIDs under a name.\n\nKey Features:\n- Prompts viewport selection at run time\n- Captures picked object GUIDs into a named contract\n- Re-select a stored contract in one click\n- Skips deleted or missing objects on re-select",
+        "tab": "Selection.tab",
+        "tab_icon": "Selection.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_favorites.button\\library_favorites_left.py": {
+        "script": "Knowledge.tab\\library_favorites.button\\library_favorites_left.py",
+        "icon": "Knowledge.tab\\library_favorites.button\\icon.png",
+        "alias": "LibraryFavorites",
+        "doc": "Pin and unpin catalog definitions as favorites.\n\nKey Features:\n- Pin entries so favorites sort first in pin order\n- Pin order is preserved across sessions\n- Stored in the shared library-settings.json (favoriteEntryIds)",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\quick_bake_text_dots.button\\quick_bake_text_dots_left.py": {
+        "script": "Modify.tab\\quick_bake_text_dots.button\\quick_bake_text_dots_left.py",
+        "icon": "Modify.tab\\quick_bake_text_dots.button\\icon.png",
+        "alias": "QuickBakeTextDots",
+        "doc": "Quick-bake selected objects with text-dot labels.\n\nKey Features:\n- One-click bake of the current selection\n- Text dots carry object names at bbox centers\n- Dedicated quick-bake layer, no dialog digging\n- Remembers the target layer between runs",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\group_objects_by_key.button\\group_objects_by_key_left.py": {
+        "script": "Knowledge.tab\\group_objects_by_key.button\\group_objects_by_key_left.py",
+        "icon": "Knowledge.tab\\group_objects_by_key.button\\icon.png",
+        "alias": "GroupObjectsByKey",
+        "doc": "Group sample objects by a property key (Layer, Name, or user-text key) and preview the one-branch-per-value map.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\replace_in_place.button\\replace_in_place_left.py": {
+        "script": "Modify.tab\\replace_in_place.button\\replace_in_place_left.py",
+        "icon": "Modify.tab\\replace_in_place.button\\icon.png",
+        "alias": "ReplaceInPlace",
+        "doc": "Replace-in-place: swap same-named objects instead of duplicating.\n\nKey Features:\n- Matches incoming objects to existing by name\n- Shows diff count before committing\n- Deletes replaced originals, keeps newcomers\n- Untouched objects and layers are never modified",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\model_contract.button\\model_contract_left.py": {
+        "script": "Knowledge.tab\\model_contract.button\\model_contract_left.py",
+        "icon": "Knowledge.tab\\model_contract.button\\icon.png",
+        "alias": "ModelContract",
+        "doc": "Edit the living model-contract description for a model context key, and propagate it to every Grasshopper catalog sidecar referencing that context.\n\nA model contract describes what a definition expects from the model (for example which layers and user-text keys it reads). Catalog entries carry a modelContextKey; this tool edits the shared description once and writes it into every *.gh.ennead.json / *.ghx.ennead.json sidecar in your library folder whose modelContextKey matches, and stores it in this document's user text too.\n\nFeatures:\n- Pick an existing context key or create a new one\n- Multiline editor for the contract description\n- Stores the description in the document (user text key ET_ModelContract:<key>)\n- Propagates to every matching catalog sidecar in a library folder\n- Remembers the library folder between sessions\n\nRhino-side companion to the GH library's model-contract propagation (feature 17).\n",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_recent.button\\library_recent_left.py": {
+        "script": "Knowledge.tab\\library_recent.button\\library_recent_left.py",
+        "icon": "Knowledge.tab\\library_recent.button\\icon.png",
+        "alias": "LibraryRecent",
+        "doc": "Recently-opened catalog definitions (MRU list).\n\nKey Features:\n- Newest-first list of opened definitions, capped at 10\n- Opening an entry re-records it at the front\n- Stored in the shared library-settings.json (recentEntryIds)",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\explicit_bake.button\\explicit_bake_left.py": {
+        "script": "Modify.tab\\explicit_bake.button\\explicit_bake_left.py",
+        "icon": "Modify.tab\\explicit_bake.button\\icon.png",
+        "alias": "ExplicitBake",
+        "doc": "Bake with an explicit Push/Pull/Bake/Purge action mode and a required unique base name.",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_ai_badges.button\\library_ai_badges_left.py": {
+        "script": "Knowledge.tab\\library_ai_badges.button\\library_ai_badges_left.py",
+        "icon": "Knowledge.tab\\library_ai_badges.button\\icon.png",
+        "alias": "LibraryAiBadges",
+        "doc": "Show the AI enrichment badge for a catalog entry.\n\nKey Features:\n- AI description, tags, category and confidence from the sidecar\n- Display only: never calls an AI service\n- Flags low-confidence entries queued for human review",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Block.tab\\block_fidelity.button\\block_fidelity_left.py": {
+        "script": "Block.tab\\block_fidelity.button\\block_fidelity_left.py",
+        "icon": "Block.tab\\block_fidelity.button\\icon.png",
+        "alias": "BlockFidelity",
+        "doc": "Classify every block definition in this document as embedded, linked, or proxy (linked but its source file is missing), and stamp the result into document user text.\n\nWhy this matters: Grasshopper definitions behave very differently against block-heavy models depending on whether their components round-trip blocks (names, materials, user strings, GUIDs preserved) or silently explode instances to raw geometry. This tool gives you the block side of that picture: which definitions are safe to edit here, and which are proxies pointing at missing files.\n\nFeatures:\n- Classifies all block definitions (embedded / linked / proxy)\n- Shows a report with counts per class\n- Stamps each block's fidelity into document user text (ET_BlockFidelity:<name>) so the GH library catalog can read it\n\nRhino-side companion to the GH library's block-fidelity badge (feature 19).\n",
+        "tab": "Block.tab",
+        "tab_icon": "Block.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_lint.button\\library_lint_left.py": {
+        "script": "Knowledge.tab\\library_lint.button\\library_lint_left.py",
+        "icon": "Knowledge.tab\\library_lint.button\\icon.png",
+        "alias": "LibraryLint",
+        "doc": "Validate every catalog sidecar and report unknown or mistyped fields.\n\nRhino port of the Grasshopper library sidecar field warnings\n(EnneadTab-For-Grasshopper PR #23): sidecars whose fields have the wrong\ntype or are unknown no longer fail silently - each problem is collected\nas a structured warning so typos (e.g. 'catagory') surface instead of\nbeing dropped.\n\nKey Features:\n- Checks all catalog entries through the shared Library catalog module\n- Reports unknown sidecar fields\n- Reports mistyped values (wrong JSON type for a known field)\n- Full per-entry report printed to the command line",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": true
+    },
+    "Knowledge.tab\\library_why.button\\library_why_left.py": {
+        "script": "Knowledge.tab\\library_why.button\\library_why_left.py",
+        "icon": "Knowledge.tab\\library_why.button\\icon.png",
+        "alias": "LibraryWhy",
+        "doc": "Explain why a catalog search hit matches.\n\nKey Features:\n- Shows which fields and terms matched each hit\n- One line per hit, e.g. matches via tag 'nesting' and title 'panel'\n- Mirrors the Grasshopper match-explanation wording",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Layer.tab\\snapshot_layer_state.button\\snapshot_layer_state_left.py": {
+        "script": "Layer.tab\\snapshot_layer_state.button\\snapshot_layer_state_left.py",
+        "icon": "Layer.tab\\snapshot_layer_state.button\\icon.png",
+        "alias": "LayerStateSnapshot",
+        "doc": "Snapshot and restore layer visibility states (session-scoped named snapshots).",
+        "tab": "Layer.tab",
+        "tab_icon": "Layer.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_popular.button\\library_popular_left.py": {
+        "script": "Knowledge.tab\\library_popular.button\\library_popular_left.py",
+        "icon": "Knowledge.tab\\library_popular.button\\icon.png",
+        "alias": "LibraryPopular",
+        "doc": "Catalog definitions ranked by usage.\n\nKey Features:\n- Reads the Grasshopper usage store (library-usage.json)\n- Ranked by opens, then solves\n- Display only: never writes usage data",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_dupes.button\\library_dupes_left.py": {
+        "script": "Knowledge.tab\\library_dupes.button\\library_dupes_left.py",
+        "icon": "Knowledge.tab\\library_dupes.button\\icon.png",
+        "alias": "LibraryDupes",
+        "doc": "Find duplicate file content across catalog entries and report the groups.\n\nRhino port of the Grasshopper library duplicate-content report\n(EnneadTab-For-Grasshopper PR #27): entries whose files are byte-identical\nbut stored at different paths are grouped by content hash so the copies\ncan be cleaned up.\n\nKey Features:\n- SHA-256 content hash per entry file (no mtime/size fingerprints)\n- Same-path repeats are collapsed, never reported as duplicates\n- Groups ordered by hash; entries within a group ordered by path\n- Pick a group to see every copy's path; full report on the command line",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": true
+    },
+    "Selection.tab\\library_attr_filter.button\\library_attr_filter_left.py": {
+        "script": "Selection.tab\\library_attr_filter.button\\library_attr_filter_left.py",
+        "icon": "Selection.tab\\library_attr_filter.button\\icon.png",
+        "alias": "LibraryAttrFilter",
+        "doc": "Select model objects by Elefront-style key/value user-text attributes.\n\nRhino port of the Grasshopper library attribute filtering\n(EnneadTab-For-Grasshopper PR #39): pick user-text key/value criteria and\nevery model object whose attributes match ALL criteria gets selected.\n\nKey Features:\n- Key picker lists every user-text key already in the document\n- '(key present)' matches any value for a key (Elefront-style presence check)\n- Stack multiple criteria (AND); values compare case-insensitively\n- Reports how many objects were selected",
+        "tab": "Selection.tab",
+        "tab_icon": "Selection.tab\\icon.png",
+        "is_popular": true
+    },
+    "Knowledge.tab\\library_assert.button\\library_assert_left.py": {
+        "script": "Knowledge.tab\\library_assert.button\\library_assert_left.py",
+        "icon": "Knowledge.tab\\library_assert.button\\icon.png",
+        "alias": [
+            "LibraryAssert"
+        ],
+        "doc": "Run contract assertions for a catalog definition.\n\nKey Features:\n- Pick a Grasshopper definition from the shared library catalog\n- Runs the author-declared red/green contract checks (PancakeContract-style)\n- Uses live slider values when the definition is open in Grasshopper, else catalog defaults\n- Warns before opening a definition whose checks fail",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_dry_run.button\\library_dry_run_left.py": {
+        "script": "Knowledge.tab\\library_dry_run.button\\library_dry_run_left.py",
+        "icon": "Knowledge.tab\\library_dry_run.button\\icon.png",
+        "alias": [
+            "LibraryDryRun"
+        ],
+        "doc": "Preview a catalog refresh without writing anything.\n\nKey Features:\n- Reports what a refresh would do: reuse / reindex / drop / error previews\n- Scans the configured roots read-only (no Rhino open, no index write)\n- Flags missing or unreadable roots before a real refresh hits them",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_scan_roots.button\\library_scan_roots_left.py": {
+        "script": "Knowledge.tab\\library_scan_roots.button\\library_scan_roots_left.py",
+        "icon": "Knowledge.tab\\library_scan_roots.button\\icon.png",
+        "alias": [
+            "LibraryScanRoots"
+        ],
+        "doc": "Validate the catalog scan roots.\n\nKey Features:\n- Checks every configured scan root for missing or unreadable paths\n- Warn-and-continue: reports all problems at once, flags possibly-offline shares",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_param_preview.button\\library_param_preview_left.py": {
+        "script": "Knowledge.tab\\library_param_preview.button\\library_param_preview_left.py",
+        "icon": "Knowledge.tab\\library_param_preview.button\\icon.png",
+        "alias": "LibraryParamPreview",
+        "doc": "Show a library definition's parameter contract, grouped by parameter group.\n\nPick a catalog entry to see its parameter summary header (total plus per-group\ncounts) followed by one name/type/default table per group, in first-seen group\norder. Ports the grouped parameter preview from the Grasshopper library\nexplorer (EnneadTab-For-Grasshopper PR #15).\n\nReads the shared Grasshopper definition catalog through\nApps/_rhino/Library/catalog.py; parameters come from the catalog index.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_input_summary.button\\library_input_summary_left.py": {
+        "script": "Knowledge.tab\\library_input_summary.button\\library_input_summary_left.py",
+        "icon": "Knowledge.tab\\library_input_summary.button\\icon.png",
+        "alias": "LibraryInputSummary",
+        "doc": "Summarize a library definition's inputs, grouped by control type.\n\nPick a catalog entry to see its Inputs-group parameters grouped as sliders,\ntoggles, value lists, panels, referenced geometry, or other, with counts and\nmember names \u2014 the \"drive 3 sliders\" view from the Grasshopper library\nexplorer (EnneadTab-For-Grasshopper PR #42). The picker list itself shows the\ncompact summary (e.g. \"2 sliders \u00b7 1 toggle\") next to each entry.\n\nReads the shared Grasshopper definition catalog through\nApps/_rhino/Library/catalog.py; inputs come from the catalog index.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\audit_usertext_keys.button\\audit_usertext_keys_left.py": {
+        "script": "Modify.tab\\audit_usertext_keys.button\\audit_usertext_keys_left.py",
+        "icon": null,
+        "alias": "AuditUsertextKeys",
+        "doc": "Audit user-text keys on the selected objects (or the whole document) and report per-key object counts.\n\nShows how many objects carry each key plus the number of distinct values, so missing, misspelled, or inconsistently filled keys surface before baking.\n",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_contract.button\\library_contract_left.py": {
+        "script": "Knowledge.tab\\library_contract.button\\library_contract_left.py",
+        "icon": "Knowledge.tab\\library_contract.button\\icon.png",
+        "alias": "LibraryContract",
+        "doc": "Show a library definition's Hops-style input/output contract.\n\nPick a catalog entry to see the contract the Grasshopper plugin derived at\nindex time: inputs grouped by control kind (sliders, toggles, value lists,\npanels, referenced geometry, Get components) with type, default, domain, and\nrequired/optional flags, followed by terminal outputs. Ports the auto-derived\nparameter contract from the Grasshopper library explorer\n(EnneadTab-For-Grasshopper PR #37).\n\nThe live Grasshopper derivation needs a running Grasshopper document, so from\nRhino this button shows the contract stored in the catalog index; entries\nindexed before contract derivation report that none is stored.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_readme.button\\library_readme_left.py": {
+        "script": "Knowledge.tab\\library_readme.button\\library_readme_left.py",
+        "icon": "Knowledge.tab\\library_readme.button\\icon.png",
+        "alias": "LibraryReadme",
+        "doc": "Show a library definition's version-agnostic README.md docs.\n\nPick a catalog entry to read the <definition>.gh.README.md sidecar sitting next\nto the definition file \u2014 usage notes, input explanations, and known\nlimitations, exactly as the Grasshopper library explorer renders them\n(EnneadTab-For-Grasshopper PR #30). The docs live outside the .gh file, so\nupdating the definition never wipes them; files over 256 KiB are not loaded.\n\nReads the shared Grasshopper definition catalog through\nApps/_rhino/Library/catalog.py to resolve each entry's definition path.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Layer.tab\\validate_layer_patterns.button\\validate_layer_patterns_left.py": {
+        "script": "Layer.tab\\validate_layer_patterns.button\\validate_layer_patterns_left.py",
+        "icon": null,
+        "alias": "ValidateLayerPatterns",
+        "doc": "Validate Elefront-style layer patterns (with :: full paths and * wildcards) against the document's layer table.\n\nReports per-pattern match counts and, for patterns that match nothing, suggests the closest real layer names \u2014 catching renamed layers before a definition fails silently.\n",
+        "tab": "Layer.tab",
+        "tab_icon": "Layer.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_address.button\\library_address_left.py": {
+        "script": "Knowledge.tab\\library_address.button\\library_address_left.py",
+        "icon": "Knowledge.tab\\library_address.button\\icon.png",
+        "alias": "LibraryAddress",
+        "doc": "Show a library entry's address stamp and check it for updates.\n\nPick a catalog entry to see its library address (entry id plus catalog\nversion \u2014 the revision entry the Grasshopper importer stamps onto documents)\nand run update recognition: the catalog's recorded file hash is compared\nagainst the file on disk, flagging local changes with an asterisk, and an\noptional \"version you have\" answer produces the \"v3 available \u2014 you have v2*\"\nreport. Ports the address stamp from the Grasshopper library explorer\n(EnneadTab-For-Grasshopper PR #46).\n\nReads the shared Grasshopper definition catalog through\nApps/_rhino/Library/catalog.py.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\harvest_model_context.button\\harvest_model_context_left.py": {
+        "script": "Knowledge.tab\\harvest_model_context.button\\harvest_model_context_left.py",
+        "icon": "Knowledge.tab\\harvest_model_context.button\\icon.png",
+        "alias": "HarvestModelContext",
+        "doc": "Inventory the active model's context for catalog tagging.\n\nFeatures:\n- Per-layer object counts with layer colors\n- Block definitions with instance counts\n- User-text key frequencies across objects\n- Object type frequencies\n\nUsage:\n1. Run in a model\n2. Copy the reported layer/block/user-text patterns into a GH catalog sidecar \"modelContext\" tag",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Selection.tab\\resolve_model_binding.button\\resolve_model_binding_left.py": {
+        "script": "Selection.tab\\resolve_model_binding.button\\resolve_model_binding_left.py",
+        "icon": "Selection.tab\\resolve_model_binding.button\\icon.png",
+        "alias": "ResolveModelBinding",
+        "doc": "Select model objects by layer or block-name wildcard pattern.\n\nFeatures:\n- Layer patterns with * wildcards and :: sublayer paths (e.g. FACADE::*)\n- Block-name patterns (e.g. Panel_*)\n- Remembers the last pattern used\n\nUsage:\n1. Choose layer or block-name matching\n2. Enter a wildcard pattern\n3. Matching objects are selected",
+        "tab": "Selection.tab",
+        "tab_icon": "Selection.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\model_footprint.button\\model_footprint_left.py": {
+        "script": "Knowledge.tab\\model_footprint.button\\model_footprint_left.py",
+        "icon": "Knowledge.tab\\model_footprint.button\\icon.png",
+        "alias": "ModelFootprint",
+        "doc": "Live footprint of layer patterns against the current model.\n\nFeatures:\n- One or more layer wildcard patterns, comma-separated (e.g. FACADE::*, *_Annotation)\n- Per-pattern live object counts with layer color swatches (hex)\n- Remembers the last patterns used\n\nUsage:\n1. Enter layer wildcard patterns\n2. See the live match count per pattern",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Modify.tab\\bakename_clean.button\\bakename_clean_left.py": {
+        "script": "Modify.tab\\bakename_clean.button\\bakename_clean_left.py",
+        "icon": "Modify.tab\\bakename_clean.button\\icon.png",
+        "alias": "BakeNameClean",
+        "doc": "Delete previous bake outputs by bake-name pattern (idempotent bakes).\n\nFeatures:\n- Matches object names and/or the \"BakeName\" user-text key\n- Wildcard patterns (e.g. BriseSoleil_*)\n- Preview count with explicit Yes/No confirmation before deleting\n\nUsage:\n1. Enter a bake-name wildcard pattern\n2. Choose the match source (name, BakeName user-text, or both)\n3. Confirm the deletion",
+        "tab": "Modify.tab",
+        "tab_icon": "Modify.tab\\icon.png",
+        "is_popular": false
+    },
+    "File.tab\\harvest_folder_report.button\\harvest_folder_report_left.py": {
+        "script": "File.tab\\harvest_folder_report.button\\harvest_folder_report_left.py",
+        "icon": "File.tab\\harvest_folder_report.button\\icon.png",
+        "alias": "HarvestFolderReport",
+        "doc": "Scan a folder of .3dm files and report aggregated model context.\n\nKey Features:\n- Resolves a folder + file pattern (e.g. *.3dm), top folder or subfolders\n- Lists every matched file before reading anything\n- Aggregates layer paths found across all files\n- Aggregates attribute user-text keys found across all files\n- Prints a copy-paste-ready report to the command line\n\nRhino-side equivalent of the Rhino 8 Query Directory + Import Content\nharvest pattern: batch-read model context without importing anything\ninto the active document.",
+        "tab": "File.tab",
+        "tab_icon": "File.tab\\icon.png",
+        "is_popular": false
+    },
+    "File.tab\\model_snapshot.button\\model_snapshot_left.py": {
+        "script": "File.tab\\model_snapshot.button\\model_snapshot_left.py",
+        "icon": "File.tab\\model_snapshot.button\\icon.png",
+        "alias": "ModelSnapshot",
+        "doc": "Versioned snapshots of model geometry, with Speckle-style branch/commit vocabulary, kept local.\n\nSnapshot mode: capture the objects on chosen layers into a versioned store - a .3dm export plus a JSON manifest recording a fingerprint per object - on a named branch, with a commit message.\nDiff mode: pick any past commit and compare it against the current document; added, removed, and modified objects are listed.\n\nManifests and exports live in <chosen folder>/model_snapshots/<branch>/.\n\nRhino-side companion to the GH library's model snapshot workflow (feature 18).\n",
+        "tab": "File.tab",
+        "tab_icon": "File.tab\\icon.png",
+        "is_popular": false
+    },
+    "File.tab\\check_worksession_files.button\\check_worksession_files_left.py": {
+        "script": "File.tab\\check_worksession_files.button\\check_worksession_files_left.py",
+        "icon": null,
+        "alias": "CheckWorksessionFiles",
+        "doc": "Check an expected list of model files against the disk and the active worksession.\n\nReports which expected files are missing on disk, which are not attached to the worksession, and which attached models were not expected \u2014 then offers to attach the missing ones.\n",
+        "tab": "File.tab",
+        "tab_icon": "File.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\expected_host.button\\expected_host_left.py": {
+        "script": "Knowledge.tab\\expected_host.button\\expected_host_left.py",
+        "icon": "Knowledge.tab\\expected_host.button\\icon.png",
+        "alias": "ExpectedHost",
+        "doc": "Record which host document this Rhino model expects Grasshopper definitions to run against.\n\nDefinitions that drive the active Rhino document, a linked file (worksession attachment or model link), or an external host (Rhino.Inside.Revit) are not interchangeable. This tool stores the expectation in the document's user text (key ET_ExpectedHost) so the GH library explorer can hide definitions that don't match the current session.\n\nChoices: activeRhinoDocument, linkedFile, externalHost, hostAgnostic.\n\nRhino-side companion to the GH library's host-model driver mode (feature 20).\n",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_open_with_inputs.button\\library_open_with_inputs_left.py": {
+        "script": "Knowledge.tab\\library_open_with_inputs.button\\library_open_with_inputs_left.py",
+        "icon": "Knowledge.tab\\library_open_with_inputs.button\\icon.png",
+        "alias": [
+            "LibraryOpenWithInputs"
+        ],
+        "doc": "Open a catalog definition with its annotated inputs.\n\nKey Features:\n- Pick a Grasshopper definition from the shared library catalog\n- Fill Player-style annotated inputs (min/max clamp, presets) in a Rhino form\n- Opens the definition in Grasshopper and applies the values to matching sliders",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_refresh.button\\library_refresh_left.py": {
+        "script": "Knowledge.tab\\library_refresh.button\\library_refresh_left.py",
+        "icon": "Knowledge.tab\\library_refresh.button\\icon.png",
+        "alias": [
+            "LibraryRefresh"
+        ],
+        "doc": "Refresh the Grasshopper definition catalog (throttled).\n\nKey Features:\n- Re-scans the configured roots and rebuilds the catalog index\n- Throttled: skips the re-scan while the last refresh is still fresh\n- Interval is configurable in the library settings; 0 disables throttling",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Block.tab\\block_dependency_map.button\\block_dependency_map_left.py": {
+        "script": "Block.tab\\block_dependency_map.button\\block_dependency_map_left.py",
+        "icon": null,
+        "alias": "BlockDependencyMap",
+        "doc": "Report per-definition instance counts, embedded vs linked status, and the recursive nesting tree with max depth for every block definition in the document.\n\nHelps answer \"what uses this block?\" and \"how deep does this nesting go?\" before editing or exploding a definition.\n",
+        "tab": "Block.tab",
+        "tab_icon": "Block.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_publishers.button\\library_publishers_left.py": {
+        "script": "Knowledge.tab\\library_publishers.button\\library_publishers_left.py",
+        "icon": "Knowledge.tab\\library_publishers.button\\icon.png",
+        "alias": "LibraryPublishers",
+        "doc": "List named publishers harvested from catalog sidecars and rename one everywhere.\n\nCatalog entries can expose contract parameters as named publishers (the\nsidecar \"publishers\" map: publisher name -> contract parameter name, borrowed\nfrom Telepathy by EnneadTab-For-Grasshopper PR #47). Pick a publisher, enter\na new name, and the rename propagates across every sidecar that references\nit, the version-agnostic markdown docs (<definition>.gh.ennead.md), and any\nsaved contract presets (contract-presets.json) -- one rename, everywhere\nconsistent.\n\nAdditive-only: sidecar files keep every existing field; only the publisher\nkey is renamed. Depends on PR #283 (shared catalog lib); degrades gracefully\nif unmerged.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_examine.button\\library_examine_left.py": {
+        "script": "Knowledge.tab\\library_examine.button\\library_examine_left.py",
+        "icon": "Knowledge.tab\\library_examine.button\\icon.png",
+        "alias": "LibraryExamine",
+        "doc": "Read-only detail view of one catalog entry -- opens nothing, changes nothing.\n\nPick a Grasshopper library catalog entry to see a read-only summary: title,\ncategory, tags, parameter contract summary, provenance (scan root, index\ntime, file hash, convention check), and the purpose note from its sidecar.\n\nPorts the read-only \"Examine\" preview idea from EnneadTab-For-Grasshopper\nPR #48. On the Rhino side the preview is a single detail dialog instead of a\nlocked Grasshopper canvas: a definition is never opened and nothing is\nmodified. Depends on PR #283 (shared catalog lib); degrades gracefully if\nunmerged.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_insert_modes.button\\library_insert_modes_left.py": {
+        "script": "Knowledge.tab\\library_insert_modes.button\\library_insert_modes_left.py",
+        "icon": "Knowledge.tab\\library_insert_modes.button\\icon.png",
+        "alias": "LibraryInsertModes",
+        "doc": "Open a catalog definition in Grasshopper -- three open modes.\n\nPorts EnneadTab-For-Grasshopper PR #53 (insert as loose / group / cluster).\nThe Rhino-side equivalent of inserting into a canvas is opening the\ndefinition in Grasshopper:\n\n- Loose: open the .gh normally in Grasshopper.\n- Grouped with model: copy the .gh into the current .3dm's folder, then open\n  the copy (keeps the definition next to the model it belongs to).\n- Pinned version: open a chosen pinned/versioned copy of the definition\n  (sidecar \"pinnedVersion\", or versioned sibling files such as Foo.v2.gh).\n\nInvocation: the Grasshopper plugin's explorer is a canvas component and\nexposes no Rhino command entry point, so this button opens documents through\nGrasshopper.Instances.DocumentServer.AddDocument(path, True) from Rhino\nIronPython, loading the Grasshopper plug-in first with the _Grasshopper\ncommand when it is not already loaded.\n\nDepends on PR #283 (shared catalog lib); degrades gracefully if unmerged.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_backup.button\\library_backup_left.py": {
+        "script": "Knowledge.tab\\library_backup.button\\library_backup_left.py",
+        "icon": "Knowledge.tab\\library_backup.button\\icon.png",
+        "alias": "LibraryBackup",
+        "doc": "Back up the catalog's sidecar/metadata files to a timestamped zip on demand.\n\nKey Features:\n- Snapshots every *.ennead.json sidecar under each catalog scan root\n- Stores a backup-interval preference in library-settings.json (backupIntervalMinutes)\n- Offers 'back up now' when the newest backup is older than the interval\n- Prunes old backups, keeps the newest 10\n\nPorts EnneadTab-For-Grasshopper#57 (interval auto-backup of sidecars/metadata).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_palette.button\\library_palette_left.py": {
+        "script": "Knowledge.tab\\library_palette.button\\library_palette_left.py",
+        "icon": "Knowledge.tab\\library_palette.button\\icon.png",
+        "alias": [
+            "ET_PAL",
+            "LibraryPalette"
+        ],
+        "doc": "Keyboard-first quick launcher for the library catalog.\n\nKey Features:\n- One filter-as-you-type list combining pinned favorites and recently-opened definitions\n- Favorites carry their one-keystroke shelf labels [1]..[9],[0] (GH feature 30)\n- Enter opens the chosen definition in Grasshopper; Esc dismisses\n- Opened entries are recorded at the front of the recent list\n\nPorts EnneadTab-For-Grasshopper#60 (keyboard-first palette + favorites shelf).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_purpose_notes.button\\library_purpose_notes_left.py": {
+        "script": "Knowledge.tab\\library_purpose_notes.button\\library_purpose_notes_left.py",
+        "icon": "Knowledge.tab\\library_purpose_notes.button\\icon.png",
+        "alias": "LibraryPurposeNotes",
+        "doc": "View and edit purpose notes for library definitions, keyed by document GUID.\n\nKey Features:\n- Pick a catalog entry and view its stored purpose note\n- Edit the note; it is saved back into the entry's .ennead.json sidecar under an\n  additive \"purposeNotes\" key, keyed by document GUID (\"doc:<guid>\" when the\n  definition file is readable, \"file:<path>\" fallback) -- existing sidecar keys\n  are never renamed or touched\n- Note schema mirrors the GH definition-notes.json format:\n  {\"purposeNotes\": {\"doc:<guid>\": {\"text\": \"...\", \"updatedAt\": \"...\"}}}\n\nPorts EnneadTab-For-Grasshopper#55 (purpose notes keyed by document GUID).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_versions.button\\library_versions_left.py": {
+        "script": "Knowledge.tab\\library_versions.button\\library_versions_left.py",
+        "icon": "Knowledge.tab\\library_versions.button\\icon.png",
+        "alias": "LibraryVersions",
+        "doc": "Version history for a library definition: update check + roll back.\n\nKey Features:\n- Pick a catalog entry and list its version history from the .ennead.json sidecar\n  (\"versions\": [{version, diffNote, publishedAt, sourcePath, fileHash}, ...]);\n  the live version is marked [current]\n- Roll back: restores a versioned backup copy of the .gh + its sidecar over the\n  live files; the live files are first backed up to .bak copies, and the button\n  asks for confirmation before overwriting anything\n- Update check: compares the live file's last-modified time against the latest\n  version's publishedAt / recorded file and reports whether it looks current\n\nPorts EnneadTab-For-Grasshopper#50 (version history + Update / Roll back).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_pinned_import.button\\library_pinned_import_left.py": {
+        "script": "Knowledge.tab\\library_pinned_import.button\\library_pinned_import_left.py",
+        "icon": "Knowledge.tab\\library_pinned_import.button\\icon.png",
+        "alias": "LibraryPinnedImport",
+        "doc": "Import a library definition at a pinned version.\n\nKey Features:\n- Pick a catalog entry and one pinned version from its sidecar history\n  (\"versions\": [{version, diffNote, publishedAt, sourcePath, fileHash}, ...])\n- Copy that version's .gh file to a user-chosen folder (file name stamped with\n  the version), or open it in Grasshopper\n- Rhino-side equivalent of the GH pinned import (cluster/Hops/snippet): the copy\n  is a frozen snapshot -- library updates never change it\n\nPorts EnneadTab-For-Grasshopper#52 (pinned-version import as cluster/Hops/snippet).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_insights.button\\library_insights_left.py": {
+        "script": "Knowledge.tab\\library_insights.button\\library_insights_left.py",
+        "icon": "Knowledge.tab\\library_insights.button\\icon.png",
+        "alias": "LibraryInsights",
+        "doc": "Show a read-only Insights dashboard for the Grasshopper definition catalog.\n\nRhino port of the Grasshopper catalog analytics dashboard\n(EnneadTab-For-Grasshopper PR #49): entry counts per category and tag,\nmost-used plugins, sidecar completeness (how many entries have a\n*.ennead.json and how many are clean), and -- when a library-usage.json\nfile is present -- a usage section with the most-opened entries and the\nstale-entry cleanup hit-list (no opens in 90 days). Pure report; nothing\nis modified.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_canvas_preview.button\\library_canvas_preview_left.py": {
+        "script": "Knowledge.tab\\library_canvas_preview.button\\library_canvas_preview_left.py",
+        "icon": "Knowledge.tab\\library_canvas_preview.button\\icon.png",
+        "alias": "LibraryCanvasPreview",
+        "doc": "Show a static summary of a Grasshopper definition's canvas without opening Grasshopper.\n\nRhino port of the static canvas preview (EnneadTab-For-Grasshopper PR\n#33): a .ghx file is plain XML, so its canvas is summarized directly --\ncomponent type counts and names, group and scribble counts, document id,\nand canvas bounds -- plus the plugin assemblies the catalog index knows\nabout. Binary .gh files cannot be parsed this way and are skipped with a\nnote. Read-only; nothing is opened or modified.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_provenance.button\\library_provenance_left.py": {
+        "script": "Knowledge.tab\\library_provenance.button\\library_provenance_left.py",
+        "icon": "Knowledge.tab\\library_provenance.button\\icon.png",
+        "alias": "LibraryProvenance",
+        "doc": "Show provenance for a catalog entry: will this definition open on my machine?\n\nRhino port of the Grasshopper provenance tab (EnneadTab-For-Grasshopper\nPR #51): component count and component kinds (parsed from the .ghx XML\nwhen available), the plugin assemblies the definition needs (from the\ncatalog index), and a best-effort check flagging required plugins that\nare not installed (scans loaded assemblies plus the Grasshopper\nLibraries folders for .gha files). Read-only; nothing is modified.",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_publish.button\\library_publish_left.py": {
+        "script": "Knowledge.tab\\library_publish.button\\library_publish_left.py",
+        "icon": "Knowledge.tab\\library_publish.button\\icon.png",
+        "alias": "LibraryPublish",
+        "doc": "Stage a Grasshopper catalog entry for publishing (ports EnneadTab-For-Grasshopper PR #69).\n\nPicks a library catalog entry (or browses for a .gh/.ghx file), collects the\npublish metadata (title, version, description, tags, category), validates the\nrequest the same way the Grasshopper publish dialogs do, writes the versioned\n*.ennead.json sidecar, then stages the definition + sidecar (+README if one\nsits next to the definition) into a publish/staging folder under the catalog\ndirectory.\n\nKey Features:\n- Entry picker over the shared catalog index, or browse for a file\n- Next-version suggestion (\"1.2.0\" -> \"1.2.1\", \"v3\" -> \"v4\", \"3beta\" -> \"4beta\")\n- Request validation (source file exists, title, dotted-numeric version, no blank tags)\n- Sidecar field warnings through catalog.validate_sidecar\n- Full staging report printed to the command line",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_portability.button\\library_portability_left.py": {
+        "script": "Knowledge.tab\\library_portability.button\\library_portability_left.py",
+        "icon": "Knowledge.tab\\library_portability.button\\icon.png",
+        "alias": "LibraryPortability",
+        "doc": "Audit a catalog definition for portability problems (ports EnneadTab-For-Grasshopper PR #72).\n\nChecks one library entry for the things that break when a definition moves to\nanother machine: absolute paths hiding in the sidecar or in indexed parameter\nvalues, plugin assemblies the entry needs but this machine does not have\ninstalled (\"Name|secret\" wire format, cross-checked against the Grasshopper\nLibraries / yak package folders and the entry's pluginsKnown provenance flag),\nand Windows-only assumptions (registry keys, drive-letter paths, Program\nFiles references).\n\nKey Features:\n- Pass / warn / fail verdict per entry with fix hints\n- Absolute-path scan over sidecar fields and parameter values\n- Missing-plugin detection with yak install hints\n- Full report printed to the command line",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_package_restore.button\\library_package_restore_left.py": {
+        "script": "Knowledge.tab\\library_package_restore.button\\library_package_restore_left.py",
+        "icon": "Knowledge.tab\\library_package_restore.button\\icon.png",
+        "alias": "LibraryPackageRestore",
+        "doc": "Show the Yak install commands for a catalog entry's missing plugins (ports EnneadTab-For-Grasshopper PR #74).\n\nReads the entry's required plugin packages (\"DisplayName|secret\" wire format,\nsame as the Grasshopper plugin), compares them against the plugins installed\non this machine, and emits the `yak install <name>` commands needed to restore\nthe missing ones.\n\nRead-only helper: it never runs installs itself. Copy the commands to the\nclipboard or open the Rhino PackageManager from the prompt.\n\nKey Features:\n- Missing vs already-installed plugin report per entry\n- Install hints prefer the secret GUID (unambiguous on the package server)\n- Copyable command list (clipboard + command line)\n- One-click open of the Rhino PackageManager",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
+        "is_popular": false
+    },
+    "Knowledge.tab\\library_yak_restore.button\\library_yak_restore_left.py": {
+        "script": "Knowledge.tab\\library_yak_restore.button\\library_yak_restore_left.py",
+        "icon": "Knowledge.tab\\library_yak_restore.button\\icon.png",
+        "alias": "LibraryYakRestore",
+        "doc": "Install missing Grasshopper plugins for a library entry via Yak. Reads the entry's required plugins (\"Name|secret\" format), detects installed plugins from the Grasshopper Libraries folder and Rhino Yak package folders, offers to run `yak install` for the missing ones and reports results.\n\nPorts EnneadTab-For-Grasshopper#74 (missing-plugin package restore via Yak).",
+        "tab": "Knowledge.tab",
+        "tab_icon": "Knowledge.tab\\icon.png",
         "is_popular": false
     }
 }

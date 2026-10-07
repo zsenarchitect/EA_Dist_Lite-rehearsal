@@ -34,111 +34,162 @@ try:
     clr.AddReference('RhinoInside.Revit')
     from RhinoInside.Revit.Convert.Geometry import GeometryDecoder as RIR_DECODER  # pyright: ignore
     IMPORT_OK = True
-except:
+except Exception:
     IMPORT_OK = False
+    print(traceback.format_exc())
 
 
-from EnneadTab import ERROR_HANDLE, LOG, NOTIFICATION, UI, ENVIRONMENT, USER
+from EnneadTab import ERROR_HANDLE, LOG, NOTIFICATION, UI, ENVIRONMENT, USER, DATA_FILE, REVIT2RHINO
 from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_UNIT, REVIT_RHINO, REVIT_FORMS
 from Autodesk.Revit import DB  # pyright: ignore
 
 # Get the current document
 DOC = REVIT_APPLICATION.get_doc()
 
+# Abort the export when this many elements in a row fail: the same systematic error
+# would otherwise log a full traceback per element (Revit Safety: error loop detection).
+MAX_CONSECUTIVE_ERRORS = 10
 
-def export_elements_to_rhino(doc, selected_instances):
+
+def export_elements_to_rhino(doc, selected_instances, open_in_rhino=False):
     """
     Export selected elements to Rhino with options.
-    
+
     Args:
         doc (DB.Document): The Revit document.
         selected_instances (list): List of Revit elements to export
-        
+        open_in_rhino (bool): Also open the exported file in a new Rhino window when done.
+            Off by default: the Rhino import button (Revit2RhinoImport) is the normal way in.
+
     Returns:
         str: Path to the exported Rhino file or None if failed
     """
     # Track start time for performance measurement
     start_time = time.time()
-    
+
+    if not IMPORT_OK:
+        NOTIFICATION.messenger("Revit2Rhino: RhinoCommon / Rhino.Inside libraries could not be loaded. Export aborted.", sticky=True)
+        return None
+
     # Initialize exporter with options
     exporter = RevitToRhinoExporter(doc)
     exporter.family_instances = selected_instances
+    exporter.open_in_rhino = open_in_rhino
     exporter.preserve_family_layers = True  # Always preserve family layers
     exporter.setup_document()
-    
+
     # Process elements with progress bar
     def process_element(element):
         exporter.process_element(element)
-    
+
     def label_func(element):
         element_name = "{} - {}".format(
             exporter._get_family_name(element), 
             REVIT_APPLICATION.get_element_id_value(element.Id)
         )
         return "Exporting: {}".format(element_name)
-    
+
     # Process elements with progress bar
-    UI.progress_bar(
-        selected_instances,
-        process_element,
-        label_func=label_func,
-        title="Revit2Rhino: Exporting Elements"
-    )
-    
+    try:
+        UI.progress_bar(
+            selected_instances,
+            process_element,
+            label_func=label_func,
+            title="Revit2Rhino: Exporting Elements"
+        )
+    except Exception:
+        # Do not leak the headless Rhino doc if the export loop dies
+        print(traceback.format_exc())
+        exporter.dispose_document()
+        raise
+
     # Complete export and save file
     logger.info("Finalizing Rhino file...")
     export_result = exporter.finalize_export()
-    
+
     # Calculate elapsed time
     elapsed_time = time.time() - start_time
     mins, secs = divmod(elapsed_time, 60)
     hours, mins = divmod(mins, 60)
-    
+
     time_str = ""
     if hours > 0:
         time_str += "{:.0f} hours ".format(hours)
     if mins > 0:
         time_str += "{:.0f} minutes ".format(mins)
     time_str += "{:.1f} seconds".format(secs)
-    
+
     if export_result:
+        _record_handoff(doc, exporter, export_result)
         success_message = "Successfully exported to: {}\nTotal time: {}".format(export_result, time_str)
-        success_message += "\nYou new Rhino will start soon."
+        if open_in_rhino:
+            success_message += "\nYour new Rhino will start soon."
+        else:
+            success_message += "\nIn Rhino, run Revit2RhinoImport."
+        success_message += "\n" + exporter.get_stats_summary()
         NOTIFICATION.messenger(success_message)
         return export_result
-    else:
-        NOTIFICATION.messenger("Export failed. Check log for details.\nTotal time: {}".format(time_str), sticky=True)
+    elif exporter.nothing_exported:
+        NOTIFICATION.messenger("Nothing exported: no selected element had usable geometry.\nTotal time: {}\n{}".format(time_str, exporter.get_stats_summary()), sticky=True)
         return None
+    else:
+        NOTIFICATION.messenger("Export failed. Check log for details.\nTotal time: {}\n{}".format(time_str, exporter.get_stats_summary()), sticky=True)
+        return None
+
+
+def _record_handoff(doc, exporter, exported_file):
+    """Tell the Rhino side what was exported (same convention as rhino2revit_out_paths).
+
+    Never fails the export: the Rhino import button falls back to the newest export file.
+    """
+    try:
+        view_name = doc.ActiveView.Name if doc.ActiveView else None
+        entry = REVIT2RHINO.build_entry([exported_file],
+                                        exporter.revit_unit,
+                                        exporter.stamp,
+                                        project=doc.Title,
+                                        view=view_name)
+        DATA_FILE.set_data(entry, REVIT2RHINO.KEY)
+        # set_data returns nothing on its local path, so read it back to be sure.
+        if not REVIT2RHINO.recorded_ok(DATA_FILE.get_data, entry):
+            logger.warning("The export record could not be confirmed; the Rhino import button will use the newest file.")
+    except Exception:
+        logger.warning("Could not record the export for the Rhino import button: {}".format(traceback.format_exc()))
 
 
 class RevitToRhinoExporter(object):
     def __init__(self, revit_doc):
         self.revit_doc = revit_doc
-        
+
         # Generate timestamp for filename
         timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        self.stamp = timestamp
         self.output_file = os.path.join(ENVIRONMENT.DUMP_FOLDER, "{}_Revit2Rhino_{}.3dm".format(ENVIRONMENT.PLUGIN_NAME, timestamp))
-        
+
         self.rhino_doc = None
         self.family_instances = None
         self.geom_options = None
-        
+
         # New option for preserving family layers
         self.preserve_family_layers = False
-        
+
         # Statistics tracking
         self.symbol_geo_count = 0
         self.instance_geo_count = 0
         self.failed_geo_count = 0
+        self.error_count = 0
+        self.consecutive_error_count = 0
+        self.nothing_exported = False
+        self.open_in_rhino = False
         self.layer_dict = {}
-        
+
         # Cache for block definitions
         self.block_cache = {}
         self.block_geo_source = {}
-        
+
         # Get the current document unit
         self.revit_unit = REVIT_UNIT.get_doc_length_unit_name(revit_doc)
-        
+
         # Store the scale factor for unit conversion
         # Revit internal unit is always feet, but display unit can be different
         self.scale_factor = REVIT_UNIT.get_scale_factor(self.revit_unit)
@@ -148,19 +199,44 @@ class RevitToRhinoExporter(object):
     def setup_document(self):
         """Initialize Rhino document and geometry options"""
         self.rhino_doc = REVIT_RHINO.setup_rhino_doc(self.revit_doc)
-        
+
         # Create geometry options
         opts = DB.Options()
         opts.DetailLevel = DB.ViewDetailLevel.Fine
         opts.IncludeNonVisibleObjects = True
         self.geom_options = opts
-        
+
         return True
-            
+
     def process_element(self, element):
-        """Process a single family instance"""
-        return self._process_element(element)
-    
+        """Process a single family instance. One bad element must not abort the whole export."""
+        try:
+            result = self._process_element(element)
+            self.consecutive_error_count = 0
+            return result
+        except Exception:
+            self.error_count += 1
+            self.consecutive_error_count += 1
+            logger.error("  ERROR processing element: {}".format(traceback.format_exc()))
+            if self.consecutive_error_count >= MAX_CONSECUTIVE_ERRORS:
+                raise RuntimeError("Export aborted: {} elements in a row failed. See the log for the first error.".format(
+                    self.consecutive_error_count))
+            return None
+
+    def get_stats_summary(self):
+        """Short human-readable summary of skipped/failed elements for the user."""
+        return "Elements with no usable geometry: {}\nElements that errored: {}".format(
+            self.failed_geo_count, self.error_count)
+
+    def dispose_document(self):
+        """Dispose the headless Rhino doc (safe to call more than once)."""
+        if self.rhino_doc is not None:
+            try:
+                self.rhino_doc.Dispose()
+            except Exception:
+                print(traceback.format_exc())
+            self.rhino_doc = None
+
     def finalize_export(self):
         """Generate statistics and save the Rhino file"""
         # Print statistics
@@ -168,11 +244,13 @@ class RevitToRhinoExporter(object):
         logger.info("  - Blocks using symbol geometry: {}".format(self.symbol_geo_count))
         logger.info("  - Blocks using instance geometry: {}".format(self.instance_geo_count))
         logger.info("  - Elements with no usable geometry: {}".format(self.failed_geo_count))
-        
-        # Save the file
-        self._write_rhino_file()
+        logger.info("  - Elements that errored: {}".format(self.error_count))
+
+        # Save the file; only report a path if the file was really written
+        if not self._write_rhino_file():
+            return None
         return self.output_file
-        
+
     def _get_family_name(self, element):
         """Get family name from an element with error handling"""
         try:
@@ -235,6 +313,18 @@ class RevitToRhinoExporter(object):
             pass
         return "NoType"
 
+    @staticmethod
+    def _has_geometry(geometry_data):
+        """True if geometry_data holds at least one converted geometry object (metadata keys ignored)."""
+        if not geometry_data:
+            return False
+        for key, geo_list in geometry_data.items():
+            if key in ("geometry_source", "category_name", "family_name"):
+                continue
+            if geo_list:
+                return True
+        return False
+
     def _geometry_signature(self, geometry_data):
         """Generate an 8-digit hash signature for all Rhino geometry in geometry_data using ToJSON."""
         jsons = []
@@ -278,7 +368,7 @@ class RevitToRhinoExporter(object):
                             value = param.AsString()
                         except:
                             value = str(param.AsInteger())
-                
+
                 # Clean the value string to ensure it's ASCII-safe
                 if value:
                     # Replace common special characters with their ASCII equivalents
@@ -288,11 +378,11 @@ class RevitToRhinoExporter(object):
                     value = value.replace("÷", "/")
                     # Remove any remaining non-ASCII characters
                     value = ''.join(char for char in value if ord(char) < 128)
-                
+
                 param_dict[param.Definition.Name] = value
             except Exception:
                 continue
-                
+
         # Sort and serialize for stable hashing
         try:
             param_json = json.dumps(param_dict, sort_keys=True, ensure_ascii=True)
@@ -314,6 +404,11 @@ class RevitToRhinoExporter(object):
             "RailingType", "CeilingType", "RampType", "ModelTextType"
         ])
 
+        if not type_name:
+            type_name = "NoType"
+        if not family_name:
+            family_name = "Unknown"
+
         # Extract geometry for this element
         geometry_data = self._get_geometry(element)
 
@@ -332,30 +427,40 @@ class RevitToRhinoExporter(object):
             geo_source = self.block_geo_source.get(block_name, "Unknown")
             logger.debug("  Using cached block for {}".format(block_name))
         else:
-            if not geometry_data or len(geometry_data) <= 1:
+            if not self._has_geometry(geometry_data):
                 logger.warning("  WARNING: No valid geometry found for {}".format(family_name))
                 self.failed_geo_count += 1
                 return
 
-            # Update statistics based on geometry source
             geo_source = geometry_data.get("geometry_source", "Unknown")
-            if geo_source == "Symbol":
-                self.symbol_geo_count += 1
-            elif geo_source.startswith("Instance"):
-                self.instance_geo_count += 1
 
             # For Instance geometry, untransform it to get it in symbol coordinates
             if geo_source == "Instance" and hasattr(element, "GetTransform"):
                 transform = element.GetTransform()
                 if transform:
-                    geometry_data = self._untransform_geometry(geometry_data, transform)
+                    # Undo exactly the transform that _place_block_instance applies (same unit
+                    # scaling of the origin), so block geometry and placement always agree.
+                    placement = self._get_element_transform_no_scale(element)
+                    can_invert, rhino_inverse = placement.TryGetInverse()
+                    if not can_invert:
+                        logger.warning("  Element placement transform is not invertible; skipped.")
+                        self.failed_geo_count += 1
+                        return
+                    geometry_data = self._untransform_geometry(geometry_data, rhino_inverse)
                     geo_source = geometry_data.get("geometry_source", "Unknown")
 
             # Create a block definition from the geometry
-            block_idx = self._create_block_definition(family_name, type_name, geometry_data)
+            block_idx = self._create_block_definition(family_name, type_name, geometry_data, block_name)
             if block_idx < 0:
                 logger.error("  ERROR: Failed to create block for {}".format(family_name))
+                self.failed_geo_count += 1
                 return
+
+            # Update statistics only for blocks that were really created
+            if geo_source == "Symbol":
+                self.symbol_geo_count += 1
+            elif geo_source.startswith("Instance"):
+                self.instance_geo_count += 1
 
             # Cache the block for future instances
             self.block_cache[block_name] = block_idx
@@ -373,29 +478,29 @@ class RevitToRhinoExporter(object):
             "category_name": category_name, 
             "family_name": family_name,
             "geometry_source": "None"}
-        
+
         # For system families, get geometry directly from the element
         if any(hasattr(element, attr) for attr in ["WallType", "FloorType", "RoofType", "StairsType", 
                                                   "RailingType", "CeilingType", "RampType", "ModelTextType"]):
             instance_geometry = self._get_instance_geometry(element)
-            if instance_geometry and len(instance_geometry) > 1:  # More than just metadata
+            if self._has_geometry(instance_geometry):
                 instance_geometry["category_name"] = category_name
                 return instance_geometry
             return out_data
-        
+
         # For loadable families, try symbol geometry first
         if hasattr(element, "Symbol"):
             symbol_geometry = self._get_symbol_geometry(element.Symbol)
-            if symbol_geometry and len(symbol_geometry) > 1:  # More than just metadata
+            if self._has_geometry(symbol_geometry):
                 symbol_geometry["category_name"] = category_name
                 return symbol_geometry
-            
+
             # If symbol geometry failed, try instance geometry
             instance_geometry = self._get_instance_geometry(element)
-            if instance_geometry and len(instance_geometry) > 1:  # More than just metadata
+            if self._has_geometry(instance_geometry):
                 instance_geometry["category_name"] = category_name
                 return instance_geometry
-        
+
         # If both approaches failed
         return out_data
 
@@ -405,32 +510,35 @@ class RevitToRhinoExporter(object):
             # Initialize result dictionary with geometry source metadata
             geometry_by_subcategory = {"geometry_source": "Symbol"}
             total_objects = 0
-            
+
             # Get the symbol's geometry
             geom_elem = symbol.get_Geometry(self.geom_options)
             if not geom_elem:
                 return geometry_by_subcategory
-                
+
             # Process each geometry object
             for geometry_object in geom_elem:
                 if isinstance(geometry_object, DB.GeometryInstance):
                     # Handle nested family geometry recursively
                     nested_symbol = geometry_object.Symbol
+                    if nested_symbol is None:
+                        continue
                     nested_geo = self._get_symbol_geometry(nested_symbol)
                     for subcat_name, geo_list in nested_geo.items():
-                        if subcat_name == "geometry_source":
+                        # category_name is a str, not a geometry list; extending with it adds single characters
+                        if subcat_name in ("geometry_source", "category_name"):
                             continue
                         if subcat_name not in geometry_by_subcategory:
                             geometry_by_subcategory[subcat_name] = []
                         geometry_by_subcategory[subcat_name].extend(geo_list)
                         total_objects += len(geo_list)
-                
+
                 elif isinstance(geometry_object, DB.Solid) or hasattr(geometry_object, 'Mesh'):
                     # Direct geometry objects in symbol
                     subcat_name = self._get_subcategory_name(geometry_object)
-                    
+
                     converted = self._convert_revit_geometry(geometry_object)
-                    
+
                     if converted:
                         if subcat_name not in geometry_by_subcategory:
                             geometry_by_subcategory[subcat_name] = []
@@ -440,7 +548,7 @@ class RevitToRhinoExporter(object):
             if hasattr(symbol, 'Family') and hasattr(symbol.Family, 'FamilyCategory') and symbol.Family.FamilyCategory:
                 geometry_by_subcategory["category_name"] = symbol.Family.FamilyCategory.Name
             return geometry_by_subcategory
-            
+
         except Exception as e:
             logger.debug("  Error getting symbol geometry: {}".format(str(e)))
             return {"geometry_source": "Symbol"}
@@ -451,12 +559,12 @@ class RevitToRhinoExporter(object):
             # Initialize result dictionary with geometry source metadata
             geometry_by_subcategory = {"geometry_source": "Instance"}
             total_objects = 0
-            
+
             # Handle linked elements with their transforms
             if hasattr(element, 'link_doc'):
                 # Get link transform and apply it to all geometry
                 link_transform = element.link_transform
-                
+
                 # Use the link document for the element's geometry
                 if hasattr(element, 'get_Geometry'):
                     geom_elem = element.get_Geometry(self.geom_options)
@@ -468,11 +576,11 @@ class RevitToRhinoExporter(object):
                                 inst_geo = geometry_object.GetInstanceGeometry()
                                 if not inst_geo:
                                     continue
-                                
+
                                 for g_obj in inst_geo:
                                     # Get subcategory
                                     subcat_name = self._get_subcategory_name(g_obj)
-                                    
+
                                     # Convert to Rhino
                                     converted = self._convert_revit_geometry(g_obj)
                                     if converted:
@@ -480,32 +588,35 @@ class RevitToRhinoExporter(object):
                                             geometry_by_subcategory[subcat_name] = []
                                         geometry_by_subcategory[subcat_name].extend(converted)
                 return geometry_by_subcategory
-            
+
             # Normal case - get the instance's geometry
             geom_elem = element.get_Geometry(self.geom_options)
             if not geom_elem:
                 return geometry_by_subcategory
-                
+
             # Process each geometry object
             for geometry_object in geom_elem:
                 if isinstance(geometry_object, DB.GeometryInstance):
                     # Handle nested family geometry recursively
                     nested_symbol = geometry_object.Symbol
+                    if nested_symbol is None:
+                        continue
                     nested_geo = self._get_symbol_geometry(nested_symbol)
                     for subcat_name, geo_list in nested_geo.items():
-                        if subcat_name == "geometry_source":
+                        # category_name is a str, not a geometry list; extending with it adds single characters
+                        if subcat_name in ("geometry_source", "category_name"):
                             continue
                         if subcat_name not in geometry_by_subcategory:
                             geometry_by_subcategory[subcat_name] = []
                         geometry_by_subcategory[subcat_name].extend(geo_list)
                         total_objects += len(geo_list)
-                
+
                 elif isinstance(geometry_object, DB.Solid) or hasattr(geometry_object, 'Mesh'):
                     # Direct geometry objects
                     subcat_name = self._get_subcategory_name(geometry_object)
-                    
+
                     converted = self._convert_revit_geometry(geometry_object)
-                    
+
                     if converted:
                         if subcat_name not in geometry_by_subcategory:
                             geometry_by_subcategory[subcat_name] = []
@@ -515,7 +626,7 @@ class RevitToRhinoExporter(object):
             if hasattr(element, 'Category') and element.Category:
                 geometry_by_subcategory["category_name"] = element.Category.Name
             return geometry_by_subcategory
-            
+
         except Exception as e:
             logger.debug("  Error getting instance geometry: {}".format(str(e)))
             return {"geometry_source": "Instance"}
@@ -529,13 +640,13 @@ class RevitToRhinoExporter(object):
                     return style.GraphicsStyleCategory.Name
         except:
             pass
-        
+
         return "UnCategorized"
 
     def _convert_revit_geometry(self, g_obj):
         """Convert Revit geometry to Rhino geometry."""
         results = []
-        
+
         # Handle Solids - convert to Breps if volume is significant
         if isinstance(g_obj, DB.Solid):
             if g_obj.Volume > 1e-6:
@@ -548,9 +659,9 @@ class RevitToRhinoExporter(object):
                                     results.append(b)
                         else:
                             results.append(breps)
-                except:
-                    pass
-                    
+                except Exception as e:
+                    logger.debug("  Solid to Brep conversion failed: {}".format(str(e)))
+
         # Handle Meshes
         elif hasattr(g_obj, 'Mesh'):
             revit_mesh = g_obj.Mesh
@@ -558,20 +669,20 @@ class RevitToRhinoExporter(object):
                 try:
                     r_mesh = self._mesh_to_rhino(revit_mesh)
                     results.append(r_mesh)
-                except:
-                    pass
-                
+                except Exception as e:
+                    logger.debug("  Mesh conversion failed: {}".format(str(e)))
+
         return results
 
     def _mesh_to_rhino(self, revit_mesh):
         """Convert a Revit mesh to a Rhino mesh"""
         rhino_mesh = Rhino.Geometry.Mesh()
-        
+
         # Add vertices
         for i in range(revit_mesh.NumVertices):
             rv_vertex = revit_mesh.Vertices[i]
             rhino_mesh.Vertices.Add(rv_vertex.X, rv_vertex.Y, rv_vertex.Z)
-            
+
         # Add triangular faces
         for i in range(revit_mesh.NumTriangles):
             tri = revit_mesh.get_Triangle(i)
@@ -579,54 +690,76 @@ class RevitToRhinoExporter(object):
             idx1 = tri.get_VertexIndex(1)
             idx2 = tri.get_VertexIndex(2)
             rhino_mesh.Faces.AddFace(idx0, idx1, idx2)
-            
+
         return rhino_mesh
+
+    @staticmethod
+    def _safe_layer_name(name):
+        """Return a name usable as a Rhino layer name segment."""
+        if name is None:
+            return "Unknown"
+        name = str(name)
+        for ch in ("::", "\\", "/", ":", ";", '"', "<", ">", "?", "|", "*"):
+            name = name.replace(ch, "_")
+        name = name.strip()
+        return name or "Unknown"
 
     def _get_or_create_layer(self, subC_name, family_name, category_name):
         """Get or create a layer with the given name and return its index.
-        
+
         Args:
             subC_name (str): The subcategory name
             family_name (str): The family name
             category_name (str): The category name
-            
+
         Returns:
             int: Layer index in the Rhino document
         """
+        # Layer names cannot be empty or contain path/illegal characters
+        category_name = self._safe_layer_name(category_name)
+        family_name = self._safe_layer_name(family_name)
+        subC_name = self._safe_layer_name(subC_name)
+
         # Create parent layers first
         category_layer = self._get_or_create_parent_layer(category_name)
-        family_layer = self._get_or_create_parent_layer(family_name, parent_index=category_layer)
-        
+        family_layer = self._get_or_create_parent_layer(family_name, parent_index=category_layer if category_layer >= 0 else None)
+
         # Create the full layer path using the new format
         full_layer_path = "{}::{}::{}".format(category_name, family_name, subC_name)
-        
+
         # Check if layer already exists
-        layer_index = self.rhino_doc.Layers.FindByFullPath(full_layer_path, True)
-        if layer_index >= 0:
-            return layer_index
-            
+        # Linear scan on FullPath (same approach as _get_or_create_parent_layer); no FindByFullPath overload guessing
+        for i in range(self.rhino_doc.Layers.Count):
+            existing = self.rhino_doc.Layers[i]
+            if existing.FullPath == full_layer_path:
+                return i
+
         # Create new layer
         layer = Rhino.DocObjects.Layer()
         layer.Name = subC_name
-        layer.ParentLayerId = self.rhino_doc.Layers[family_layer].Id
-        
+        if family_layer >= 0:
+            layer.ParentLayerId = self.rhino_doc.Layers[family_layer].Id
+
         # Generate a color based only on the subcategory name
         name_hash = hash(subC_name) % 1000
         r = (name_hash * 13) % 256
         g = (name_hash * 17) % 256
         b = (name_hash * 19) % 256
         layer.Color = System.Drawing.Color.FromArgb(r, g, b)
-        
+
         # Add the layer to the document
-        return self.rhino_doc.Layers.Add(layer)
+        new_index = self.rhino_doc.Layers.Add(layer)
+        if new_index < 0:
+            logger.warning("  Could not create layer {}; objects will fall on the default layer".format(full_layer_path))
+        return new_index
 
     def _get_or_create_parent_layer(self, layer_name, parent_index=None):
         """Create or get a parent layer.
-        
+
         Args:
             layer_name (str): The layer name
             parent_index (int, optional): Index of the parent layer
-            
+
         Returns:
             int: Layer index in the Rhino document
         """
@@ -645,31 +778,42 @@ class RevitToRhinoExporter(object):
                 layer = self.rhino_doc.Layers[i]
                 if layer.FullPath == full_path:
                     return i
-            
+
         # Create new layer
         layer = Rhino.DocObjects.Layer()
         layer.Name = layer_name
         if parent_index is not None:
             layer.ParentLayerId = self.rhino_doc.Layers[parent_index].Id
-            
-        # Add the layer to the document
-        return self.rhino_doc.Layers.Add(layer)
 
-    def _create_block_definition(self, family_name, type_name, geometry_data):
-        """Create a Rhino block definition for a family symbol."""
+        # Add the layer to the document
+        new_index = self.rhino_doc.Layers.Add(layer)
+        if new_index < 0:
+            logger.warning("  Could not create layer {}".format(layer_name))
+        return new_index
+
+    def _create_block_definition(self, family_name, type_name, geometry_data, unique_name=None):
+        """Create a Rhino block definition for a family symbol.
+
+        unique_name is the cache key (includes the parameter signature / element id). Rhino
+        refuses (returns -1) a definition whose name already exists, so distinct cache entries
+        that share family+type must not share a definition name.
+        """
         # Create a block name
-        if type_name == "NoType":
+        if unique_name:
+            block_name = unique_name
+        elif type_name == "NoType":
             block_name = "{}".format(family_name)
         else:
             block_name = "{}_{}".format(family_name, type_name)
-        
+
         # Remove invalid characters
-        block_name = block_name.replace(":", "_").replace("/", "_").replace("\\", "_").replace(" ", "_")
-        
+        for ch in (":", ";", "/", "\\", "|", "\"", "<", ">", "?", "*", "=", "`", "~", " "):
+            block_name = block_name.replace(ch, "_")
+
         # Collect all geometry and create layers for subcategories
         all_geometry = []
         all_attributes = []
-        
+
         # Check if there's any actual geometry
         has_geometry = False
         for subcat_name, geo_list in geometry_data.items():
@@ -683,47 +827,47 @@ class RevitToRhinoExporter(object):
                     continue
                 has_geometry = True
                 break
-                
+
         if not has_geometry:
             return -1
-        
+
         # Use category_name from geometry_data
         category_name = geometry_data.get("category_name", "Unknown")
-        
+
         # Process each subcategory
         for subcat_name, geo_list in geometry_data.items():
             if subcat_name in ("geometry_source", "category_name") or not geo_list:
                 continue
-                
+
             # Create or get layer for this subcategory using the new format
             layer_index = self._get_or_create_layer(subcat_name, family_name, category_name)
-            
+
             for geo in geo_list:
                 if geo is None:
                     continue
-                    
+
                 # Only add if geo is a geometry object
                 if not hasattr(geo, "IsValid"):  # or use isinstance(geo, Rhino.Geometry.GeometryBase)
                     continue
                 all_geometry.append(geo)
-                
+
                 # Create attributes for this object that reference the layer
                 attrib = Rhino.DocObjects.ObjectAttributes()
                 attrib.LayerIndex = layer_index
                 all_attributes.append(attrib)
-                
+
                 # Keep track of geometry by layer for statistics
                 if subcat_name not in self.layer_dict:
                     self.layer_dict[subcat_name] = []
                 self.layer_dict[subcat_name].append(geo)
-        
+
         # Final validation
         if not all_geometry:
             return -1
-        
+
         # Create the block definition
         base_point = Rhino.Geometry.Point3d(0, 0, 0)
-        
+
         block_idx = self.rhino_doc.InstanceDefinitions.Add(
             block_name,
             "Created from Revit family",
@@ -731,7 +875,7 @@ class RevitToRhinoExporter(object):
             all_geometry,
             all_attributes
         )
-            
+
         return block_idx
 
     def _get_category_name(self, element):
@@ -758,51 +902,48 @@ class RevitToRhinoExporter(object):
     def _revit_transform_to_rhino(self, revit_transform):
         """Convert a Revit transform to a Rhino transform"""
         rhino_transform = Rhino.Geometry.Transform.Identity
-        
+
         # Set basis vectors
         rhino_transform.M00 = revit_transform.BasisX.X
         rhino_transform.M10 = revit_transform.BasisX.Y
         rhino_transform.M20 = revit_transform.BasisX.Z
-        
+
         rhino_transform.M01 = revit_transform.BasisY.X
         rhino_transform.M11 = revit_transform.BasisY.Y
         rhino_transform.M21 = revit_transform.BasisY.Z
-        
+
         rhino_transform.M02 = revit_transform.BasisZ.X
         rhino_transform.M12 = revit_transform.BasisZ.Y
         rhino_transform.M22 = revit_transform.BasisZ.Z
-        
+
         # Set origin (no unit conversion here - we'll handle that separately)
         rhino_transform.M03 = revit_transform.Origin.X
         rhino_transform.M13 = revit_transform.Origin.Y
         rhino_transform.M23 = revit_transform.Origin.Z
-        
+
         return rhino_transform
 
-    def _untransform_geometry(self, geometry_data, transform):
-        """Untransform geometry extracted with GetInstanceGeometry() to get it back to symbol space."""
+    def _untransform_geometry(self, geometry_data, rhino_inverse):
+        """Untransform geometry extracted with GetInstanceGeometry() to get it back to symbol space.
+
+        rhino_inverse is the inverse of the placement transform (already in Rhino units).
+        """
         # Make a copy of the input data
         result = dict(geometry_data)
-        
+
         try:
             # If there's no geometry other than metadata, return as is
             if len(geometry_data) <= 1 and "geometry_source" in geometry_data:
                 return result
-                
-            # Create the inverse transform to get back to symbol space
-            inverse_transform = transform.Inverse
-            
-            # Convert the inverse transform to a Rhino transform
-            rhino_inverse = self._revit_transform_to_rhino(inverse_transform)
-            
+
             # Process each subcategory
             for subcat_name, geo_list in list(result.items()):
-                if subcat_name == "geometry_source":
+                if subcat_name in ("geometry_source", "category_name", "family_name"):
                     continue
-                    
+
                 # Create a new list for the untransformed geometry
                 untransformed_list = []
-                
+
                 # Apply inverse transform to each geometry object
                 for geo in geo_list:
                     try:
@@ -812,13 +953,13 @@ class RevitToRhinoExporter(object):
                         untransformed_list.append(geo_copy)
                     except:
                         untransformed_list.append(geo)  # Keep original if transform fails
-                
+
                 # Replace the original list with the untransformed one
                 result[subcat_name] = untransformed_list
-            
+
             # Update the geometry source in the metadata
             result["geometry_source"] = "Instance_Untransformed"
-            
+
             return result
         except:
             return geometry_data  # Return original data if anything fails
@@ -827,29 +968,35 @@ class RevitToRhinoExporter(object):
         """Place a block instance in the Rhino document with the element's transformation."""
         # Get the element's transformation
         instance_transform = self._get_element_transform_no_scale(element)
-        
+
         # Create a block instance with the transformation
         instance_id = self.rhino_doc.Objects.AddInstanceObject(block_idx, instance_transform)
-        
-        # Add element metadata if successful
-        if instance_id:
-            inst_obj = self.rhino_doc.Objects.FindId(instance_id)
-            if inst_obj:
-                element_id = REVIT_APPLICATION.get_element_id_value(element.Id)
-                
-                # Add metadata as user strings
-                inst_obj.Attributes.SetUserString("RevitElementID", str(element_id))
-                family_name = self._get_family_name(element)
-                type_name = self._get_type_name(element)
-                inst_obj.Attributes.SetUserString("FamilyName", family_name)
-                inst_obj.Attributes.SetUserString("TypeName", type_name)
-                
-                # Add source document info for linked elements
-                if hasattr(element, 'link_doc'):
-                    link_name = element.link_doc.Title
-                    inst_obj.Attributes.SetUserString("LinkedModel", link_name)
-                
-                inst_obj.CommitChanges()
+
+        # A failed add returns Guid.Empty, which is truthy in IronPython, so compare explicitly
+        if instance_id == System.Guid.Empty:
+            logger.error("  ERROR: Failed to place block instance for element {}".format(
+                REVIT_APPLICATION.get_element_id_value(element.Id)))
+            self.error_count += 1
+            return
+
+        # Add element metadata
+        inst_obj = self.rhino_doc.Objects.FindId(instance_id)
+        if inst_obj:
+            element_id = REVIT_APPLICATION.get_element_id_value(element.Id)
+
+            # Add metadata as user strings
+            inst_obj.Attributes.SetUserString("RevitElementID", str(element_id))
+            family_name = self._get_family_name(element) or "Unknown"
+            type_name = self._get_type_name(element) or "NoType"
+            inst_obj.Attributes.SetUserString("FamilyName", family_name)
+            inst_obj.Attributes.SetUserString("TypeName", type_name)
+
+            # Add source document info for linked elements
+            if hasattr(element, 'link_doc'):
+                link_name = element.link_doc.Title
+                inst_obj.Attributes.SetUserString("LinkedModel", link_name)
+
+            inst_obj.CommitChanges()
 
     def _get_element_transform_no_scale(self, element):
         """Get a Rhino transform from a Revit family instance."""
@@ -865,10 +1012,10 @@ class RevitToRhinoExporter(object):
         else:
             # Regular case - just use the element's transform
             revit_transform = element.GetTransform() if hasattr(element, 'GetTransform') else None
-            
+
         if revit_transform is None:
             return Rhino.Geometry.Transform.Identity
-          
+
         # Create a new Rhino transform
         rhTrans = Rhino.Geometry.Transform.Identity
 
@@ -892,44 +1039,78 @@ class RevitToRhinoExporter(object):
         origin_x = REVIT_UNIT.internal_to_unit(revit_transform.Origin.X, self.revit_unit)
         origin_y = REVIT_UNIT.internal_to_unit(revit_transform.Origin.Y, self.revit_unit)
         origin_z = REVIT_UNIT.internal_to_unit(revit_transform.Origin.Z, self.revit_unit)
-        
+
         rhTrans.M03 = origin_x
         rhTrans.M13 = origin_y
         rhTrans.M23 = origin_z
         rhTrans.M33 = 1.0
-        
+
         return rhTrans
 
     def _write_rhino_file(self):
-        """Write the Rhino document to a 3DM file and open it"""
-        # Configure file write options
-        write_option = Rhino.FileIO.FileWriteOptions()
-        write_option.FileVersion = 7  # Save as Rhino 7 3dm
-        
-        # Zoom extents to all objects before saving
-        if self.rhino_doc.Objects.Count > 0:
-            # Get all objects' bounding box
-            bbox = Rhino.Geometry.BoundingBox.Empty
-            for obj in self.rhino_doc.Objects:
-                if obj.Geometry is not None:
-                    bbox.Union(obj.Geometry.GetBoundingBox(True))
-            
-            # Set all active views to this bounding box
-            if bbox.IsValid:
-                # Add some padding to the bounding box (10%)
-                pad = bbox.Diagonal.Length * 0.1
-                bbox.Inflate(pad, pad, pad)
-                
-                for view in self.rhino_doc.Views:
-                    view.ActiveViewport.ZoomBoundingBox(bbox)
-                    view.Redraw()
-        
-        # Write the file and dispose the document
-        self.rhino_doc.Write3dmFile(self.output_file, write_option)
-        self.rhino_doc.Dispose()
-        
-        # Open the file
-        os.startfile(self.output_file) 
+        """Write the Rhino document to a 3DM file and open it.
+
+        Returns:
+            bool: True only if the file was written (and is left on disk).
+        """
+        if self.rhino_doc is None:
+            logger.error("No Rhino document to write.")
+            return False
+
+        try:
+            # Configure file write options
+            write_option = Rhino.FileIO.FileWriteOptions()
+            # Rhino 8 is the primary target and Rhino 7 is still supported. Rhino 8 opens a
+            # version 7 file, but Rhino 7 cannot open a newer one, so keep this at 7.
+            write_option.FileVersion = 7  # Save as Rhino 7 3dm
+
+            # Zoom extents to all objects before saving
+            if self.rhino_doc.Objects.Count > 0:
+                # Get all objects' bounding box
+                bbox = Rhino.Geometry.BoundingBox.Empty
+                for obj in self.rhino_doc.Objects:
+                    if obj.Geometry is not None:
+                        bbox.Union(obj.Geometry.GetBoundingBox(True))
+
+                # Set all active views to this bounding box
+                if bbox.IsValid:
+                    # Add some padding to the bounding box (10%)
+                    pad = bbox.Diagonal.Length * 0.1
+                    bbox.Inflate(pad, pad, pad)
+
+                    for view in self.rhino_doc.Views:
+                        view.ActiveViewport.ZoomBoundingBox(bbox)
+                        view.Redraw()
+            else:
+                logger.warning("Rhino document is empty; nothing was exported.")
+                self.nothing_exported = True
+                return False
+
+            # Write the file
+            ok = self.rhino_doc.Write3dmFile(self.output_file, write_option)
+        except Exception:
+            print(traceback.format_exc())
+            ok = False
+        finally:
+            self.dispose_document()
+
+        if not ok:
+            logger.error("Failed to write {}".format(self.output_file))
+            # Do not leave a half-written file behind
+            try:
+                if os.path.exists(self.output_file):
+                    os.remove(self.output_file)
+            except Exception:
+                print(traceback.format_exc())
+            return False
+
+        # Open the file (only when asked: the Rhino import button is the normal way in)
+        if self.open_in_rhino:
+            try:
+                os.startfile(self.output_file)
+            except Exception:
+                print(traceback.format_exc())
+        return True
 
 
 if __name__ == "__main__":

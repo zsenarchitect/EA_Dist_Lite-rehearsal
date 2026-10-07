@@ -258,19 +258,11 @@ def _auto_configure_claude(python_cmd, port, engine_dir):
     # Claude Code: ~/.claude/settings.json (project-level .mcp.json)
     userprofile = os.environ.get("USERPROFILE", "")
     if userprofile:
-        # Write .mcp.json in the engine dir for project-level config
+        # Merge into .mcp.json in the engine dir for project-level config.
+        # Never overwrite: the user may already have other MCP servers configured.
         mcp_json_path = os.path.join(os.path.dirname(engine_dir), ".mcp.json")
-        mcp_json_data = {
-            "mcpServers": {
-                "enneadtab-revit": mcp_entry
-            }
-        }
-        try:
-            with open(mcp_json_path, "w") as f:
-                json.dump(mcp_json_data, f, indent=2)
+        if _merge_mcp_config(mcp_json_path, "enneadtab-revit", mcp_entry):
             configured.append("Claude Code (.mcp.json)")
-        except Exception:
-            pass
 
     if configured:
         return "Auto-configured: {}".format(", ".join(configured))
@@ -388,13 +380,17 @@ def mcp_server():
         set_state({"pid": proc.pid, "running": True, "port": routes_port})
         script.toggle_icon(True)
 
+        # Auto-configure Claude clients to use this MCP server
+        claude_status = _auto_configure_claude(python_cmd, routes_port, engine_dir)
+
         # Open browser from the pushbutton (detached processes can't reliably do this)
         import webbrowser  # pyright: ignore
         webbrowser.open("http://localhost:5000")
 
         NOTIFICATION.messenger(
             "MCP Server is running.\n"
-            "Browser opened to http://localhost:5000"
+            "Browser opened to http://localhost:5000\n"
+            "{}".format(claude_status)
         )
     except Exception as e:
         NOTIFICATION.messenger(

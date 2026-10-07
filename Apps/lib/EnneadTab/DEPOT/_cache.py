@@ -66,7 +66,12 @@ def read_index():
 
 
 def write_index(index):
-    """Atomically persist the index (temp file + rename)."""
+    """Persist the index via temp file + rename.
+
+    NOT atomic: the existing index is removed BEFORE the rename, so there is
+    a window where the index file does not exist. Do not build on an
+    atomicity guarantee here. senzhang-todo #3896.
+    """
     path = ENVIRONMENT.DEPOT_CACHE_INDEX_FILE
     d = os.path.dirname(path)
     if d and not os.path.exists(d):

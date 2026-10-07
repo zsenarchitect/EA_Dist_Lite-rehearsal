@@ -112,14 +112,16 @@ def locate_executable(exe_name):
     # Search order: .bat first (preferred - no recompilation needed), then .exe
     extensions = [".bat", ".exe"]
 
+    # Local checks first, network last-resort: both product-folder checks are
+    # a cheap os.path.exists, while the depot lookup below is an HTTP round
+    # trip (manifest GET + a download attempt). Checking it per-extension
+    # ahead of the foldered-variant check would pay that cost on every lookup
+    # for any tool still using the foldered layout -- including
+    # NotificationHost, resolved via this function on the Revit UI thread by
+    # _try_wake_notification_host / _notification_host_is_stale.
     for ext in extensions:
         # Check product folder
         path = ENVIRONMENT.EXE_PRODUCT_FOLDER + "\\{}{}".format(exe_name, ext)
-        if os.path.exists(path):
-            return path
-
-        # Check standalone folder
-        path = ENVIRONMENT.STAND_ALONE_FOLDER + "\\{}{}".format(exe_name, ext)
         if os.path.exists(path):
             return path
 
@@ -127,6 +129,17 @@ def locate_executable(exe_name):
         path = ENVIRONMENT.EXE_PRODUCT_FOLDER + "\\{0}\\{0}{1}".format(exe_name, ext)
         if os.path.exists(path):
             return path
+
+    # STAND_ALONE_FOLDER (office L: drive) is retired -- resolve through the
+    # depot "tools/standalone" asset namespace instead (network-drive
+    # retirement epic, senzhang-todo #3171). get_asset_path downloads to a
+    # local cache and returns that path, or None if the key is unknown. Tried
+    # only after every local location has missed for both extensions.
+    from EnneadTab.DEPOT import ASSET
+    for ext in extensions:
+        depot_path = ASSET.get_asset_path("tools/standalone/{}{}".format(exe_name, ext))
+        if depot_path:
+            return depot_path
 
     return None
 

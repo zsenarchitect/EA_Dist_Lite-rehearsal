@@ -24,15 +24,15 @@ from pyrevit import script #
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
 
-from EnneadTab import ERROR_HANDLE, COLOR, NOTIFICATION, OUTPUT
+from EnneadTab import ERROR_HANDLE, COLOR, NOTIFICATION, OUTPUT, SHAREPOINT
 from EnneadTab.REVIT import REVIT_SELECTION
-from Autodesk.Revit import DB # pyright: ignore 
+from Autodesk.Revit import DB # pyright: ignore
 # from Autodesk.Revit import UI # pyright: ignore
 doc = __revit__.ActiveUIDocument.Document # pyright: ignore
 
 
 
-EXCEL_PATH = "J:\\2151\\2_Master File\\B-70_Programming\\03_Colors\\Color Scheme_NYULI.xlsx"
+EXCEL_PATH = SHAREPOINT.get_project_file("2151/2_Master File/B-70_Programming/03_Colors/Color Scheme_NYULI.xlsx")
 NAMING_MAP = {"department_color_map":["Department Category_Primary", "Department Category_Opt1"],
               "program_color_map":["Department Program Type_Primary", "Department Program Type_Opt1"]}
 

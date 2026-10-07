@@ -32,6 +32,9 @@ try:
     import tkinter as tk
     import tkinter.ttk as ttk
     from tkinter import scrolledtext
+    from tkinter import messagebox
+
+    import _protocol_handler_registration
 
     IMPORT_FINE = True
 except ImportError as e:
@@ -84,7 +87,28 @@ class RepositoryUpdater:
         folder = os.path.join(self.extract_to_eco_sys_folder, "Dump")
         os.makedirs(folder, exist_ok=True)
         return folder
-    
+
+    @property
+    def last_applied_sha_path(self):
+        # Keyed by repo_name: lite ("EA_Dist_Lite") and full ("EA_Dist") are two
+        # independent GitHub repos with unrelated commit history, so a sha that's
+        # current for one says nothing about the other.
+        return os.path.join(self.dump_folder, f"last_applied_sha_{self.repo_name}.txt")
+
+    def _read_last_applied_sha(self):
+        try:
+            with open(self.last_applied_sha_path, 'r') as f:
+                return f.read().strip()
+        except Exception:
+            return None
+
+    def _write_last_applied_sha(self, sha):
+        try:
+            with open(self.last_applied_sha_path, 'w') as f:
+                f.write(sha)
+        except Exception as e:
+            logger.warning(f"Failed to persist last-applied sha: {e}")
+
 
 
     def setup_gui(self):
@@ -132,6 +156,7 @@ class RepositoryUpdater:
             self.start_update()
 
     def start_update(self):
+        success = False
         try:
             # Fetch the latest commit before downloading the zip
             self.commit_sha, self.commit_message = self.get_latest_commit()
@@ -146,19 +171,96 @@ class RepositoryUpdater:
                 print("Updated full version usage tracking\n")
 
             self.cleanup_old_files()  # Use combined cleanup method
+
+            # Skip the download/extract/update pipeline entirely when this repo's
+            # content hasn't changed since the last successful run. Previously this
+            # method fetched commit_sha only to log it and never compared it to
+            # anything, so every 45-min scheduled-task fire re-downloaded and
+            # re-extracted the full zip fleet-wide even when nothing changed
+            # (senzhang-todo #5884 discussion, 2026-09-10). Gated on final_dir
+            # already existing so a first-time install always proceeds.
+            if (
+                self.commit_sha
+                and os.path.exists(self.final_dir)
+                and self.commit_sha == self._read_last_applied_sha()
+            ):
+                print(f"Already up to date at commit {self.commit_sha} — skipping download.\n")
+                self.create_duck_file(success=True, skipped=True)
+                return
+
             self.download_zip()
             self.extract_zip()
             self.update_files()
             self.cleanup_current_cache()
             self.cleanup_empty_EA_dist_folder()
+            has_errors = bool(getattr(self, 'extraction_errors', None))
+            # Only record this sha as applied when EVERY file actually landed. update_files()
+            # swallows a per-file copy failure (logs it, keeps going) rather than raising, so a
+            # locked/permission-denied file produces a torn install that still reaches this
+            # line with no exception — persisting the sha here would tell the skip check in
+            # start_update() this machine is done, and no future cycle would ever retry the
+            # missing file until the next real upstream commit. See senzhang-todo #2391 (the
+            # pre-existing, still-open defect this mirrors) and #6036.
+            if self.commit_sha and not has_errors:
+                self._write_last_applied_sha(self.commit_sha)
+            elif has_errors:
+                print(f"\nNot recording commit {self.commit_sha} as applied — {len(self.extraction_errors)} file(s) failed, will retry next cycle.\n")
             self.create_duck_file(success=True)
             print("\n\nUpdate completed. You can now close this window!")
+            success = True
         except Exception as e:
             self.create_duck_file(success=False, error_details=traceback.format_exc())
             print(f"Update failed with error: {e}")
 
         if self.use_gui:
-            self.root.after(10000, self.root.destroy)  # Close the GUI after 10 seconds
+            # Marshal onto the main thread -- this worker thread must not touch
+            # Tk widgets/dialogs directly (start_update runs in a background
+            # thread; see run_update).
+            self.root.after(0, lambda: self._finish_gui(success))
+
+    def _finish_gui(self, success):
+        """First-time install only (use_gui True): offer to chain straight
+        into the Revit/Rhino installers, then close. Runs on the main thread.
+        """
+        if success:
+            self._offer_chain_installs()
+        self.root.after(3000, self.root.destroy)
+
+    def _offer_chain_installs(self):
+        """Offer to install EnneadTab for Rhino and/or Revit right after the
+        core install finishes, mirroring the Wiki install guide's own order
+        (OS installer, then "Choose Rhino, Revit, or both") instead of
+        leaving the user to go find those installers on their own.
+
+        Both installers are now fully guided/non-interactive from here on
+        (Rhino via the headless RhinoCode installer, Revit via pyRevit
+        attach) -- see senzhang-todo #5884. Only offered on first-time
+        install (use_gui) and only when the exe actually exists in this
+        distribution (the Lite build may not carry it) -- missing means a
+        silent skip, not an error.
+        """
+        exe_product_folder = os.path.join(self.final_dir, "Apps", "lib", "ExeProducts")
+        installers = [
+            ("Rhino", os.path.join(exe_product_folder, "EnneadTab_For_Rhino_Installer.exe")),
+            ("Revit", os.path.join(exe_product_folder, "EnneadTab_For_Revit_Installer.exe")),
+        ]
+        for product_name, installer_path in installers:
+            if not os.path.exists(installer_path):
+                continue
+            try:
+                wants_it = messagebox.askyesno(
+                    "Install EnneadTab for {}?".format(product_name),
+                    "EnneadTab is now set up.\n\nInstall EnneadTab for {} now?".format(product_name),
+                )
+            except Exception as e:
+                print(f"Could not prompt for {product_name} install: {e}")
+                continue
+            if wants_it:
+                try:
+                    os.startfile(installer_path)
+                    print(f"Launched EnneadTab for {product_name} installer.")
+                except Exception as e:
+                    print(f"Failed to launch EnneadTab for {product_name} installer: {e}")
 
     def download_zip(self):
         for attempt in range(self.max_retries):
@@ -293,7 +395,21 @@ class RepositoryUpdater:
             try:
                 shutil.copyfile(src_path, tgt_path)
             except Exception as e:
-                logger.warning(f"Failed to copy {rel_path}: {str(e)}")
+                error_msg = f"Failed to copy {rel_path}: {str(e)}"
+                logger.warning(error_msg)
+                # Feed the SAME error list extract_zip() populates (senzhang-todo #2391: a
+                # partial/torn update must never be recorded as a verified success). Before
+                # this, a copy failure here was only logged, never reflected in
+                # extraction_errors, so create_duck_file() called it a clean "Update
+                # succeeded" and (after the SHA-skip fix, #5884/#5914) the new sha would be
+                # persisted as applied — permanently skipping retry on a machine that never
+                # actually got the file. Previously every 45-min cycle re-copied everything
+                # unconditionally, so a torn copy silently self-healed on the next run; the
+                # skip-if-unchanged optimization removes that accidental safety net unless
+                # this failure is tracked and gates the sha write below.
+                if not hasattr(self, 'extraction_errors'):
+                    self.extraction_errors = []
+                self.extraction_errors.append(error_msg)
         
         # Only clean up old files when using the FULL version
         # Lite version is partial and should not delete existing files
@@ -358,17 +474,19 @@ class RepositoryUpdater:
                     pass
         print("Cleanup empty EA folder completed.")
 
-    def create_duck_file(self, success=True, error_details=None):
+    def create_duck_file(self, success=True, error_details=None, skipped=False):
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         duck_file_path = os.path.join(self.extract_to_eco_sys_folder, f"{timestamp}.duck")
-        
+
         # If there are extraction errors or other errors, mark as error duck file
         has_extraction_errors = hasattr(self, 'extraction_errors') and len(self.extraction_errors) > 0
         if not success or has_extraction_errors:
             duck_file_path = os.path.join(self.extract_to_eco_sys_folder, f"{timestamp}_ERROR.duck")
 
         with open(duck_file_path, 'w') as f:
-            if success and not has_extraction_errors:
+            if skipped:
+                f.write("Already up to date — no download needed.\n")
+            elif success and not has_extraction_errors:
                 f.write("Update succeeded.\n")
             else:
                 f.write("Failed update.\n")
@@ -763,6 +881,25 @@ class RepositorySelector:
             return timedelta(0)
 
 
+def _register_protocol_handler_step():
+    """Register enneadtab-depot:// so EnneadTab-Library's web "1-Click Drag &
+    Download" button (currently dead in production, senzhang-todo #5513) has
+    something to hand off to. Best-effort and non-fatal: a registration
+    failure (e.g. a locked-down machine) must never fail the whole install --
+    the repo sync above is this installer's actual job."""
+    try:
+        handler_exe_path = os.path.join(_Exe_Util.EXE_PRODUCT_FOLDER, "EnneadTabDepotProtocolHandler.exe")
+        # Never register a handler that points at nothing: the button would then
+        # fail with a Windows "cannot find file" dialog instead of doing nothing.
+        if not os.path.exists(handler_exe_path):
+            logger.warning("Skipping enneadtab-depot:// registration: {0} is not installed.".format(handler_exe_path))
+            return
+        _protocol_handler_registration.register_protocol_handler(handler_exe_path)
+        logger.info("Registered enneadtab-depot:// protocol handler.")
+    except Exception as e:
+        logger.warning("Could not register enneadtab-depot:// protocol handler: {0}".format(e))
+
+
 @_Exe_Util.try_catch_error
 def main():
     try:
@@ -805,6 +942,7 @@ def main():
         # Run the update process with error recovery
         try:
             updater.run_update()
+            _register_protocol_handler_step()
         except Exception as e:
             # Record the failure
             repo_selector.record_failed_attempt(selected_repo['name'].lower().split('_')[-1])

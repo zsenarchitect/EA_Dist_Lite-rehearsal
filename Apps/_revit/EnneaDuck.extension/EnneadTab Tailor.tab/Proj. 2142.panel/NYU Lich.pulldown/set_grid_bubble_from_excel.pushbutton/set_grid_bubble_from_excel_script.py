@@ -19,13 +19,13 @@ import time
 
 from pyrevit import script
 
-from EnneadTab import ERROR_HANDLE, NOTIFICATION, EXCEL, DATA_CONVERSION
+from EnneadTab import ERROR_HANDLE, NOTIFICATION, EXCEL, DATA_CONVERSION, SHAREPOINT
 from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_VIEW
 from Autodesk.Revit import DB  # pyright: ignore
 
 doc = REVIT_APPLICATION.get_doc()
 
-EXCEL_PATH = r"J:\2142\6_Team\BS\NYU-SUF View List.xlsx"
+EXCEL_PATH = SHAREPOINT.get_project_file("2142/6_Team/BS/NYU-SUF View List.xlsx")
 WORKSHEET = "Sheet1"
 HEADER_ROW = 1
 

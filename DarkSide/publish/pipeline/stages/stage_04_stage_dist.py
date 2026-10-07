@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """Stage 04: Staging Distribution Repositories (EA_Dist & EA_Dist_Lite)."""
 
+import datetime
+import json
 import os
 import shutil
 import stat
 import subprocess
+import tempfile
 import time
 from ..stage_base import PublishStage, PublishStageError
 
@@ -18,6 +21,71 @@ EXE_PRODUCTS_REL = os.path.join("Apps", "lib", "ExeProducts")
 # uncommitted edit to one of those is unrecoverable: never staged, so not in the
 # reflog and not in any git object.
 FOLDERS_TO_PROCESS = ["Apps", "Installation", "DarkSide"]
+
+# Tracked files at the dist ROOT that this stage rewrites (outside FOLDERS_TO_PROCESS).
+# The crash-restore checks these out too, so a crash after a rewrite cannot leave the
+# tree dirty. Checkout only, never clean: they are tracked, and clean at repo root is banned.
+ROOT_FILES_WRITTEN = ["README.md"]
+
+# What the Lite distribution drops. Module scope, NOT locals inside _sync_dist_repo,
+# because stage_03's path-length scan has to reproduce EA_Dist_Lite's file set to know
+# which paths actually land there. A second copy of these lists in another stage is how
+# the scan and the sync quietly start disagreeing about what ships. senzhang-todo #4692.
+LITE_SKIP_FOLDERS = ["DuckMaker.extension", "_cad", "_engine", "DumpScripts", "dependency"]
+LITE_ALLOWED_EXES = [
+    "EnneadTab_OS_Installer.exe",
+    "EnneadTab_OS_UnInstaller.exe",
+    "EnneadTab_For_Revit_Installer.exe",
+    "EnneadTab_For_Revit_UnInstaller.exe",
+    "Emailer.exe",
+    "NotificationHost.exe",
+    "ProgressBar.exe",
+]
+
+# Excluded from EVERY target, Full included -- checked unconditionally in
+# path_excluded_from_target below, NOT gated on is_lite. It also appears first in
+# LITE_SKIP_FOLDERS above, which makes it redundant for Lite specifically, but that
+# list alone never excluded it from Full: without this separate unconditional check,
+# stage_03's path-length scan measured EA_Dist (the Full root) as if this content
+# shipped there, when stage_04's own walk never lets it. senzhang-todo #4747.
+UNCONDITIONAL_SKIP_FOLDERS = ["DuckMaker.extension"]
+
+
+def path_excluded_from_target(rel_path, is_lite):
+    """Would `rel_path` (relative to a FOLDERS_TO_PROCESS folder) be excluded from the
+    given target's staged content by _sync_dist_repo's walk?
+
+    SINGLE SOURCE OF TRUTH for the exclusion rules _sync_dist_repo applies at
+    walk-time -- stage_03's path-length scan must reproduce the same decision at
+    scan-time to measure the roots it claims to measure, and a second copy of this
+    logic is how the two silently drift. They already had: stage_03's own
+    reimplementation was missing the extension filter below AND the unconditional
+    DuckMaker.extension exclusion, so its Lite measurement over-counted and its Full
+    measurement did too. senzhang-todo #4747.
+
+    `rel_path` may name either a directory (for the walk's own prune decision) or a
+    file -- the predicate is written to work identically either way, since it checks
+    path SEGMENTS, and a directory exclusion here is what stage_03 uses to skip an
+    entire subtree without needing to enumerate it.
+    """
+    normalized = rel_path.replace("\\", "/")
+    segments = [s for s in normalized.split("/") if s and s != "."]
+    filename = segments[-1] if segments else ""
+
+    if any(skip.lower() in seg.lower() for seg in segments
+           for skip in UNCONDITIONAL_SKIP_FOLDERS):
+        return True
+
+    if is_lite:
+        low = normalized.lower()
+        if any(skip.lower() in low for skip in LITE_SKIP_FOLDERS):
+            return True
+        if filename.lower().endswith(".exe") and filename not in LITE_ALLOWED_EXES:
+            return True
+        if any(ext in filename.lower() for ext in (".dll", ".psd", ".ai")):
+            return True
+
+    return False
 
 # Fault injection for testing the restore path. A repair that has never been WATCHED
 # to fire is unverified -- "silently does nothing" and "works" look identical. Set
@@ -175,6 +243,10 @@ def _restore_dist_tree(context, repo, label):
         rc, out = _git(context, repo, ["clean", "-fd", "--", folder])
         if rc != 0:
             problems.append("clean {} failed: {}".format(folder, out.strip()[:300]))
+    for root_file in ROOT_FILES_WRITTEN:
+        rc, out = _git(context, repo, ["checkout", "--", root_file])
+        if rc != 0 and "did not match any file" not in out:
+            problems.append("checkout {} failed: {}".format(root_file, out.strip()[:300]))
     rc, out = _git(context, repo, ["status", "--porcelain"], timeout=300)
     remaining = len([ln for ln in out.splitlines() if ln.strip()]) if rc == 0 else -1
     return problems, remaining
@@ -219,6 +291,176 @@ def restore_dist_repos(context, repos, reason):
     print("=" * 70 + "\n")
 
 
+def _resolve_source_commit(context):
+    """The exact SHA this publish is shipping, for the version stamp.
+
+    Prefers ENNEADTAB_PUBLISH_SHA (set by run-ci-publish.ps1 right after its own reset,
+    following workflow_dispatch's inputs.sha override) over GITHUB_SHA (Actions' own
+    trigger-commit var, which does NOT follow that override) over a live `git rev-parse
+    HEAD` on os_repo_folder -- ported unchanged from the legacy ________publish.py
+    _write_dist_version_stamp, which senzhang-todo #4417 fixed. See that history for why
+    this precedence, not a fresher one, is correct.
+    """
+    source_commit = (
+        os.environ.get("ENNEADTAB_PUBLISH_SHA")
+        or os.environ.get("GITHUB_SHA")
+        or None
+    )
+    if source_commit:
+        source_commit = source_commit.strip()
+    if source_commit:
+        return source_commit
+    try:
+        return subprocess.check_output(
+            [context.git_exe, "rev-parse", "HEAD"],
+            cwd=context.os_repo_folder, universal_newlines=True, timeout=30).strip()
+    except Exception as exc:
+        print("    Could not resolve source commit for version stamp: {}".format(exc))
+        return "unknown"
+
+
+def _write_dist_version_stamp(dist_folder, stamp):
+    """Write Apps/lib/EnneadTab/DIST_VERSION.json into the dist copy.
+
+    Runtime code (ENVIRONMENT.get_dist_version) reads this so every error report carries
+    the exact publish a machine is running; absence of the file means a dev tree.
+
+    MUST run after _sync_dist_repo (which wipes Apps/) and before stage_05 commits --
+    ported from the legacy, now-dead ________publish.py._write_dist_version_stamp. That
+    function kept working correctly through the 2026-08-18 stage-pipeline migration, but
+    the migration never called it: StageDistStage replaced the monolith's copy-and-commit
+    method without carrying this step over, so the stamp silently stopped shipping on
+    every publish since (senzhang-todo #2391, confirmed against EA_Dist's own git history
+    -- the file was removed in the first post-migration commit and never reappeared).
+    """
+    stamp_path = os.path.join(dist_folder, "Apps", "lib", "EnneadTab", "DIST_VERSION.json")
+    os.makedirs(os.path.dirname(stamp_path), exist_ok=True)
+    with open(stamp_path, "w") as f:
+        json.dump(stamp, f, indent=4)
+    print("    DIST_VERSION stamp written: {}".format(stamp["version"]))
+
+
+def _write_dist_manifest(dist_folder, stamp):
+    """Write Installation/dist_manifest.json into the dist copy.
+
+    A SHA-256 of every shipped .py file under Apps/lib/EnneadTab and
+    Apps/_revit/EnneaDuck.extension -- the integrity manifest that lets a user machine
+    prove its install is internally consistent. EnneadTab.INTEGRITY.verify() reads it.
+    Scope lives in INTEGRITY.MANIFEST_TREES so the writer and reader cannot drift.
+
+    Same provenance and same "must run after copy, before commit" rule as
+    _write_dist_version_stamp above -- ported from the same dead legacy method for the
+    same reason.
+
+    Imports EnneadTab.INTEGRITY lazily: this stage must remain importable (for tests,
+    for a rehearsal with no EnneadTab lib on sys.path) even when the real package is not
+    reachable. A missing INTEGRITY module degrades to "no manifest this run", loud on
+    stdout, never a hard failure -- write failures here must never block the fleet from
+    getting the rest of the publish.
+    """
+    try:
+        from EnneadTab import INTEGRITY
+    except Exception as exc:
+        print("    Warning: EnneadTab.INTEGRITY not importable, skipping dist_manifest.json: "
+              "{}: {}".format(type(exc).__name__, exc))
+        return
+
+    files = INTEGRITY.build_manifest_files(dist_folder)
+    manifest = {
+        "version": stamp["version"],
+        "source_commit": stamp["source_commit"],
+        "published_at": stamp["published_at"],
+        "trees": INTEGRITY.MANIFEST_TREES,
+        "files": files,
+    }
+    manifest_dir = os.path.join(dist_folder, "Installation")
+    os.makedirs(manifest_dir, exist_ok=True)
+    manifest_path = os.path.join(manifest_dir, INTEGRITY.MANIFEST_NAME)
+    with open(manifest_path, "w") as f:
+        json.dump(manifest, f, indent=4, sort_keys=True)
+    print("    dist_manifest written: {} files hashed".format(len(files)))
+
+
+_LITE_README_NOTE = """# LITE VERSION
+
+This is the **LITE VERSION** of the distribution repository, optimized for quick installation.
+
+## Excluded Content
+The following content has been removed to reduce size:
+- Most executable files (.exe), **except installers, uninstallers and a few core utilities**
+- Dynamic link libraries (.dll)
+- CAD-related files and folders
+- Engine files and folders
+- Dump scripts
+- Dependency files
+
+## Included Executable Files
+{installers}
+
+For the full version with all features, please use the standard distribution."""
+
+_DIST_README_TEMPLATE = """# EnneadTab Distribution Repository
+
+## 📅 Last Updated
+{updated}
+
+{lite_note}
+
+## 📦 Contents
+This repository contains:
+- 📂 Apps
+- 📂 Installation
+
+## ⚠️ Important Notes
+- For support, please contact szhang@ennead.com directly
+
+## 🙏 Acknowledgments
+- Special thanks to all users who have provided feedback and suggestions
+- Special thanks to Ehsan and the pyRevit team for providing the foundation for the Revit Extension
+
+## 💭 Wisdom of the Day
+{joke}
+
+---
+*Have a nice day! Hope you enjoy using this product.*
+"""
+
+
+def _random_joke():
+    """Lazy, never-fatal JOKE import, same reasoning as INTEGRITY in _write_dist_manifest."""
+    try:
+        from EnneadTab import JOKE
+        return JOKE.random_joke()
+    except Exception as exc:
+        print("    Warning: EnneadTab.JOKE unavailable for README: {}: {}".format(
+            type(exc).__name__, exc))
+        return "Keep calm and model on."
+
+
+def _write_dist_readme(dist_folder, is_lite, stamp):
+    """Write the public README.md at the dist repo root.
+
+    Ported from the dead legacy ________publish.py._copy_files_to_dist_repo. Same story
+    as _write_dist_version_stamp: the 2026-08-18 stage-pipeline migration never carried
+    this step over, so EA_Dist's README froze at "Last Updated 2026-08-18 14:54:01" while
+    every publish after it shipped normally. README.md sits outside FOLDERS_TO_PROCESS,
+    so the sync never touches it; stage_05's `git add -A` commits this rewrite.
+
+    The internal "automatically generated and not manually maintained" note is
+    deliberately NOT carried over: EA_Dist is public and that line is for us only.
+    """
+    lite_note = ""
+    if is_lite:
+        lite_note = _LITE_README_NOTE.format(
+            installers="\n".join("- {}".format(name) for name in LITE_ALLOWED_EXES))
+    updated = stamp["published_at"].replace("T", " ")
+    content = _DIST_README_TEMPLATE.format(
+        updated=updated, lite_note=lite_note, joke=_random_joke())
+    with open(os.path.join(dist_folder, "README.md"), "w", encoding="utf-8") as f:
+        f.write(content)
+    print("    README.md written (Last Updated {})".format(updated))
+
+
 class StageDistStage(PublishStage):
     """Staging stage: copies OS content into EA_Dist and EA_Dist_Lite with filtering."""
 
@@ -242,6 +484,20 @@ class StageDistStage(PublishStage):
         # just the failing one) matters -- a crash in Lite otherwise leaves EA_Dist fully
         # copied and dirty, and the next publish refuses on IT instead.
         touched = []
+        # Temp ExeProducts backups created during this stage, cleaned in the finally below.
+        # A crash between creating one and restoring from it must not leave it on disk:
+        # it is outside the repo so it cannot wedge a publish any more, but an unbounded
+        # pile of multi-hundred-MB exe copies in %TEMP% is its own slow failure.
+        self._exe_backup_dirs = []
+        # Computed once, shared by both targets, so EA_Dist and EA_Dist_Lite from the same
+        # publish run carry an identical version -- same intent as the legacy (now dead)
+        # ________publish.py._write_dist_version_stamp this was ported from.
+        now = datetime.datetime.now()
+        dist_version_stamp = {
+            "version": now.strftime("%Y.%m.%d.%H%M"),
+            "source_commit": _resolve_source_commit(context),
+            "published_at": now.strftime("%Y-%m-%dT%H:%M:%S"),
+        }
         try:
             for dist_folder, is_lite, label in dist_targets:
                 if not os.path.exists(os.path.dirname(dist_folder)):
@@ -249,6 +505,33 @@ class StageDistStage(PublishStage):
                         label, dist_folder))
                 touched.append((dist_folder, label))
                 self._sync_dist_repo(context, dist_folder, is_lite, label)
+
+                # Written AFTER the sync (which wipes Apps/lib/EnneadTab and Installation/)
+                # and BEFORE stage_05 commits, so the stamp rides the same auto-commit.
+                # Never allowed to block the publish: a missing stamp only degrades version
+                # reporting for one run, a skipped commit stops fleet updates entirely.
+                try:
+                    _write_dist_version_stamp(dist_folder, dist_version_stamp)
+                except Exception as exc:
+                    print("    Warning: failed to write DIST_VERSION.json for {}: {}".format(
+                        label, exc))
+                try:
+                    _write_dist_manifest(dist_folder, dist_version_stamp)
+                except Exception as exc:
+                    print("    Warning: failed to write dist_manifest.json for {}: {}".format(
+                        label, exc))
+
+            # READMEs only AFTER every target synced. README.md sits at the dist root,
+            # outside FOLDERS_TO_PROCESS, so writing it per target meant a crash while
+            # staging Lite left EA_Dist's README modified -- a dirty tree the guard then
+            # refuses every later publish on. _restore_dist_tree also restores it, for a
+            # cancel that lands inside this short loop.
+            for dist_folder, is_lite, label in dist_targets:
+                try:
+                    _write_dist_readme(dist_folder, is_lite, dist_version_stamp)
+                except Exception as exc:
+                    print("    Warning: failed to write README.md for {}: {}".format(
+                        label, exc))
         except BaseException:
             # BaseException so a cancelled CI job (KeyboardInterrupt) repairs too.
             # Repair, then re-raise the ORIGINAL with a bare raise: the traceback is
@@ -256,6 +539,17 @@ class StageDistStage(PublishStage):
             # raised, so they cannot replace the real cause.
             restore_dist_repos(context, touched, "staging failed -- undoing this stage's own damage")
             raise
+        finally:
+            # Error-isolated: cleanup must never replace the exception that brought us
+            # here, and a cleanup problem must not be silent either (global rule #13).
+            for backup in self._exe_backup_dirs:
+                parent = os.path.dirname(backup)
+                try:
+                    shutil.rmtree(parent, onerror=_force_writable_retry)
+                except Exception as exc:
+                    print("    Warning: could not remove temp exe backup {}: {}: {}".format(
+                        parent, type(exc).__name__, exc))
+            self._exe_backup_dirs = []
 
     def _sync_dist_repo(self, context, dist_folder, is_lite, label):
         """Synchronize OS repository into target distribution directory."""
@@ -263,16 +557,6 @@ class StageDistStage(PublishStage):
         os.makedirs(dist_folder, exist_ok=True)
 
         folders_to_process = FOLDERS_TO_PROCESS
-        lite_skip_folders = ["DuckMaker.extension", "_cad", "_engine", "DumpScripts", "dependency"]
-        lite_allowed_exes = [
-            "EnneadTab_OS_Installer.exe",
-            "EnneadTab_OS_UnInstaller.exe",
-            "EnneadTab_For_Revit_Installer.exe",
-            "EnneadTab_For_Revit_UnInstaller.exe",
-            "Emailer.exe",
-            "NotificationHost.exe",
-            "ProgressBar.exe",
-        ]
 
         # Accumulates across folders. It used to be rebound per folder, so the "[OK]
         # ... N files copied" line below reported only the LAST folder's count (and
@@ -287,15 +571,29 @@ class StageDistStage(PublishStage):
             dist_exe_folder = os.path.join(dist_folder, EXE_PRODUCTS_REL)
 
             if folder == "Apps" and _count_exe_files(src_exe_folder) == 0 and _count_exe_files(dist_exe_folder) > 0:
-                exe_backup_dir = os.path.join(dist_folder, ".publish_exe_products_backup")
-                if os.path.exists(exe_backup_dir):
-                    # Surfaced, not fatal: this is scratch, and copytree below reports the
-                    # real consequence (it has no dirs_exist_ok, so leftovers make it raise).
-                    # The wider redesign of this backup window is senzhang-todo #4657.
-                    for p, e in try_remove_content(exe_backup_dir):
-                        print("    Warning: leftover in exe backup, could not remove {}: {}".format(p, e))
+                # OUTSIDE the dist repo, deliberately. This used to be
+                # <dist_folder>/.publish_exe_products_backup -- inside the very tree the
+                # publisher must leave clean. That directory is gitignored in NEITHER dist
+                # repo (verified: `git check-ignore` exits 1 in EA_Dist, EA_Dist_Lite and
+                # here), so an orphan left behind was UNTRACKED, and publish_guard's dirty
+                # predicate counts any porcelain output (publish_guard.py:306-308) -- one
+                # leftover refused every later publish. Worse, it sat at the repo ROOT,
+                # outside the FOLDERS_TO_PROCESS pathspec that _restore_dist_tree cleans,
+                # so neither the crash-repair nor `git checkout -- .` nor the documented
+                # #4456 manual procedure could clear it. And if a file survived in it,
+                # stage_05's `git add -A` would have COMMITTED AND FORCE-PUSHED the backup
+                # to the fleet.
+                #
+                # A temp dir cannot be any of that: it is not in the repo, so it cannot
+                # appear in porcelain, cannot be committed, and needs no .gitignore change
+                # in two repos this PR does not touch. The defect stops existing rather
+                # than being compensated for. senzhang-todo #4657.
+                exe_backup_dir = os.path.join(
+                    tempfile.mkdtemp(prefix="enneadtab-publish-exe-"), "ExeProducts")
+                self._exe_backup_dirs.append(exe_backup_dir)
                 shutil.copytree(dist_exe_folder, exe_backup_dir)
-                print("    Preserving {} existing dist exes".format(_count_exe_files(dist_exe_folder)))
+                print("    Preserving {} existing dist exes at {}".format(
+                    _count_exe_files(dist_exe_folder), exe_backup_dir))
 
             dest_subfolder = os.path.join(dist_folder, folder)
             src_subfolder = os.path.join(context.os_repo_folder, folder)
@@ -325,19 +623,20 @@ class StageDistStage(PublishStage):
                 # excluded subtrees, so an unreadable directory inside one of them would
                 # abort the publish over content that was never going to ship -- an
                 # availability regression with no correctness gain.
-                if is_lite and any(skip.lower() in root.lower() for skip in lite_skip_folders):
-                    dirs[:] = []
-                    continue
-                if "DuckMaker.extension" in root:
+                #
+                # path_excluded_from_target is the SAME predicate stage_03's path-length
+                # scan calls to reproduce this decision at scan-time (senzhang-todo #4747)
+                # -- consolidated here so there is exactly one copy of these rules, not two
+                # that can silently drift.
+                rel_root = os.path.relpath(root, src_subfolder)
+                if path_excluded_from_target(rel_root, is_lite):
                     dirs[:] = []
                     continue
 
                 for filename in files:
-                    if is_lite:
-                        if filename.lower().endswith(".exe") and filename not in lite_allowed_exes:
-                            continue
-                        if any(ext in filename.lower() for ext in [".dll", ".psd", ".ai"]):
-                            continue
+                    rel_file = filename if rel_root == "." else os.path.join(rel_root, filename)
+                    if path_excluded_from_target(rel_file, is_lite):
+                        continue
 
                     src_file = os.path.join(root, filename)
                     rel_path = os.path.relpath(src_file, src_subfolder)
@@ -389,14 +688,17 @@ class StageDistStage(PublishStage):
 
             if exe_backup_dir and os.path.isdir(exe_backup_dir):
                 if _count_exe_files(dist_exe_folder) == 0:
+                    # REMOVE the destination before copying rather than relying on
+                    # copytree's dirs_exist_ok. dirs_exist_ok is 3.8+, and the publisher
+                    # and rehearsal clones do not run the same interpreter (measured
+                    # 2026-08-21: production 3.13.14 from the Microsoft Store, rehearsal
+                    # 3.11.9) -- remove-then-copy is version-agnostic and does not quietly
+                    # depend on that staying true when a clone venv is rebuilt.
+                    if os.path.isdir(dist_exe_folder):
+                        shutil.rmtree(dist_exe_folder, onerror=_force_writable_retry)
                     os.makedirs(os.path.dirname(dist_exe_folder), exist_ok=True)
                     shutil.copytree(exe_backup_dir, dist_exe_folder)
                     print("    Restored dist ExeProducts from backup")
-                # An orphaned backup dir is untracked and NOT gitignored in older dist
-                # clones, and publish_guard counts untracked as dirty -- so leftovers here
-                # can refuse the NEXT publish. Say so rather than dropping it. (#4657)
-                for p, e in try_remove_content(exe_backup_dir):
-                    print("    Warning: could not clean up exe backup {}: {}".format(p, e))
 
         # Final assertion: every file the plan named is on disk.
         #

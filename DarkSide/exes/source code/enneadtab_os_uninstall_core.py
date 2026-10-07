@@ -380,6 +380,20 @@ def unregister_self_heal(log: Optional[LogFn] = None) -> List[str]:
     return failures
 
 
+def unregister_protocol_handler_step(log: Optional[LogFn] = None) -> List[str]:
+    """Remove the enneadtab-depot:// registration this repo's own installer
+    adds (senzhang-todo #5513). Best-effort, like unregister_self_heal above
+    -- a missing/already-clean key is not a failure."""
+    try:
+        import _protocol_handler_registration
+
+        _protocol_handler_registration.unregister_protocol_handler()
+        return []
+    except Exception as e:
+        _log("Could not remove enneadtab-depot:// protocol handler: {}".format(e), log)
+        return ["protocol-handler:enneadtab-depot"]
+
+
 def kill_allowlisted_processes(log: Optional[LogFn] = None) -> List[str]:
     failures = []
     if psutil is None:
@@ -708,6 +722,7 @@ def run_uninstall(log=None, rhino_skipped=False):
 
     _user("Turning off automatic EnneadTab updates…")
     failures.extend(unregister_self_heal(log=None))
+    failures.extend(unregister_protocol_handler_step(log=None))
 
     _user("Stopping EnneadTab helpers…")
     failures.extend(kill_allowlisted_processes(_user))

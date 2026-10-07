@@ -92,6 +92,28 @@ class InDesignHelper:
             print(f"❌ Error getting text frames: {e}")
             return []
 
+    def select_text_frame(self, frame_id):
+        """Select a text frame in the active document by its ID.
+
+        Returns (success, message).
+        """
+        try:
+            doc = self.get_active_document()
+            if doc is None:
+                return False, "No active document found"
+
+            for page in doc.Pages:
+                for item in page.AllPageItems:
+                    if item.Constructor.Name == "TextFrame" and str(item.id) == str(frame_id):
+                        # Replace the current selection with this frame
+                        self.app.Select(item)
+                        return True, f"Text frame '{getattr(item, 'Name', frame_id)}' selected"
+
+            return False, f"Text frame with id '{frame_id}' not found"
+        except Exception as e:
+            print(f"❌ Error selecting text frame: {e}")
+            return False, str(e)
+
 # Initialize InDesign helper
 indesign_helper = InDesignHelper()
 
@@ -147,6 +169,33 @@ def api_text_frames():
             'status': 'success',
             'data': text_frames
         })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/document/select-frame', methods=['POST'])
+def api_select_frame():
+    """API endpoint to select a text frame in the active document"""
+    try:
+        data = request.get_json(silent=True) or {}
+        frame_id = data.get('frame_id')
+        if frame_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Missing frame_id in request body'
+            }), 400
+        success, message = indesign_helper.select_text_frame(frame_id)
+        if success:
+            return jsonify({
+                'status': 'success',
+                'message': message
+            })
+        return jsonify({
+            'status': 'error',
+            'message': message
+        }), 404
     except Exception as e:
         return jsonify({
             'status': 'error',
@@ -473,9 +522,22 @@ def create_templates():
             }
         }
         
-        function selectTextFrame(frameId) {
-            // TODO: Implement text frame selection functionality
-            showSuccess('Text frame selected: ' + frameId);
+        async function selectTextFrame(frameId) {
+            try {
+                const response = await fetch('/api/document/select-frame', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ frame_id: frameId })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    showSuccess('Text frame selected: ' + frameId);
+                } else {
+                    showError('Failed to select text frame: ' + data.message);
+                }
+            } catch (error) {
+                showError('Failed to select text frame: ' + error.message);
+            }
         }
         
         function showError(message) {

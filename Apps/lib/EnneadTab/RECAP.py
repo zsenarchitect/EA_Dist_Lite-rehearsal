@@ -148,7 +148,6 @@ def show_pending_digest():
     # Consume first. A duplicate digest is more annoying than a missed one.
     _mark_consumed(data)
 
-    chart = data.get("chart")
     kwargs = {
         "main_text": data.get("surface_text"),
         "level": "info",
@@ -157,19 +156,14 @@ def show_pending_digest():
     actions = _build_actions(data)
     if actions:
         kwargs["actions"] = actions
-    if chart:
-        # Declarative payload: NotificationHost renders it. Nothing is
-        # rasterized here, which is what keeps this file IronPython safe.
-        kwargs["chart"] = chart
 
-    try:
-        NOTIFICATION.messenger(**kwargs)
-    except TypeError:
-        # An older NotificationHost/NOTIFICATION without chart support. Show
-        # the text rather than nothing -- a missing chart must never suppress
-        # the message.
-        kwargs.pop("chart", None)
-        NOTIFICATION.messenger(**kwargs)
+    # NOTE: no "chart" kwarg. A chart payload used to be attached here, but no
+    # NOTIFICATION.messenger() signature accepts it and no host renders it --
+    # it raised TypeError on every call and was silently dropped. The dead
+    # payload and its comment (which described a renderer that was never
+    # built) were removed in senzhang-todo #3897. Do not re-add a chart kwarg
+    # without a real renderer on the NotificationHost side.
+    NOTIFICATION.messenger(**kwargs)
     return True
 
 

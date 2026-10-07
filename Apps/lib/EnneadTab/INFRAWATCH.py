@@ -82,6 +82,7 @@ def _infra_apps():
         if task_type not in (TaskType.REPEAT, TaskType.WEEKLY):
             continue
         if "task_name" not in app:
+            _log("SKIP {} task-name-missing".format(name))
             continue
         apps.append(app)
     return apps

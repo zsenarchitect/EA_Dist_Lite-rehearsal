@@ -1,11 +1,12 @@
 __title__ = "BakeGFADataToExcel"
-__doc__ = """Export GFA (Gross Floor Area) data to Excel and manage area targets.
+__doc__ = """Export GFA (Gross Floor Area) data to Excel and manage area targets and display settings.
 
 Features:
 - Export area calculations to formatted Excel spreadsheet
 - Generate checking surfaces for visual verification 
 - Set and manage target areas for different GFA categories
 - Compare actual vs target areas with variance analysis
+- Change on-screen text size for layer display
 
 Usage:
 - Click to export current GFA data to Excel
@@ -13,6 +14,7 @@ Usage:
   - Generate checking surfaces
   - Set target areas for GFA categories
   - Edit existing target values
+  - Change on-screen text size
 """
 
 
@@ -22,7 +24,7 @@ import Rhino # pyright: ignore
 import rhinoscriptsyntax as rs # pyright: ignore
 import scriptcontext as sc # pyright: ignore
 import Eto # pyright: ignore
-from EnneadTab import ERROR_HANDLE, LOG, EXCEL, NOTIFICATION
+from EnneadTab import ERROR_HANDLE, LOG, EXCEL, NOTIFICATION, DATA_FILE
 from EnneadTab.RHINO import RHINO_PROJ_DATA, RHINO_UI
 import gfa_excel_import
 reload(gfa_excel_import)
@@ -315,6 +317,111 @@ def set_target_dict():
     
     return gfa_dict
 
+
+DEFAULT_HUD_FONT_SIZE = 20
+
+@ERROR_HANDLE.try_catch_error()
+def get_hud_font_size():
+    """Retrieve the HUD layer row font size preference."""
+    try:
+        data = RHINO_PROJ_DATA.get_plugin_data()
+        if RHINO_PROJ_DATA.DocKeys.GFA_FONT_SIZE in data:
+            return int(data[RHINO_PROJ_DATA.DocKeys.GFA_FONT_SIZE])
+    except:
+        pass
+
+    if sc.sticky.has_key("EA_GFA_FONT_SIZE"):
+        try:
+            return int(sc.sticky["EA_GFA_FONT_SIZE"])
+        except:
+            pass
+
+    try:
+        val = DATA_FILE.get_sticky("EA_GFA_FONT_SIZE", None)
+        if val is not None:
+            return int(val)
+    except:
+        pass
+
+    return DEFAULT_HUD_FONT_SIZE
+
+
+@ERROR_HANDLE.try_catch_error()
+def set_hud_font_size():
+    """Prompt user to set the text size for the on-screen display."""
+    current_size = get_hud_font_size()
+    options = [
+        "8 (Smallest)",
+        "10 (Extra Small)",
+        "12 (Small)",
+        "14 (Medium Small)",
+        "16 (Medium)",
+        "18 (Medium Large)",
+        "20 (Default)",
+        "Custom..."
+    ]
+
+    default_opt = "20 (Default)"
+    for opt in options:
+        if opt.startswith("{} ".format(current_size)):
+            default_opt = opt
+            break
+
+    selected = rs.ListBox(
+        options,
+        "Select text size for the on-screen display:\n(Current size: {})\n\nTip: Choose a smaller size if long layer names overflow your screen.".format(current_size),
+        "On-Screen Text Size",
+        default=default_opt
+    )
+    if not selected:
+        return None
+
+    if selected == "Custom...":
+        custom = rs.RealBox(
+            message="Enter custom text size (6 - 40):",
+            default_number=current_size,
+            title="Custom Text Size"
+        )
+        if custom is None:
+            return None
+        new_size = int(round(custom))
+    else:
+        new_size = int(selected.split()[0])
+
+    if new_size < 4:
+        new_size = 4
+    elif new_size > 60:
+        new_size = 60
+
+    # 1. Save to current Rhino document project data
+    try:
+        data = RHINO_PROJ_DATA.get_plugin_data()
+        data[RHINO_PROJ_DATA.DocKeys.GFA_FONT_SIZE] = new_size
+        RHINO_PROJ_DATA.set_plugin_data(data)
+    except Exception as ex:
+        print("Error saving font size to project data: {}".format(str(ex)))
+
+    # 2. Save persistent sticky for future Rhino sessions
+    try:
+        DATA_FILE.set_sticky("EA_GFA_FONT_SIZE", new_size)
+    except Exception as ex:
+        print("Error saving font size to sticky: {}".format(str(ex)))
+
+    # 3. Update in-memory sticky
+    sc.sticky["EA_GFA_FONT_SIZE"] = new_size
+
+    # 4. If conduit is running, update conduit font size and refresh immediately
+    key = "EA_GFA_display_conduit"
+    if sc.sticky.has_key(key):
+        conduit = sc.sticky[key]
+        if conduit:
+            conduit.font_size = new_size
+            sc.doc.Views.Redraw()
+
+    NOTIFICATION.messenger(main_text="On-screen text size set to {}.".format(new_size))
+    return new_size
+
+
 @LOG.log(__file__, __title__)
 @ERROR_HANDLE.try_catch_error()
 def toggle_GFA():
@@ -324,11 +431,12 @@ def toggle_GFA():
     sc.sticky[key] = filepath
     """
 
-
+    current_font_size = get_hud_font_size()
     items  = [
         ("Export Current GFA Numbers To Excel.", False),
         ("Bake Current GFA Calc Surfaces.", False),
-        ("Set Target Dict.", False)
+        ("Set Target Dict.", False),
+        ("Change On-Screen Text Size (Current: {}).".format(current_font_size), False)
         ]
     results  = rs.CheckListBox(items, "What do you want to do?", "Bake GFA Massing Data")
     if not results:
@@ -343,6 +451,7 @@ def toggle_GFA():
     sc.sticky[key] = results[1][1]
 
     set_target_dict() if results[2][1] else None
+    set_hud_font_size() if results[3][1] else None
 
     if results[0][1] or results[1][1]:
         NOTIFICATION.messenger(main_text = "Shake your Rhino viewport camera to trigger baking.")

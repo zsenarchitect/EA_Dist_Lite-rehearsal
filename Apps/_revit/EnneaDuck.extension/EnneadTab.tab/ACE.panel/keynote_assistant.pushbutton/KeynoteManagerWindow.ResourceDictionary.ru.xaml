@@ -110,6 +110,13 @@
     <system:String x:Key="KeynoteUsed">"КП "%s" используется в модели. Удаление не возможно.</system:String>
     <system:String x:Key="PromptToDeleteKeynote">Вы уверены что хотите удалить КП "%s"?</system:String>
     
+    <system:String x:Key="RemoveWithChildrenPrompt">"%s" не пуста(о). Переместить дочерние элементы в другую категорию или удалить вместе?</system:String>
+    <system:String x:Key="RemoveWithChildrenMove">Переместить дочерние элементы в другую категорию...</system:String>
+    <system:String x:Key="RemoveWithChildrenDelete">Удалить все дочерние элементы</system:String>
+    <system:String x:Key="RemoveWithChildrenCancel">Отмена</system:String>
+    <system:String x:Key="PromptToDeleteChildren">Вы уверены что хотите удалить все дочерние элементы "%s"? Это действие нельзя отменить.</system:String>
+    <system:String x:Key="RemoveChildrenLocked">Как минимум один дочерний элемент этой записи заблокирован. Дождитесь завершения изменений.</system:String>
+    
     <system:String x:Key="ReKeyKeynoteTransaction">Rekey Keynote {}</system:String>
     <system:String x:Key="ReKeyKeynoteChildrenLocked">Покрайней мере одна дочерняя КП в этой категории заблокирована. Подождите пока изменения будут зафиксированы.</system:String>
     <system:String x:Key="ReCatKeynoteChildrenLocked">Покрайней мере одна дочерняя КП в этой категории заблокирована. Подождите пока изменения будут зафиксированы.</system:String>

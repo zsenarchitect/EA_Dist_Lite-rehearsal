@@ -1,4 +1,4 @@
-__title__ = "ExternalTrimmer"
+__title__ = "RefreshExternalLink"
 __doc__ = """Update external linked references.
 
 Key Features:

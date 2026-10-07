@@ -46,12 +46,20 @@ class DepotTestBase(unittest.TestCase):
         self._orig_index = ENVIRONMENT.DEPOT_CACHE_INDEX_FILE
         ENVIRONMENT.DEPOT_CACHE_FOLDER = self.tmp
         ENVIRONMENT.DEPOT_CACHE_INDEX_FILE = os.path.join(self.tmp, "cache_index.sexyDuck")
+        # ENVIRONMENT.DEPOT_OUTBOX_FOLDER is computed once at import time from the
+        # real DEPOT_CACHE_FOLDER, so it does NOT follow the tmp-dir swap above --
+        # outbox files from a prior run/test (or a concurrent worktree on the same
+        # machine) leak in on a real machine. Isolated here, not per-subclass, so
+        # any FUTURE test touching the outbox inherits isolation for free (#5114).
+        self._orig_outbox = ENVIRONMENT.DEPOT_OUTBOX_FOLDER
+        ENVIRONMENT.DEPOT_OUTBOX_FOLDER = os.path.join(self.tmp, "outbox")
         _alarm._ANNOUNCED_THIS_PROCESS = False
         self._orig_env = os.environ.get("EA_DEPOT_URL")
 
     def tearDown(self):
         ENVIRONMENT.DEPOT_CACHE_FOLDER = self._orig_folder
         ENVIRONMENT.DEPOT_CACHE_INDEX_FILE = self._orig_index
+        ENVIRONMENT.DEPOT_OUTBOX_FOLDER = self._orig_outbox
         if self._orig_env is None:
             os.environ.pop("EA_DEPOT_URL", None)
         else:
@@ -131,6 +139,66 @@ class TransportTests(DepotTestBase):
         self.assertTrue(r.transport_failed)
         self.assertTrue(_transport.is_route_offline(r))
 
+    def test_no_token_no_service_key_sends_neither_header(self):
+        # Baseline: today's behavior is unchanged when neither credential
+        # is available -- no Authorization, no X-Depot-Service-Key.
+        orig = _transport._SERVICE_KEY_FILE
+        _transport._SERVICE_KEY_FILE = None
+        try:
+            r = _transport.get(ROUTES.asset_url("a.txt"))
+            self.assertTrue(r.ok())
+        finally:
+            _transport._SERVICE_KEY_FILE = orig
+        self.assertNotIn("Authorization", self.srv.last_headers)
+        self.assertNotIn("X-Depot-Service-Key", self.srv.last_headers)
+
+    def test_no_token_falls_back_to_service_key_header(self):
+        # todo #5023: AUTH.get_token() returning None (no interactive
+        # session, e.g. Task Scheduler / SYSTEM context) must fall back to
+        # the machine-wide X-Depot-Service-Key credential (D3/D5).
+        key_file = os.path.join(self.tmp, "depot_service_key")
+        with open(key_file, "w") as f:
+            f.write("test-service-key-value\n")
+        orig = _transport._SERVICE_KEY_FILE
+        _transport._SERVICE_KEY_FILE = key_file
+        try:
+            r = _transport.get(ROUTES.asset_url("a.txt"), token=None)
+            self.assertTrue(r.ok())
+        finally:
+            _transport._SERVICE_KEY_FILE = orig
+        self.assertEqual(self.srv.last_headers.get("X-Depot-Service-Key"),
+                          "test-service-key-value")
+        self.assertNotIn("Authorization", self.srv.last_headers)
+
+    def test_token_present_takes_priority_over_service_key(self):
+        # Pure addition, not a replacement: when a Bearer token IS available
+        # the existing behavior must win -- no X-Depot-Service-Key sent.
+        key_file = os.path.join(self.tmp, "depot_service_key")
+        with open(key_file, "w") as f:
+            f.write("test-service-key-value\n")
+        orig = _transport._SERVICE_KEY_FILE
+        _transport._SERVICE_KEY_FILE = key_file
+        try:
+            r = _transport.get(ROUTES.asset_url("a.txt"), token="a-desktop-token")
+            self.assertTrue(r.ok())
+        finally:
+            _transport._SERVICE_KEY_FILE = orig
+        self.assertEqual(self.srv.last_headers.get("Authorization"),
+                          "Bearer a-desktop-token")
+        self.assertNotIn("X-Depot-Service-Key", self.srv.last_headers)
+
+    def test_missing_service_key_file_is_not_an_error(self):
+        # No file provisioned yet (the common case today) -- get() must not
+        # raise, and must behave exactly as before this change.
+        orig = _transport._SERVICE_KEY_FILE
+        _transport._SERVICE_KEY_FILE = os.path.join(self.tmp, "does_not_exist")
+        try:
+            r = _transport.get(ROUTES.asset_url("a.txt"), token=None)
+            self.assertTrue(r.ok())
+        finally:
+            _transport._SERVICE_KEY_FILE = orig
+        self.assertNotIn("X-Depot-Service-Key", self.srv.last_headers)
+
 
 class AssetTests(DepotTestBase):
     def setUp(self):
@@ -190,6 +258,24 @@ class AssetTests(DepotTestBase):
         # then request the asset: download body != cached manifest sha -> None.
         p = ASSET.get_asset_path(self.key)
         self.assertIsNone(p)
+
+    def test_get_asset_folder_over_budget_uses_budget_error_code(self):
+        """#5013: a local budget refusal is not a depot-reachability problem --
+        it must not get the generic 'could not reach the shared depot' text."""
+        self.srv.folders["big"] = {"total_size": 999999999}
+        seen = {}
+        orig = _alarm.announce_depot_unreachable
+
+        def _spy(context="", error_code=None):
+            seen["error_code"] = error_code
+            return orig(context, error_code=error_code)
+        _alarm.announce_depot_unreachable = _spy
+        try:
+            folder = ASSET.get_asset_folder("big", budget_bytes=1000)
+        finally:
+            _alarm.announce_depot_unreachable = orig
+        self.assertIsNone(folder)
+        self.assertEqual(seen["error_code"], "budget_exceeded")
 
 
 class StateTests(DepotTestBase):
@@ -258,6 +344,133 @@ class StateTests(DepotTestBase):
         self.assertEqual(stale.get("v"), 1)
         self.assertTrue(stale.get("_depot_stale"))   # annotated, not silent
 
+    # --- #5013: expired token must not be reported as "depot unreachable" ---
+
+    def test_write_rejected_401_extracts_unauthorized_error_code(self):
+        self.srv.force_status = 401
+        self.srv.force_error = "unauthorized"
+        seen = {}
+        orig = _alarm.announce_depot_unreachable
+
+        def _spy(context="", error_code=None):
+            seen["context"] = context
+            seen["error_code"] = error_code
+            return orig(context, error_code=error_code)
+        _alarm.announce_depot_unreachable = _spy
+        try:
+            ok = STATE.write_state("k2", {"n": 1})
+        finally:
+            _alarm.announce_depot_unreachable = orig
+        self.assertFalse(ok)
+        self.assertEqual(seen["error_code"], "unauthorized")
+        # Rejected (not transport_failed) -> must NOT outbox-loop a write the
+        # server actively refused.
+        self.assertEqual(STATE._outbox_count(), 0)
+
+    def test_write_rejected_500_has_no_error_code(self):
+        self.srv.force_status = 500
+        self.srv.force_error = "internal"
+        seen = {}
+        orig = _alarm.announce_depot_unreachable
+
+        def _spy(context="", error_code=None):
+            seen["error_code"] = error_code
+            return orig(context, error_code=error_code)
+        _alarm.announce_depot_unreachable = _spy
+        try:
+            STATE.write_state("k3", {"n": 1})
+        finally:
+            _alarm.announce_depot_unreachable = orig
+        self.assertEqual(seen["error_code"], "internal")
+
+    def test_update_rejected_401_extracts_error_code_via_fetch(self):
+        self.srv.force_status = 401
+        self.srv.force_error = "unauthorized"
+        seen = {}
+        orig = _alarm.announce_depot_unreachable
+
+        def _spy(context="", error_code=None):
+            seen["error_code"] = error_code
+            return orig(context, error_code=error_code)
+        _alarm.announce_depot_unreachable = _spy
+        try:
+            ok = STATE.update_state("cnt2", lambda d: {"n": 1})
+        finally:
+            _alarm.announce_depot_unreachable = orig
+        self.assertFalse(ok)
+        self.assertEqual(seen["error_code"], "unauthorized")
+
+    def test_transport_failure_passes_no_error_code(self):
+        self._offline()
+        seen = {}
+        orig = _alarm.announce_depot_unreachable
+
+        def _spy(context="", error_code=None):
+            seen["error_code"] = error_code
+            return orig(context, error_code=error_code)
+        _alarm.announce_depot_unreachable = _spy
+        try:
+            STATE.write_state("k4", {"n": 1})
+        finally:
+            _alarm.announce_depot_unreachable = orig
+        self.assertIsNone(seen["error_code"])
+
+
+class AlarmTests(DepotTestBase):
+    """#5013: the alarm must actually reach ErrorDump, and must not blame the
+    depot for an expired sign-in or a local budget refusal."""
+
+    def _capture_error_dump_calls(self):
+        from EnneadTab import ERROR_HANDLE
+        calls = []
+        orig = ERROR_HANDLE.report_infra_warning_to_error_dump_async
+
+        def _spy(*a, **k):
+            calls.append((a, k))
+        ERROR_HANDLE.report_infra_warning_to_error_dump_async = _spy
+        return ERROR_HANDLE, orig, calls
+
+    def test_generic_failure_posts_to_error_dump(self):
+        ERROR_HANDLE, orig, calls = self._capture_error_dump_calls()
+        try:
+            fired = _alarm.announce_depot_unreachable("test context")
+        finally:
+            ERROR_HANDLE.report_infra_warning_to_error_dump_async = orig
+        self.assertTrue(fired)
+        self.assertEqual(len(calls), 1)
+        self.assertIn("could not reach the shared depot", calls[0][0][0])
+
+    def test_unauthorized_error_code_shows_sign_in_message_not_outage(self):
+        ERROR_HANDLE, orig, calls = self._capture_error_dump_calls()
+        try:
+            fired = _alarm.announce_depot_unreachable(
+                "state write:k1", error_code="unauthorized")
+        finally:
+            ERROR_HANDLE.report_infra_warning_to_error_dump_async = orig
+        self.assertTrue(fired)
+        msg = calls[0][0][0]
+        self.assertIn("sign-in", msg)
+        self.assertIn("expired", msg)
+        self.assertNotIn("could not reach the shared depot", msg)
+
+    def test_forbidden_error_code_also_shows_sign_in_message(self):
+        ERROR_HANDLE, orig, calls = self._capture_error_dump_calls()
+        try:
+            _alarm.announce_depot_unreachable("state write:k1", error_code="forbidden")
+        finally:
+            ERROR_HANDLE.report_infra_warning_to_error_dump_async = orig
+        self.assertIn("sign-in", calls[0][0][0])
+
+    def test_budget_exceeded_error_code_shows_folder_message(self):
+        ERROR_HANDLE, orig, calls = self._capture_error_dump_calls()
+        try:
+            _alarm.announce_depot_unreachable("folder x", error_code="budget_exceeded")
+        finally:
+            ERROR_HANDLE.report_infra_warning_to_error_dump_async = orig
+        msg = calls[0][0][0]
+        self.assertIn("size budget", msg)
+        self.assertNotIn("could not reach the shared depot", msg)
+
 
 class DataFileSeamTests(DepotTestBase):
     """Prove the DATA_FILE(is_local=False) seam holds after the Commit-3 rewrite
@@ -318,6 +531,49 @@ class SharePointTests(DepotTestBase):
     def test_required_raises_when_unset(self):
         self.assertRaises(self.SP.ProjectRootNotSet,
                           self.SP.get_project_file, "a/b", True, False)
+
+    def test_missing_config_triggers_picker_and_persists(self):
+        root = os.path.join(self.tmp, "SPRoot")
+        os.makedirs(root)
+        orig_prompt = self.SP._prompt_for_root
+        self.SP._prompt_for_root = lambda: root
+        try:
+            resolved = self.SP.get_project_root(prompt_if_missing=True)
+            self.assertEqual(resolved, root)
+
+            def _fail_if_called():
+                raise AssertionError("picker should not fire again once persisted")
+            self.SP._prompt_for_root = _fail_if_called
+            self.assertEqual(self.SP.get_project_root(prompt_if_missing=True), root)
+        finally:
+            self.SP._prompt_for_root = orig_prompt
+
+    def test_path_gone_triggers_reprompt(self):
+        root = os.path.join(self.tmp, "SPRoot")
+        os.makedirs(root)
+        self.SP.set_project_root(root)
+        shutil.rmtree(root)
+
+        new_root = os.path.join(self.tmp, "SPRoot2")
+        os.makedirs(new_root)
+        orig_prompt = self.SP._prompt_for_root
+        self.SP._prompt_for_root = lambda: new_root
+        try:
+            resolved = self.SP.get_project_root(prompt_if_missing=True)
+            self.assertEqual(resolved, new_root)
+        finally:
+            self.SP._prompt_for_root = orig_prompt
+
+    def test_cancelled_picker_degrades_cleanly(self):
+        orig_prompt = self.SP._prompt_for_root
+        self.SP._prompt_for_root = lambda: None
+        try:
+            self.assertIsNone(self.SP.get_project_root(prompt_if_missing=True))
+            self.assertIsNone(self.SP.get_project_file("a/b", prompt_if_missing=True))
+            self.assertRaises(self.SP.ProjectRootNotSet,
+                              self.SP.get_project_file, "a/b", True, True)
+        finally:
+            self.SP._prompt_for_root = orig_prompt
 
 
 if __name__ == "__main__":

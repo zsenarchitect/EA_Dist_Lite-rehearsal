@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\AutoReconnectDrive.py"
+   "value": "DarkSide\\exes\\source code\\AutoReconnectDrive.py"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
     "optionDest": "icon_file",
-    "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\Apps\\lib\\EnneadTab\\images\\icon_duck.ico"
+    "value": "Apps\\lib\\EnneadTab\\images\\icon_duck.ico"
   },
   {
    "optionDest": "clean_build",

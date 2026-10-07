@@ -354,7 +354,10 @@ def _save_dict_to_json(data_dict, filepath, use_encode=True):
                         with open(temp_filepath, "w") as f:
                             f.write(json_str)
                 
-                # Atomic move: temp file -> target file
+                # Publish via temp file + move. NOT atomic: the target is removed
+                # BEFORE the move, so there is a window where the destination
+                # does not exist. Do not build on an atomicity guarantee here.
+                # senzhang-todo #3896.
                 if os.path.exists(filepath):
                     os.remove(filepath)
                 shutil.move(temp_filepath, filepath)

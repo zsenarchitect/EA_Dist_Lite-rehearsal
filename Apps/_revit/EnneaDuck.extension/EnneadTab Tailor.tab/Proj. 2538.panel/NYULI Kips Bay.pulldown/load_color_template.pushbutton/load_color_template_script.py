@@ -37,7 +37,7 @@ from pyrevit import script
 import proDUCKtion  # pyright: ignore
 proDUCKtion.validify()
 
-from EnneadTab import ERROR_HANDLE, COLOR, NOTIFICATION, OUTPUT
+from EnneadTab import ERROR_HANDLE, COLOR, NOTIFICATION, OUTPUT, SHAREPOINT
 from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_SELECTION, REVIT_FORMS
 
 from Autodesk.Revit import DB  # pyright: ignore
@@ -87,7 +87,7 @@ def _log(msg):
         pass
 
 
-EXCEL_PATH = "J:\\2538\\2_Master File\\B-70_Programming\\04_Colors\\Color Scheme_NYULI Kips Bay.xlsx"
+EXCEL_PATH = SHAREPOINT.get_project_file("2538/2_Master File/B-70_Programming/04_Colors/Color Scheme_NYULI Kips Bay.xlsx")
 
 # Sheets are read in order; the LAST sheet wins on entry-name conflict.
 # Kips Bay uses CANCER CENTER only -- HEALTHCARE intentionally excluded

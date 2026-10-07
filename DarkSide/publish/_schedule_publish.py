@@ -49,6 +49,9 @@ import random
 import math
 import json
 import socket
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import autodist_paths  # noqa: E402  -- exact paths AutoDist may stage (#2372)
 import tkinter as tk
 from tkinter import ttk, font, messagebox
 import winsound
@@ -1243,29 +1246,39 @@ def git_pull_main():
 
         if has_changes:
             print("Local changes detected, attempting to preserve them...")
-            
-            # Stage all changes for potential commit
-            add_result = subprocess.call(
-                [get_git_executable(), "add", "."],
-                cwd=repo_dir,
-                timeout=60
-            )
-            
-            if add_result != 0:
-                print("Failed to stage changes, falling back to reset")
+
+            # Stage ONLY publisher-generated paths -- never `git add .` (senzhang-todo
+            # #2372). That swept any file written anywhere in this checkout (scratch,
+            # half-finished edits, malformed agent fixtures) into a commit on main
+            # every ~10 min. Foreign changes are left untouched and reported loudly.
+            try:
+                staged, foreign = autodist_paths.stage_generated(
+                    get_git_executable(), repo_dir, timeout=60)
+            except Exception as e:
+                print("Failed to stage generated changes ({}), falling back to reset".format(e))
                 return _fallback_reset(repo_dir)
-            
-            # Create a temporary commit to preserve changes
-            temp_commit_result = subprocess.call(
-                [get_git_executable(), "commit", "-m", "Temp commit before merge - AutoDist {}".format(
-                    datetime.datetime.now().strftime("%Y%m%d %H%M%S"))],
-                cwd=repo_dir,
-                timeout=60
-            )
-            
-            if temp_commit_result != 0:
-                print("Failed to create temp commit, falling back to reset")
-                return _fallback_reset(repo_dir)
+
+            if foreign:
+                msg = autodist_paths.describe_foreign(foreign)
+                print(msg)
+                _report_publish_error_to_errordump(msg)
+
+            if staged:
+                # Create a temporary commit to preserve the generated changes.
+                # --only + explicit pathspec: commit exactly these paths, even if
+                # something else had pre-staged a foreign change in the index.
+                temp_commit_result = subprocess.call(
+                    [get_git_executable(), "commit", "--only", "-m",
+                     "Temp commit before merge - AutoDist {}".format(
+                         datetime.datetime.now().strftime("%Y%m%d %H%M%S")),
+                     "--"] + staged,
+                    cwd=repo_dir,
+                    timeout=60
+                )
+
+                if temp_commit_result != 0:
+                    print("Failed to create temp commit, falling back to reset")
+                    return _fallback_reset(repo_dir)
         
         # Attempt to merge origin/main
         print("Attempting to merge origin/main...")
@@ -1292,18 +1305,29 @@ def git_pull_main():
             
             if "UU" in conflict_check.stdout or "AA" in conflict_check.stdout:
                 print("Merge conflicts detected, attempting automatic resolution...")
-                
-                # Try to resolve conflicts automatically by preferring remote changes
-                resolve_result = subprocess.call(
-                    [get_git_executable(), "checkout", "--theirs", "."],
-                    cwd=repo_dir,
-                    timeout=60
+
+                # Scope resolution to the UNMERGED paths only (senzhang-todo #2372):
+                # `checkout --theirs .` + `add .` also staged every unrelated dirty or
+                # untracked file in the checkout into the merge commit.
+                unmerged_run = subprocess.run(
+                    [get_git_executable(), "diff", "--name-only", "-z", "--diff-filter=U"],
+                    cwd=repo_dir, capture_output=True, text=True, timeout=60
                 )
-                
+                unmerged = [p for p in (unmerged_run.stdout or "").split("\0") if p]
+
+                # Try to resolve conflicts automatically by preferring remote changes
+                resolve_result = 1
+                if unmerged_run.returncode == 0 and unmerged:
+                    resolve_result = subprocess.call(
+                        [get_git_executable(), "checkout", "--theirs", "--"] + unmerged,
+                        cwd=repo_dir,
+                        timeout=60
+                    )
+
                 if resolve_result == 0:
                     # Add resolved files
                     add_resolved = subprocess.call(
-                        [get_git_executable(), "add", "."],
+                        [get_git_executable(), "add", "--"] + unmerged,
                         cwd=repo_dir,
                         timeout=60
                     )
@@ -3970,12 +3994,21 @@ def push_back_to_github():
         # SYSTEM.alert_missing_schedule_update() duck-pops "Last publish was N days
         # ago". The alarm was right; this was the bug it was pointing at.
 
-        add_result = subprocess.run(
-            [get_git_executable(), "add", "."],
-            cwd=repo_dir, capture_output=True, text=True, timeout=120,
-        )
-        if add_result.returncode != 0:
-            stderr = (add_result.stderr or "").strip()
+        # Stage ONLY publisher-generated paths -- never `git add .` (senzhang-todo
+        # #2372). This commit is force-pushed to origin/main, so a blanket stage would
+        # ship any stray file in the checkout to every clone.
+        try:
+            staged, foreign = autodist_paths.stage_generated(
+                get_git_executable(), repo_dir, timeout=120)
+            add_error = None
+        except Exception as e:
+            staged, foreign, add_error = [], [], str(e)
+        if foreign:
+            foreign_msg = autodist_paths.describe_foreign(foreign)
+            print(foreign_msg)
+            _report_publish_error_to_errordump(foreign_msg)
+        if add_error is not None:
+            stderr = add_error
             # By far the most common cause, and it is self-inflicted: a previous
             # run died mid-operation and left the lock behind. Name it explicitly
             # so the fix is obvious instead of buried in a generic git error.
@@ -3986,14 +4019,19 @@ def push_back_to_github():
                     "delete {}".format(os.path.join(repo_dir, ".git", "index.lock"))
                 )
             else:
-                msg = "AutoDist: git add failed (rc={}): {}".format(
-                    add_result.returncode, stderr[:500])
+                msg = "AutoDist: git add failed: {}".format(stderr[:500])
             print(msg)
             _report_publish_error_to_errordump(msg)
             return False  # do NOT push a commit that was never made
 
+        if not staged:
+            print("AutoDist: nothing publisher-generated to commit, skipping push")
+            return True
+
+        # --only + explicit pathspec: commit exactly the generated paths, even if
+        # something else had pre-staged a foreign change in the index.
         commit_result = subprocess.run(
-            [get_git_executable(), "commit", "-m", commit_message],
+            [get_git_executable(), "commit", "--only", "-m", commit_message, "--"] + staged,
             cwd=repo_dir, capture_output=True, text=True, timeout=120,
         )
         if commit_result.returncode != 0:

@@ -38,26 +38,71 @@ def img2pdf(image_path, output_path = None):
 
 
 
+def _merge_pdfs(pdf_paths, output_path):
+    """Merge multiple PDFs into output_path using PyPDF2, pypdf, or PyMuPDF (fitz)."""
+    try:
+        from PyPDF2 import PdfMerger
+        merger = PdfMerger()
+        for p in pdf_paths:
+            merger.append(p)
+        merger.write(output_path)
+        merger.close()
+        return
+    except (ImportError, AttributeError):
+        pass
+
+    try:
+        from pypdf import PdfMerger
+        merger = PdfMerger()
+        for p in pdf_paths:
+            merger.append(p)
+        merger.write(output_path)
+        merger.close()
+        return
+    except (ImportError, AttributeError):
+        pass
+
+    try:
+        from PyPDF2 import PdfFileMerger
+        merger = PdfFileMerger()
+        for p in pdf_paths:
+            merger.append(p)
+        merger.write(output_path)
+        merger.close()
+        return
+    except (ImportError, AttributeError):
+        pass
+
+    try:
+        try:
+            import pymupdf as fitz
+        except ImportError:
+            import fitz  # PyMuPDF
+        doc = fitz.open()
+        for p in pdf_paths:
+            with fitz.open(p) as sub_doc:
+                doc.insert_pdf(sub_doc)
+        doc.save(output_path)
+        doc.close()
+        return
+    except (ImportError, AttributeError):
+        pass
+
+    raise ImportError("No PDF merging library available. Please install PyPDF2, pypdf, or PyMuPDF.")
+
+
 def pdfs2pdf(combined_pdf_file_path, list_of_filepaths, reorder = False):
     """merge multiple pdfs to single pdf.
 
     Args:
         combined_pdf_file_path (str): path for final product
-        list_of_filepaths (list): list of l=path for the input pdfs
+        list_of_filepaths (list): list of path for the input pdfs
         reorder (bool, optional): reorder the pdf alphabetically. Defaults to False.
     """
-    from PyPDF2 import PdfFileMerger
-
-    merger = PdfFileMerger()
-
     if reorder:
-        list_of_filepaths.sort()
+        list_of_filepaths = sorted(list_of_filepaths)
 
-    for filepath in list_of_filepaths:
-        merger.append(filepath)
-
-    merger.write(combined_pdf_file_path)
-    merger.close()
+    _merge_pdfs(list_of_filepaths, combined_pdf_file_path)
 
 
 def images2pdf(combined_pdf_file_path, list_of_filepaths, reorder = False):
@@ -65,24 +110,24 @@ def images2pdf(combined_pdf_file_path, list_of_filepaths, reorder = False):
 
     Args:
         combined_pdf_file_path (str): path for final product
-        list_of_filepaths (list): list of l=path for the input images
+        list_of_filepaths (list): list of path for the input images
         reorder (bool, optional): reorder the pdf alphabetically. Defaults to False.
     """
-    from PyPDF2 import PdfFileMerger
-
     from PIL import Image
-    merger = PdfFileMerger()
 
     if reorder:
-        list_of_filepaths.sort()
+        list_of_filepaths = sorted(list_of_filepaths)
 
+    images = []
     for filepath in list_of_filepaths:
         with Image.open(filepath) as img:
-            merger.append(img)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            images.append(img.copy())
 
+    if images:
+        images[0].save(combined_pdf_file_path, "PDF", resolution=100.0, save_all=True, append_images=images[1:])
 
-    merger.write(combined_pdf_file_path)
-    merger.close()
 
 try:
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table  
@@ -312,12 +357,7 @@ class PDFGenerator:
         temp_pdfs.append(tailor_pdf)  # Add tailor info page at the end
         
         # Merge all PDFs into the final document
-        from PyPDF2 import PdfMerger
-        merger = PdfMerger()
-        for temp_pdf in temp_pdfs:
-            merger.append(temp_pdf)
-        merger.write(self.pdf_path)
-        merger.close()
+        _merge_pdfs(temp_pdfs, self.pdf_path)
         
         # Delete temporary PDFs
         for temp_pdf in temp_pdfs:

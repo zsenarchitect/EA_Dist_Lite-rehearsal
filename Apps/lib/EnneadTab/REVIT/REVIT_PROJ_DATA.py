@@ -5,8 +5,6 @@ sys.path.append(root_folder)
 
 import NOTIFICATION
 import DATA_FILE
-import FOLDER
-import ENVIRONMENT
 try:
     from Autodesk.Revit import DB # pyright: ignore
     from Autodesk.Revit import UI # pyright: ignore
@@ -220,14 +218,25 @@ def reattach_project_data(doc):
     current_data_name = get_project_data_name(doc)
     print("Current project data file: {}".format(current_data_name))
 
-    # Get all project data files from shared dump folder
-    data_files = [f for f in os.listdir(FOLDER.SHARED_DUMP_FOLDER) if f.startswith(PROJECT_DATA_PREFIX) and f.endswith(ENVIRONMENT.PLUGIN_EXTENSION)]
-    
-    # Extract XXX parts for display (without extension)
-    display_options = [f.replace(PROJECT_DATA_PREFIX, "").replace(ENVIRONMENT.PLUGIN_EXTENSION, "") for f in data_files]
+    # Get all project data keys from depot shared state (network-drive
+    # retirement epic, senzhang-todo #3171). State keys carry no file
+    # extension -- see DATA_FILE._shared_state_key -- so no extension
+    # filtering/stripping is needed here any more.
+    from EnneadTab.DEPOT import STATE
+    data_files = STATE.list_state(prefix=PROJECT_DATA_PREFIX)
+
+    # Extract XXX parts for display
+    display_options = [f.replace(PROJECT_DATA_PREFIX, "") for f in data_files]
     
     if not display_options:
-        NOTIFICATION.messenger("No project data files found in the shared network folder.")
+        # STATE.list_state returns [] on a genuinely empty prefix AND on
+        # offline/auth-failure/5xx alike, and (unlike read_state) never
+        # alarms -- so this message cannot tell "nothing to reattach" from
+        # "depot unreachable, list may be incomplete." Say so rather than
+        # imply project data is missing.
+        NOTIFICATION.messenger(
+            "No project data found in the shared depot. If you are offline "
+            "or the depot is unreachable, this list may be incomplete.")
         return
     
     # Let user pick from the list
@@ -279,26 +288,16 @@ def _retrieve_project_data_simple(doc):
         dict: Project data dictionary from storage, None if retrieval fails
     """
     try:
-        # Check shared network folder availability
-        if not ENVIRONMENT.alert_l_drive_not_available():
-            # 2026-07-29 (per request): dev-only console note (print_note self-
-            # gates on USER.IS_DEVELOPER) PLUS a silent ErrorDump fired ASYNC
-            # (runs on the UI thread and fires on every project-data read while
-            # the drive is down) and throttled 24h/machine so it never freezes
-            # the UI or floods.
-            from EnneadTab import ERROR_HANDLE
-            ERROR_HANDLE.print_note("ERROR: Shared network folder is not available - cannot retrieve project data")
-            # Only report to ErrorDump when the shared drive was TOLD to be there
-            # and vanished (data-loss). A deliberately-offline machine
-            # (IS_DELIBERATELY_OFFLINE) is a legitimate degraded mode -- stay quiet
-            # to avoid ErrorDump noise. Mirrors ENVIRONMENT.announce_shared_root_status.
-            if ENVIRONMENT.IS_SHARED_DATA_LOST:
-                ERROR_HANDLE.report_infra_warning_to_error_dump_async(
-                    "Shared network folder unavailable - cannot retrieve project data",
-                    "REVIT_PROJ_DATA._retrieve_project_data_simple",
-                    throttle_key="revit_proj_data_l_drive")
-            return None
-        
+        # 2026-08-31 (network-drive retirement epic, senzhang-todo #3171): the
+        # office-shared-folder reachability pre-check (ENVIRONMENT.
+        # alert_l_drive_not_available + IS_SHARED_DATA_LOST) is removed rather
+        # than migrated. DATA_FILE.get_data(is_local=False) below now resolves
+        # through DEPOT.STATE.read_state, which already degrades and alarms
+        # (once/process, once/24h, plus a throttled ErrorDump report) on its
+        # own when the depot is unreachable -- duplicating that check here
+        # would just double the alarm/report with no depot-reachability probe
+        # cheaper than the read itself.
+
         # Check if project data parameter exists
         if not is_setup_project_data_para_exist(doc):
             print("ERROR: Project data parameter does not exist")
@@ -358,23 +357,11 @@ def get_revit_project_data_with_debugging(doc):
         print("Attempting auto-setup...")
         return auto_setup_project_data(doc)
 
-    # Step 4: Check shared dump folder accessibility
-    try:
-        shared_dump_path = FOLDER.get_shared_dump_folder_file(project_data_file)
-        
-        # Check if shared dump folder exists
-        import os
-        shared_dump_folder = os.path.dirname(shared_dump_path)
-        if not os.path.exists(shared_dump_folder):
-            print("ERROR: Shared dump folder does not exist: {}".format(shared_dump_folder))
-            print("This may indicate shared network folder connectivity issues")
-            print("Attempting auto-setup...")
-            return auto_setup_project_data(doc)
-        
-    except Exception as e:
-        print("ERROR: Failed to check shared dump folder: {}".format(str(e)))
-        print("Attempting auto-setup...")
-        return auto_setup_project_data(doc)
+    # Step 4 (network-drive retirement epic, senzhang-todo #3171): the old
+    # "does the shared dump folder exist on disk" check is removed rather than
+    # migrated -- depot state has no local folder to probe, and Step 5's
+    # existing auto-setup fallback already covers a None/empty read (offline
+    # with no cache), so no equivalent pre-check is needed.
 
     # Step 5: Attempt to retrieve project data
     try:
@@ -408,13 +395,14 @@ def get_revit_project_data_basic(doc):
 def auto_setup_project_data(doc):
     """Automatically set up project data when retrieval fails"""
     try:
-        # Check if we're already in a transaction by trying to start one
-        try:
+        # doc.IsModifiable is True precisely when a transaction is already open --
+        # check it directly instead of using Transaction.Start() failure as a proxy,
+        # which conflates "already in a transaction" with any other start failure.
+        if not doc.IsModifiable:
             t = DB.Transaction(doc, "Auto Setup Project Data")
             t.Start()
             transaction_started = True
-        except Exception as transaction_error:
-            # We're already in a transaction, so we'll work within it
+        else:
             print("  WARNING: Already in a transaction, working within existing transaction")
             t = None
             transaction_started = False
@@ -708,11 +696,15 @@ def set_revit_project_data(doc, data):
 
 ############### FILE OPERATIONS ###############
 def open_project_data_file(doc):
-    if not ENVIRONMENT.alert_l_drive_not_available(play_sound=True):
-        return 
-    data_file = get_project_data_file(doc)
-    file = FOLDER.get_shared_dump_folder_file(data_file)
-    os.startfile(file)
+    """Retired (network-drive retirement epic, senzhang-todo #3171): project
+    data now lives in depot shared state, not a local file with a stable path
+    to hand to os.startfile. Opening/editing a raw local copy here would also
+    reintroduce the exact silent-local-edit failure mode this epic exists to
+    remove -- such edits would never round-trip through DEPOT.STATE's
+    rev-checked write. Use the built-in editor instead."""
+    NOTIFICATION.messenger(
+        "Direct file access to project data has been retired. Use "
+        "'Edit Project Data' to view or change it.")
 
 def edit_project_data_file(doc):
     editor = ProjectDataEditor(doc)
@@ -765,9 +757,6 @@ class ProjectDataEditor:
             NOTIFICATION.messenger("No project data found.")
             return
 
-        if not ENVIRONMENT.alert_l_drive_not_available(play_sound=True):
-            return
-        
         while True:
             selection = self._show_menu("Project Data Editor", self.main_menu)
             if not selection:

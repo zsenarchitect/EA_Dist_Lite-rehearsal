@@ -163,6 +163,125 @@ def is_family_exist(family_name, doc=None):
     return False
 
 
+def get_family_name(element):
+    """Return the family name of a family instance (distinct from its type name).
+
+    Args:
+        element (DB.Element): typically a DB.FamilyInstance.
+
+    Returns:
+        str or None
+    """
+    symbol = getattr(element, "Symbol", None)
+    if symbol:
+        family = symbol.Family
+        if family:
+            return family.Name
+    param = element.get_Parameter(DB.BuiltInParameter.ELEM_FAMILY_PARAM)
+    if param:
+        return param.AsString()
+    return None
+
+
+def get_nested_family_instances_by_name(host_instance, target_family_name, doc=None):
+    """Return the family instances nested directly inside `host_instance` whose family
+    name matches `target_family_name`.
+
+    Generalized from the Sparc furring-wall marker lookup ("RefMarker" points nested
+    inside curtain panel families): a small marker/position family nested inside a
+    larger host family (furniture, casework...) exposes an anchor point without the
+    host tool needing to know that family's internal geometry.
+
+    Args:
+        host_instance (DB.FamilyInstance): the placed instance to inspect.
+        target_family_name (str): family name of the nested instance to find.
+        doc (DB.Document, optional): defaults to the current document.
+
+    Returns:
+        list of DB.FamilyInstance
+    """
+    doc = doc or DOC
+    class_filter = DB.ElementClassFilter(DB.FamilyInstance)
+    try:
+        dependent_ids = host_instance.GetDependentElements(class_filter)
+    except Exception:
+        return []
+    matches = []
+    for element_id in dependent_ids:
+        element = doc.GetElement(element_id)
+        if element is None or element.Id == host_instance.Id:
+            continue
+        if get_family_name(element) == target_family_name:
+            matches.append(element)
+    return matches
+
+
+def get_shared_nested_instances_by_family_name(family_name, doc=None):
+    """Return every placed instance of a "Shared" nested family, found directly with a
+    project-wide collector instead of walking every host's dependents.
+
+    A nested family marked Shared in the Family Editor registers as its own
+    first-class element once loaded into a project, so it can be collected the same
+    way as a top-level family instance.
+
+    Args:
+        family_name (str): family name of the shared nested marker family.
+        doc (DB.Document, optional): defaults to the current document.
+
+    Returns:
+        list of DB.FamilyInstance
+    """
+    doc = doc or DOC
+    instances = DB.FilteredElementCollector(doc).OfClass(DB.FamilyInstance).WhereElementIsNotElementType().ToElements()
+    return [element for element in instances if get_family_name(element) == family_name]
+
+
+def get_nested_instance_placement(nested_instance, host_transform=None):
+    """Resolve a nested/marker family instance's world-space anchor point and orientation.
+
+    Tries Location.Point, then Location.Curve midpoint, then the instance's own
+    transform origin, matching the fallback order used by the Sparc furring-wall
+    marker extraction. `host_transform` (e.g. a link instance's total transform) maps
+    both the point and the orientation from link space into host/world space.
+
+    Args:
+        nested_instance (DB.FamilyInstance): the nested marker instance.
+        host_transform (DB.Transform, optional): transform to compose the result with,
+            e.g. from a linked document's local space into the host document.
+
+    Returns:
+        tuple (DB.XYZ point, DB.Transform orientation); either may be None.
+    """
+    point = None
+    location = getattr(nested_instance, "Location", None)
+    if location is not None:
+        point = getattr(location, "Point", None)
+        if point is None:
+            curve = getattr(location, "Curve", None)
+            if curve is not None:
+                try:
+                    point = curve.Evaluate(0.5, True)
+                except Exception:
+                    point = None
+
+    orientation = None
+    if hasattr(nested_instance, "GetTransform"):
+        try:
+            orientation = nested_instance.GetTransform()
+        except Exception:
+            orientation = None
+    if point is None and orientation is not None:
+        point = orientation.Origin
+
+    if host_transform is not None:
+        if point is not None:
+            point = host_transform.OfPoint(point)
+        if orientation is not None:
+            orientation = host_transform.Multiply(orientation)
+
+    return point, orientation
+
+
 def get_family_type_name(element):
     """Return the family type name for a given element.
 
@@ -432,7 +551,178 @@ def update_family_type_by_dict(doc, family_data, show_log=True):
     for family_name, type_data in family_data.items():
         for type_name, para_dict in type_data.items():
             update_family_type(doc, family_name, type_name, para_dict, show_log=show_log)
-        
+
+
+def _ensure_symbol_active(family_symbol, doc=None):
+    """Activate a family symbol if it is not already active.
+
+    Must be called inside an open transaction; Revit requires an active
+    symbol before it can be used with NewFamilyInstance.
+    """
+    doc = doc or DOC
+    if family_symbol and not family_symbol.IsActive:
+        family_symbol.Activate()
+        doc.Regenerate()
+
+
+def place_instance_by_face(family_symbol, face, location, reference_direction=None, doc=None):
+    """Place a face-based family instance on any host face (wall, floor, ceiling, roof...).
+
+    Must be called inside an open transaction. `family_symbol` must belong to a
+    face-based ("Work Plane Based") family.
+
+    Args:
+        family_symbol (DB.FamilySymbol): the type to place.
+        face (DB.Face): host face, typically obtained from a DB.Reference via
+            UIDocument.Selection.PickObject(ObjectType.Face, ...) and
+            element.GetGeometryObjectFromReference(reference).
+        location (DB.XYZ): insertion point on the face, e.g. reference.GlobalPoint.
+        reference_direction (DB.XYZ, optional): orientation hint; defaults to the
+            face's local X direction at `location`.
+        doc (DB.Document, optional): defaults to the current document.
+
+    Returns:
+        DB.FamilyInstance
+    """
+    doc = doc or DOC
+    _ensure_symbol_active(family_symbol, doc=doc)
+    if reference_direction is None:
+        try:
+            uv = face.Project(location).UVPoint
+            reference_direction = face.ComputeDerivatives(uv).BasisX
+        except Exception:
+            reference_direction = DB.XYZ.BasisZ
+    return doc.Create.NewFamilyInstance(face, location, reference_direction, family_symbol)
+
+
+def place_instance_by_reference(family_symbol, reference, location, reference_direction=None, doc=None):
+    """Place a face-based family instance using a DB.Reference directly, instead of
+    a DB.Face extracted from one.
+
+    Robustness note: Element.GetGeometryObjectFromReference(reference) does not
+    reliably return a Face whose internal .Reference is populated for every host
+    element/face type. Passing that Face straight to NewFamilyInstance(Face, ...)
+    (see place_instance_by_face) can then fail with "The Reference of the input
+    face is null. If the face was obtained from Element.Geometry, make sure to turn
+    on the option 'ComputeReferences'." -- even though the Face DID come from a
+    Reference. The Reference-based NewFamilyInstance overload sidesteps this
+    entirely: it needs no Face object at all, only the Reference itself, so there
+    is no internal-reference field on a Face that can be missing.
+
+    Must be called inside an open transaction. `family_symbol` must belong to a
+    face-based ("Work Plane Based") family.
+
+    Args:
+        family_symbol (DB.FamilySymbol): the type to place.
+        reference (DB.Reference): host face reference, e.g. from
+            DB.Reference.ParseFromStableRepresentation or a picked ObjectType.Face.
+        location (DB.XYZ): insertion point on the face.
+        reference_direction (DB.XYZ, optional): orientation hint; defaults to world
+            Z (DB.XYZ.BasisZ) -- keeps the instance plumb regardless of the face's
+            exact tilt, matching the Revit UI's "Place on Vertical Face" tool
+            (plain "Place on Face" instead follows the face's own local axis).
+        doc (DB.Document, optional): defaults to the current document.
+
+    Returns:
+        DB.FamilyInstance
+    """
+    doc = doc or DOC
+    _ensure_symbol_active(family_symbol, doc=doc)
+    if reference_direction is None:
+        reference_direction = DB.XYZ.BasisZ
+    return doc.Create.NewFamilyInstance(reference, location, reference_direction, family_symbol)
+
+
+def place_instance_by_wall(family_symbol, location, wall, level=None, doc=None, structural_type=None):
+    """Place a wall-hosted family instance (a "Wall Based" family, e.g. a wall-mounted device).
+
+    Must be called inside an open transaction.
+
+    Args:
+        family_symbol (DB.FamilySymbol): the type to place.
+        location (DB.XYZ): insertion point, typically on the wall's face.
+        wall (DB.Wall): the host wall.
+        level (DB.Level, optional): reference level; when omitted the host-only
+            overload is used and Revit infers the level from the wall.
+        doc (DB.Document, optional): defaults to the current document.
+        structural_type (DB.Structure.StructuralType, optional): defaults to NonStructural.
+
+    Returns:
+        DB.FamilyInstance
+    """
+    doc = doc or DOC
+    structural_type = structural_type or DB.Structure.StructuralType.NonStructural
+    _ensure_symbol_active(family_symbol, doc=doc)
+    if level is not None:
+        return doc.Create.NewFamilyInstance(location, family_symbol, wall, level, structural_type)
+    return doc.Create.NewFamilyInstance(location, family_symbol, wall, structural_type)
+
+
+def get_floor_face(floor, use_top_face=True):
+    """Return the top (or bottom) face of a Floor element, for face-based hosting.
+
+    Args:
+        floor (DB.Floor): the floor element.
+        use_top_face (bool): True (default) for the top face, False for the bottom face.
+
+    Returns:
+        DB.Face or None when no usable face is found.
+    """
+    options = DB.Options()
+    options.ComputeReferences = True
+    geo = floor.get_Geometry(options)
+    if geo is None:
+        return None
+    target_sign = 1.0 if use_top_face else -1.0
+    best_face = None
+    best_z = None
+    for solid in geo:
+        if not isinstance(solid, DB.Solid) or solid.Faces.Size == 0:
+            continue
+        for face in solid.Faces:
+            try:
+                normal = face.ComputeNormal(DB.UV(0.5, 0.5))
+            except Exception:
+                continue
+            if normal.Z * target_sign <= 0.1:
+                continue
+            bbox = face.GetBoundingBox()
+            mid = face.Evaluate((bbox.Min + bbox.Max) / 2.0)
+            if best_z is None or (use_top_face and mid.Z > best_z) or (not use_top_face and mid.Z < best_z):
+                best_z = mid.Z
+                best_face = face
+    return best_face
+
+
+def place_instance_by_floor(family_symbol, floor, location=None, doc=None, use_top_face=True):
+    """Place a face-based family instance hosted on a Floor element (a "Floor Based" family,
+    e.g. a floor-mounted device).
+
+    Convenience wrapper around place_instance_by_face() that resolves the floor's
+    top (or bottom) face. Must be called inside an open transaction.
+
+    Args:
+        family_symbol (DB.FamilySymbol): the type to place.
+        floor (DB.Floor): the host floor element.
+        location (DB.XYZ, optional): insertion point; defaults to the center of
+            the resolved face's bounding box.
+        doc (DB.Document, optional): defaults to the current document.
+        use_top_face (bool): True (default) to host on the floor's top face.
+
+    Returns:
+        DB.FamilyInstance, or None when the floor has no usable face.
+    """
+    doc = doc or DOC
+    face = get_floor_face(floor, use_top_face=use_top_face)
+    if face is None:
+        NOTIFICATION.messenger("Cannot find a usable face on floor [{}]".format(floor.Id))
+        return None
+    if location is None:
+        bbox = face.GetBoundingBox()
+        location = face.Evaluate((bbox.Min + bbox.Max) / 2.0)
+    return place_instance_by_face(family_symbol, face, location, doc=doc)
+
+
 class RevitInstance:
     def __init__(self, element):
         self.element = element

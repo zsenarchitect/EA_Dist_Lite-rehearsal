@@ -81,6 +81,41 @@ class PreflightStage(PublishStage):
         # Confirm all executables exist against maker data
         self._confirm_all_exes_exist(context)
 
+        # Confirm all button icons exist against knowledge database
+        self._confirm_all_button_icons_exist(context)
+
+    def _confirm_all_button_icons_exist(self, context):
+        """Verify all button icon files referenced in knowledge database exist.
+        Fails RED immediately in Preflight (seconds) rather than Stage 03 documentation generation (minutes)."""
+        import json
+        print("Confirming button icons exist against knowledge database...")
+        rhino_folder = os.path.join(context.os_repo_folder, "Apps", "_rhino")
+        db_path = os.path.join(rhino_folder, "knowledge_rhino_database.sexyDuck")
+        missing = []
+        if os.path.isfile(db_path):
+            try:
+                with open(db_path, "r", encoding="utf-8") as f:
+                    db = json.load(f)
+                for script_key, data in db.items():
+                    if not isinstance(data, dict):
+                        continue
+                    icon = data.get("icon")
+                    if icon:
+                        full_icon = os.path.join(rhino_folder, icon.replace("/", os.sep))
+                        if not os.path.isfile(full_icon):
+                            missing.append("{} -> {}".format(script_key, icon))
+            except Exception as e:
+                print("    Warning reading knowledge db: {}".format(e))
+
+        if missing:
+            raise PublishStageError(
+                "Preflight icon check failed: {} missing button icon(s). "
+                "Refusing to proceed to docs stage:\n  {}".format(
+                    len(missing), "\n  ".join(missing[:10])
+                )
+            )
+        print("[OK] All button icons verified.")
+
     def _run_publish_guard(self, context):
         """Execute publish_guard.py pre-publish assertion check."""
         print("Executing publish_guard pre-publish assertion...")

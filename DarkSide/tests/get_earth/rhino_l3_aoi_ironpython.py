@@ -12,8 +12,12 @@ toolbar, in front of a user.
 The `#! python 2` shebang on line 1 selects IronPython 2.7 in Rhino 8.
 
 Run:  RhinoCode.exe script DarkSide/tests/get_earth/rhino_l3_aoi_ironpython.py
-Then read the JSON it writes; do NOT trust the CLI exit code (it means
-"dispatched", not "succeeded").
+POLL for the JSON it writes -- do not read it once. The CLI is asynchronous: it
+returns when Rhino has ACCEPTED the script, not when the script has finished,
+and exits 0 either way while printing nothing. A result file read in the same
+breath as the dispatch is read before it exists, and that absence is
+indistinguishable from "Rhino never ran it" (cost an hour and a needless Rhino
+restart on 2026-08-23). Delete any previous result first, then poll on mtime.
 """
 
 import os

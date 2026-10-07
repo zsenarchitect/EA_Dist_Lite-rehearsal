@@ -364,6 +364,28 @@ def _decode_token_expiry(token):
 # .NET HttpListener flow (IronPython in Revit/Rhino)
 # ============================================================
 
+def _desktop_host_app():
+    """Host app key Home shows on its sign-in pages ("rhino"/"revit"), or None."""
+    try:
+        import ENVIRONMENT
+        if ENVIRONMENT.IS_RHINO_ENVIRONMENT:
+            return "rhino"
+        if ENVIRONMENT.IS_REVIT_ENVIRONMENT:
+            return "revit"
+    except Exception:
+        pass
+    return None
+
+
+def _desktop_auth_url(port, app=None):
+    """Legacy port flow URL. Passes app= so Home names the right source app (TODO-6034)."""
+    app = app or _desktop_host_app()
+    url = "{}/api/desktop-auth?port={}".format(ENNEADTAB_URL, port)
+    if app:
+        url += "&app={}".format(app)
+    return url
+
+
 def _do_auth_flow_dotnet():
     """Auth flow using .NET HttpListener. Runs in .NET background thread."""
     import random
@@ -379,7 +401,7 @@ def _do_auth_flow_dotnet():
         print("AUTH: Failed to start listener on port {}: {}".format(port, e))
         return
 
-    url = "{}/api/desktop-auth?port={}".format(ENNEADTAB_URL, port)
+    url = _desktop_auth_url(port)
     webbrowser.open(url)
 
     # Wait for one request (the callback from enneadtab.com)
@@ -469,7 +491,7 @@ def _do_auth_flow_python():
     server_thread.daemon = True
     server_thread.start()
 
-    url = "{}/api/desktop-auth?port={}".format(ENNEADTAB_URL, port)
+    url = _desktop_auth_url(port)
     webbrowser.open(url)
 
     deadline = time.time() + 120

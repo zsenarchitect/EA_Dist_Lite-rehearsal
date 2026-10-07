@@ -5,8 +5,10 @@ import os
 import DATA_FILE
 
 
+# See ENVIRONMENT.py's USER_PROFILE_FOLDER comment (senzhang-todo #5247): never
+# bare-subscript os.environ at module top level.
 GLOBAL_SETTING_FILE = "setting_{}".format(
-    os.environ["USERPROFILE"].split("\\")[-1]
+    (os.environ.get("USERPROFILE") or os.environ.get("HOME") or os.path.expanduser("~")).split("\\")[-1]
 )
 
 

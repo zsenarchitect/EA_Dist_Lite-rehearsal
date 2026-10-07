@@ -10,3 +10,5 @@ layout:
   - '---'
   - match_texture_mapping_in_block
   - fall_geos_on_geo
+  - block_fidelity
+  - block_dependency_map

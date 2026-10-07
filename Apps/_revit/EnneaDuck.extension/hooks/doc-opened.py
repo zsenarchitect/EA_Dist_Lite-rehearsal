@@ -433,9 +433,17 @@ def main():
     # The open resolved -- stand down the arcade wait-watcher armed in doc-opening. First
     # thing in the hook (before any dialog/sound below can stretch the measured wait), and
     # guarded so this late-add can never break document opening. Contract: EnneadTab/ARCADE.py.
+    # Long waits without Arcade installed may get a post-wait Get Arcade toast (NotificationHost
+    # only -- never from the watcher). See SYNC_SUMMARY.offer_arcade_after_wait.
+    wait_seconds = None
     try:
         from EnneadTab import ARCADE
-        ARCADE.end_wait_watch()
+        wait_seconds = ARCADE.end_wait_watch()
+    except Exception:
+        pass
+    try:
+        from EnneadTab import SYNC_SUMMARY
+        SYNC_SUMMARY.offer_arcade_after_wait(wait_seconds)
     except Exception:
         pass
 

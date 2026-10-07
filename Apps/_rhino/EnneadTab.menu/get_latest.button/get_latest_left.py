@@ -14,20 +14,24 @@ def add_search_path():
     2026-04-08: Added git repo priority so developers always load
     the latest code from their working copy, not the stale EA_Dist.
     """
-    # Primary: git repo at ~/github/ennead-llp/EnneadTab-OS/Apps/lib
-    # Use USERPROFILE (not HOME) to avoid enterprise $HOME=/p/ bug
+    # If this script is running directly from a git checkout, prefer its own lib
     home = os.environ.get("USERPROFILE", os.environ.get("HOME", ""))
-    git_lib = os.path.join(home, "github", "ennead-llp", "EnneadTab-OS", "Apps", "lib")
-
-    # Fallback: EA_Dist (where this script is running from)
     _app_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    dist_lib = os.path.join(_app_folder, "lib")
+    this_lib = os.path.join(_app_folder, "lib")
+    _repo_root = os.path.dirname(_app_folder)
 
-    # Pick the best available source
-    if os.path.isdir(git_lib):
-        lib_path = git_lib
+    if os.path.isdir(os.path.join(_repo_root, ".git")) and os.path.isdir(this_lib) and "EA_Dist" not in _repo_root:
+        lib_path = this_lib
     else:
-        lib_path = dist_lib
+        candidate_paths = [
+            os.path.join(home, "github", "EnneadTab-OS", "Apps", "lib"),
+            os.path.join(home, "github", "ennead-llp", "EnneadTab-OS", "Apps", "lib"),
+        ]
+        lib_path = this_lib
+        for candidate in candidate_paths:
+            if os.path.isdir(candidate):
+                lib_path = candidate
+                break
 
     # Remove any stale EnneadTab lib paths, then add the chosen one at front
     for p in list(sys.path):

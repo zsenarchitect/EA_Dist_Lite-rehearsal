@@ -18,8 +18,9 @@ def find_main_repo():
         "design-repo"
         ]
     for location in common_locations:
-        if os.path.exists(os.path.join(user_profile_folder, location)):
-            return os.path.join(user_profile_folder, location, 'EnneadTab-OS')
+        candidate = os.path.join(user_profile_folder, location, 'EnneadTab-OS')
+        if os.path.isdir(candidate):
+            return candidate
 
     esosys_folder = "{}\\Documents\\EnneadTab Ecosystem".format(os.environ["USERPROFILE"])
     if not os.path.exists(esosys_folder):

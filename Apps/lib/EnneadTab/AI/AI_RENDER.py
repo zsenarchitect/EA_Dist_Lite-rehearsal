@@ -13,6 +13,8 @@ Single module owning the complete render concern:
   Section G -- Cloud Gallery API         (list/items/save/community/delete)
   Section H -- Local gallery cache       (cache_dir, fetch_*_async, filter_rows)
   Section I -- Render job model + worker (RenderJob, QueueWorker, ACTIVE_CAP)
+  Starter chips -- SUGGESTED_STARTER_PROMPTS / get_suggested_starter_prompts
+                 (shared Revit+Rhino prompt-seed bubbles; Keep #459)
 
 All HTTP transports come from EnneadTab.AI._common. All the desktop UIs in
 Revit and Rhino import from this module -- there is no per-platform copy of
@@ -93,6 +95,83 @@ QUOTA_PANEL_BODY = (
     "You've used your daily render allowance. Try again tomorrow, or "
     "contact design-tech if this is unexpected (Ennead is on a paid tier)."
 )
+
+
+# =====================================================================
+# Suggested starter prompts (chip bubbles above the prompt box)
+#
+# Keep #459 -- single editable list consumed by BOTH the Revit WPF dialog
+# (ai_render_script.py) and the Rhino Eto dialog (view2render_left.py).
+# Clicking a chip fills the prompt textbox; the user can edit or submit.
+#
+# Edit ONLY this list to add/remove/reword starters. Each entry:
+#   label  -- short text shown on the chip
+#   prompt -- text written into the prompt box (may equal label)
+# =====================================================================
+
+SUGGESTED_STARTER_PROMPTS = [
+    {
+        "label": "photoreal exterior dusk",
+        "prompt": (
+            "Photoreal architectural exterior at dusk, warm golden-hour light, "
+            "soft sky glow, crisp material detail, cinematic atmosphere"
+        ),
+    },
+    {
+        "label": "watercolor interior",
+        "prompt": (
+            "Watercolor interior study, soft washes, loose linework, "
+            "paper texture, gentle daylight"
+        ),
+    },
+    {
+        "label": "schematic massing study",
+        "prompt": (
+            "Schematic massing study, abstract solid forms, clean volume "
+            "diagram, white model aesthetic, soft ambient light"
+        ),
+    },
+    {
+        "label": "axonometric clay model",
+        "prompt": (
+            "Axonometric clay model view, matte white surfaces, soft studio "
+            "lighting, subtle shadows, presentation diagram quality"
+        ),
+    },
+    {
+        "label": "nighttime streetscape",
+        "prompt": (
+            "Photoreal nighttime streetscape, warm storefront glow, cool "
+            "sky, wet pavement reflections, atmospheric depth"
+        ),
+    },
+    {
+        "label": "pencil sketch concept",
+        "prompt": (
+            "Architectural pencil sketch concept, hand-drawn linework, "
+            "light hatching, tracing-paper feel, exploratory design study"
+        ),
+    },
+]
+
+
+def get_suggested_starter_prompts():
+    """Return a copy of the shared starter-prompt chip list.
+
+    Used by Revit and Rhino AI Render UIs so the chip row cannot drift.
+    Each item is {label, prompt}. Empty list if the module constant is
+    cleared intentionally.
+    """
+    out = []
+    for item in SUGGESTED_STARTER_PROMPTS or []:
+        if not isinstance(item, dict):
+            continue
+        label = (item.get("label") or "").strip()
+        prompt = (item.get("prompt") or label).strip()
+        if not label or not prompt:
+            continue
+        out.append({"label": label, "prompt": prompt})
+    return out
 
 
 def _mime_for_path(path):

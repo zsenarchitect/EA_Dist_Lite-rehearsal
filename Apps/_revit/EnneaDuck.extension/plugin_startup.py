@@ -669,14 +669,16 @@ def _enable_routes_server():
     This runs from execute_extension_startup_script(), which sessionmgr calls
     from inside _new_session() -- BEFORE _perform_onsessionloadcomplete_ops()
     reads user_config.routes_server and calls routes.activate_server() for this
-    same session (see loader/sessionmgr.py). So flipping the flag here already
-    covers the normal case with no extra call needed. We ALSO call
-    routes.activate_server() directly as a safety net for hosts/orderings where
-    that later step does not run (e.g. a hot-reload that skips
-    onsessionloadcomplete): activate_server() is idempotent (it checks the
-    ROUTES_SERVER env var and no-ops if a server is already up), so calling it
-    twice in the same session is harmless. The /enneadtab/* routes themselves
-    are registered by _register_mcp_routes()."""
+    same session (see loader/sessionmgr.py). Flipping the flag here ensures that
+    pyRevit's own lifecycle step activates the server cleanly.
+
+    IMPORTANT: Do NOT call routes.activate_server() directly here. pyRevit's
+    activate_server() returns None if called when a server is already active,
+    so calling it early here causes sessionmgr's subsequent call to fail its
+    truthiness check and log "ERROR [pyrevit.loader.sessionmgr] Routes servers
+    failed activation", popping up an error window on startup. Let sessionmgr
+    be the sole activator. The /enneadtab/* routes themselves are registered
+    by _register_mcp_routes()."""
     try:
         from pyrevit.userconfig import user_config
     except Exception as e:
@@ -702,15 +704,6 @@ def _enable_routes_server():
         return
 
     if changed:
-        try:
-            from pyrevit import routes
-            routes.activate_server()
-        except Exception as e:
-            if USER.IS_DEVELOPER:
-                print("_enable_routes_server: activate_server() failed: {}".format(e))
-            # Non-fatal: _perform_onsessionloadcomplete_ops() still gets a
-            # chance to start the server later in this same session load.
-
         try:
             NOTIFICATION.messenger(
                 main_text="EnneadTab turned on the Revit Assistant connection."
@@ -820,7 +813,6 @@ def EnneadTab_startup():
     except Exception:
         pass
     REVIT_EVENT.set_family_load_hook_stage(stage = True)
-    REVIT_EVENT.set_L_drive_alert_hook_depressed(stage = False)
 
     TIME.update_revit_uptime()
 

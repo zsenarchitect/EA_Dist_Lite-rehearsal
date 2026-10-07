@@ -1,3 +1,39 @@
+// ErrorDump reporting (TODO-6442, child of epic TODO-6438).
+// Posts client-side errors to the centralized ErrorDump ingest API via a
+// same-origin Flask relay (/api/client_error -> app.py -> ErrorDump), so
+// they are visible outside this browser's console. Same-origin because a
+// direct browser fetch to ErrorDump's ingest host is blocked by CORS (no
+// Access-Control-Allow-Origin on its OPTIONS preflight, verified 2026-09-22).
+// Fire-and-forget; never throws, never blocks the caller. Mirrors the
+// contract in Apps/lib/EnneadTab/ERROR_HANDLE.py:send_error_to_error_dump.
+function reportErrorToErrorDump(error, functionName) {
+    try {
+        var message = (error && error.message) ? error.message : String(error);
+        var stack = (error && error.stack) ? String(error.stack).slice(0, 10000) : undefined;
+        var body = {
+            error_message: String(message).slice(0, 5000) || '(no message)',
+            stack_trace: stack,
+            function_name: functionName,
+            url: window.location.href
+        };
+        fetch('/api/client_error', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function(res) {
+            if (!res.ok) {
+                console.error('ErrorDump relay rejected report:', res.status);
+            }
+        }).catch(function(reportErr) {
+            // Never let a broken reporter break the app; log locally so the
+            // failure is at least visible in the browser console.
+            console.error('ErrorDump relay failed:', reportErr);
+        });
+    } catch (reportErr) {
+        console.error('ErrorDump reporting threw:', reportErr);
+    }
+}
+
 // Upload
 function uploadFile() {
     const fileInput = document.getElementById('fileInput');
@@ -22,7 +58,10 @@ function uploadFile() {
             alert(data.error);
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        reportErrorToErrorDump(error, 'uploadFile');
+    });
 }
 
 // Editor
@@ -73,6 +112,7 @@ function sendMessage() {
     .catch(error => {
         addMessage("Error communicating with server.", 'ai');
         console.error(error);
+        reportErrorToErrorDump(error, 'sendMessage');
     });
 }
 
@@ -105,7 +145,10 @@ function applyEdits(edits) {
             addMessage("Failed to apply edits: " + data.error, 'ai');
         }
     })
-    .catch(error => console.error(error));
+    .catch(error => {
+        console.error(error);
+        reportErrorToErrorDump(error, 'applyEdits');
+    });
 }
 
 // Allow Enter to send

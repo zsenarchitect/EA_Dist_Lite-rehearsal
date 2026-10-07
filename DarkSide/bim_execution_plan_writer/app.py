@@ -1,9 +1,15 @@
 import os
 import json
+import urllib.request
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 from utils.docx_handler import convert_to_html, save_docx
 from utils.gemini_handler import get_gemini_response
+
+# ErrorDump ingest (TODO-6442, child of epic TODO-6438). Public endpoint, no
+# API key needed -- see Apps/lib/EnneadTab/ERROR_HANDLE.py:send_error_to_error_dump
+# for the canonical Python client this mirrors.
+ERROR_DUMP_INGEST_URL = 'https://enneadtab.com/error-dump/api/ingest'
 
 app = Flask(__name__)
 
@@ -87,6 +93,50 @@ def save_edit():
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
+@app.route('/api/client_error', methods=['POST'])
+def client_error():
+    """Relay a browser-side JS error to ErrorDump.
+
+    main.js cannot POST to the ErrorDump ingest host directly: verified
+    2026-09-22 that its OPTIONS preflight response carries no
+    Access-Control-Allow-Origin header, so a real browser blocks the
+    cross-origin fetch before it ever leaves. Relaying same-origin through
+    this route (server-to-server, no CORS involved) is the only version that
+    actually reports.
+
+    Never surfaces the relay's own failure to the caller -- the browser
+    already console.error'd the original error, so a relay outage would just
+    add a second, less useful failure on top of the first.
+    """
+    data = request.get_json(silent=True) or {}
+    error_message = str(data.get('error_message') or '(no message)')[:5000]
+    stack_trace = data.get('stack_trace')
+    payload = {
+        'source_app': 'EnneadTab-OS',
+        'error_message': error_message,
+        'stack_trace': str(stack_trace)[:10000] if stack_trace else None,
+        'function_name': data.get('function_name'),
+        'environment': 'browser',
+        'context': {
+            'app': 'bim_execution_plan_writer',
+            'url': data.get('url'),
+            'user_agent': request.headers.get('User-Agent'),
+        },
+    }
+    try:
+        req = urllib.request.Request(
+            ERROR_DUMP_INGEST_URL,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+        urllib.request.urlopen(req, timeout=5)
+    except Exception as e:
+        # Never let ErrorDump's own outage break the app; print so it is at
+        # least visible in server logs rather than vanishing silently.
+        print('client_error relay to ErrorDump failed: {}'.format(e))
+    return jsonify({'ok': True})
 
 if __name__ == '__main__':
     debug_mode = os.environ.get('DEBUG', 'False').lower() == 'true'

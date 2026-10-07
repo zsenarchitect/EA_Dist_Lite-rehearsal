@@ -17,9 +17,9 @@ from pyrevit import script #
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
 
-from EnneadTab import ERROR_HANDLE, NOTIFICATION
+from EnneadTab import ERROR_HANDLE, NOTIFICATION, SHAREPOINT
 from EnneadTab.REVIT import REVIT_APPLICATION
-from Autodesk.Revit import DB # pyright: ignore 
+from Autodesk.Revit import DB # pyright: ignore
 
 doc = REVIT_APPLICATION.get_doc()
 
@@ -28,8 +28,8 @@ from EnneadTab import EXCEL
 from EnneadTab.EXCEL import ExcelDataItem
 
 
-EXCEL_PATH = "J:\\2151\\2_Master File\\B-70_Programming\\03_Colors\\Color Scheme_NYULI.xlsx"
-OUT_EXCEL_PATH = "J:\\2151\\2_Master File\\B-70_Programming\\03_Colors\\archive\\temp_out.xls"
+EXCEL_PATH = SHAREPOINT.get_project_file("2151/2_Master File/B-70_Programming/03_Colors/Color Scheme_NYULI.xlsx")
+OUT_EXCEL_PATH = SHAREPOINT.get_project_file("2151/2_Master File/B-70_Programming/03_Colors/archive/temp_out.xls")
 
 
         

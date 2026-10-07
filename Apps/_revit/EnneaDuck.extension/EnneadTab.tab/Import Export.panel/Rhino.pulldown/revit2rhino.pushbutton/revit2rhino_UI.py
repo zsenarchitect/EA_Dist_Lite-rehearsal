@@ -14,10 +14,13 @@ import System
 from EnneadTab import ENVIRONMENT, NOTIFICATION, ERROR_HANDLE
 from EnneadTab.REVIT import REVIT_APPLICATION
 from Autodesk.Revit import DB  # pyright: ignore
+import logging
 import revit2rhino_action
-import revit2rhino_script
+import revit2rhino_dwg
 
-logger = revit2rhino_script.logger
+# Same shared logger the script and action modules use (looked up by name so
+# this module does not need to re-import the launcher script).
+logger = logging.getLogger("Revit2Rhino")
 DIR_PATH = os.path.dirname(__file__)
 
 CATEGORY_CHECKBOX_MAP = {
@@ -81,7 +84,12 @@ class Revit2RhinoUI(forms.WPFWindow):
             self.logo_img.Visibility = Windows.Visibility.Collapsed
 
     def mouse_down_main_panel(self, sender, args):
-        self.DragMove()
+        # DragMove raises InvalidOperationException if the button is already
+        # released; never let that escape into Revit.
+        try:
+            self.DragMove()
+        except Exception:
+            pass
 
     @ERROR_HANDLE.try_catch_error()
     def select_families_click(self, sender, args):
@@ -137,6 +145,7 @@ class Revit2RhinoUI(forms.WPFWindow):
         )
 
         if not selected_family_names:
+            self.selected_instances = None
             self.selection_info.Text = "No families selected for export."
             self.export_button.IsEnabled = False
             return
@@ -155,22 +164,44 @@ class Revit2RhinoUI(forms.WPFWindow):
         if not self.selected_instances:
             NOTIFICATION.messenger("No elements selected for export")
             return
-        revit2rhino_action.export_elements_to_rhino(self.doc, self.selected_instances)
+        # Drop elements that became invalid since they were collected.
+        valid_instances = [el for el in self.selected_instances if el is not None and el.IsValidObject]
+        if not valid_instances:
+            NOTIFICATION.messenger("The selected elements no longer exist. Please select families again.")
+            self.selected_instances = None
+            self.export_button.IsEnabled = False
+            return
+        open_in_rhino = bool(self.open_rhino_checkbox.IsChecked)
+        revit2rhino_action.export_elements_to_rhino(self.doc, valid_instances, open_in_rhino=open_in_rhino)
 
 
+    @ERROR_HANDLE.try_catch_error()
+    def export_dwg_click(self, sender, args):
+        """Export everything visible in the active 3D view as a DWG (no element selection needed)."""
+        self.export_dwg_button.IsEnabled = False
+        try:
+            revit2rhino_dwg.export_active_view_to_dwg(self.doc)
+        finally:
+            self.export_dwg_button.IsEnabled = True
+
+
+    @ERROR_HANDLE.try_catch_error()
     def close_click(self, sender, args):
         self.Close()
 
+    @ERROR_HANDLE.try_catch_error()
     def check_all_btn_Click(self, sender, args):
         """Check all category checkboxes."""
         for cb_name in CATEGORY_CHECKBOX_MAP.keys():
             getattr(self, cb_name).IsChecked = True
 
+    @ERROR_HANDLE.try_catch_error()
     def check_none_btn_Click(self, sender, args):
         """Uncheck all category checkboxes."""
         for cb_name in CATEGORY_CHECKBOX_MAP.keys():
             getattr(self, cb_name).IsChecked = False
 
+    @ERROR_HANDLE.try_catch_error()
     def toggle_checked_btn_Click(self, sender, args):
         """Toggle all category checkboxes."""
         for cb_name in CATEGORY_CHECKBOX_MAP.keys():
@@ -245,13 +276,18 @@ class FamilyTemplateListItem(forms.TemplateListItem):
                 return "[ModelText]:{}".format(self.element.ModelTextType.LookupParameter("Type Name").AsString())
 
             else:
-                category_name = self.element.Category.Name if hasattr(self.element, 'Category') else 'Unknown'
-                type_name = self.element.LookupParameter("Type Name").AsString() if hasattr(self.element, 'LookupParameter') else self.element.Name
+                category_name = self.element.Category.Name if getattr(self.element, 'Category', None) else 'Unknown'
+                type_param = self.element.LookupParameter("Type Name") if hasattr(self.element, 'LookupParameter') else None
+                type_name = type_param.AsString() if type_param else self.element.Name
                 return "[{}]:{}".format(category_name, type_name)
 
         except Exception as e:
             print(traceback.format_exc())
-            return "[Unknown]:{}".format(str(self.element))
+            # Include category + id so unrelated elements do not collapse into
+            # one identical "[Unknown]" entry in the family list.
+            return "[Unknown]:{} (id {})".format(
+                self.element.Category.Name if getattr(self.element, 'Category', None) else "NoCategory",
+                REVIT_APPLICATION.get_element_id_value(self.element.Id))
 
     def _get_family_by_name(self, name):
         """Helper method to get family by name."""

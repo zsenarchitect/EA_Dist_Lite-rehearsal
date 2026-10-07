@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """Sync with central route handler for EnneadTab MCP."""
+import System
 from pyrevit import routes
 from Autodesk.Revit import DB
+
+from _request_utils import route_error
 
 
 def register_sync_routes(api):
@@ -32,11 +35,8 @@ def register_sync_routes(api):
             sync_opts.Comment = "MCP: Sync with Central"
 
             doc.SynchronizeWithCentral(transact_opts, sync_opts)
-        except Exception as e:
-            return routes.make_response(
-                data={"error": "Sync failed: {}".format(str(e))},
-                status_code=500,
-            )
+        except (Exception, System.Exception):
+            return route_error()
 
         return routes.make_response(data={
             "document": doc.Title,

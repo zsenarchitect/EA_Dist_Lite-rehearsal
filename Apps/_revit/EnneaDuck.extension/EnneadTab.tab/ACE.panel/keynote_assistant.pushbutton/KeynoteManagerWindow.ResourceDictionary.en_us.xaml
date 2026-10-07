@@ -111,6 +111,13 @@ Are you sure you want to convert?
     <system:String x:Key="KeynoteUsed">"Keynote "%s" is used in the model. Can not delete.</system:String>
     <system:String x:Key="PromptToDeleteKeynote">Are you sure you want to delete keynote "%s"?</system:String>
     
+    <system:String x:Key="RemoveWithChildrenPrompt">"%s" is not empty. Move its children to another category, or delete them together?</system:String>
+    <system:String x:Key="RemoveWithChildrenMove">Move children to another category...</system:String>
+    <system:String x:Key="RemoveWithChildrenDelete">Delete all children</system:String>
+    <system:String x:Key="RemoveWithChildrenCancel">Cancel</system:String>
+    <system:String x:Key="PromptToDeleteChildren">Are you sure you want to delete all children of "%s"? This can not be undone.</system:String>
+    <system:String x:Key="RemoveChildrenLocked">At least one child of this record is locked. Wait until the changes are committed.</system:String>
+    
     <system:String x:Key="ReKeyKeynoteTransaction">Rekey Keynote {}</system:String>
     <system:String x:Key="ReKeyKeynoteChildrenLocked">At least one child keynote of this keynote is locked. Wait until the changes are committed.</system:String>
     <system:String x:Key="ReCatKeynoteChildrenLocked">At least one child keynote of this keynote is locked. Wait until the changes are committed.</system:String>

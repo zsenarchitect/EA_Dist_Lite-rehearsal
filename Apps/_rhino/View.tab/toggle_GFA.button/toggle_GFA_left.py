@@ -11,11 +11,12 @@ Features:
 - Dynamic merging of coplanar surfaces at same elevation
 - Support for single surfaces and polysurfaces
 - Live comparison of how much is off from target.
+- Customizable on-screen text size for long layer trees
 
 Usage:
 - Add [GFA] to layer names to include in calculation
 - Optional \{factor\} at end of layer name for area multipliers (e.g. \{0.5\})
-- Right-click to export to Excel or generate checking surfaces or set target area for each keyword.
+- Right-click to export to Excel, generate checking surfaces, set target areas, or change text size.
 """
 __is_popular__ = True
 
@@ -26,13 +27,13 @@ import System # pyright: ignore
 import scriptcontext as sc # pyright: ignore
 import rhinoscriptsyntax as rs # pyright: ignore
 import sys
-sys.path.append("..\lib")
+sys.path.append(r"..\lib")
 
 import time
 import random
 
 
-from EnneadTab import ERROR_HANDLE, LOG, NOTIFICATION, TIME, EXCEL
+from EnneadTab import ERROR_HANDLE, LOG, NOTIFICATION, TIME, EXCEL, DATA_FILE
 
 from EnneadTab.RHINO import RHINO_LAYER, RHINO_OBJ_DATA, RHINO_PROJ_DATA
 
@@ -68,6 +69,7 @@ class EA_GFA_Conduit(Rhino.Display.DisplayConduit):
         
         data = RHINO_PROJ_DATA.get_plugin_data()
         self.target_dict = data.get(RHINO_PROJ_DATA.DocKeys.GFA_TARGET_DICT, {})
+        self.font_size = self.get_hud_font_size(data)
 
 
 
@@ -124,7 +126,33 @@ class EA_GFA_Conduit(Rhino.Display.DisplayConduit):
         sc.sticky["reset_timestamp"] = time.time()
         # print ("cached data is now empty")
         # self.is_reseted = True
-        self.target_dict = RHINO_PROJ_DATA.get_plugin_data().get(RHINO_PROJ_DATA.DocKeys.GFA_TARGET_DICT, {})   
+        data = RHINO_PROJ_DATA.get_plugin_data()
+        self.target_dict = data.get(RHINO_PROJ_DATA.DocKeys.GFA_TARGET_DICT, {})   
+        self.font_size = self.get_hud_font_size(data)
+
+    def get_hud_font_size(self, data=None):
+        try:
+            if data is None:
+                data = RHINO_PROJ_DATA.get_plugin_data()
+            if RHINO_PROJ_DATA.DocKeys.GFA_FONT_SIZE in data:
+                return int(data[RHINO_PROJ_DATA.DocKeys.GFA_FONT_SIZE])
+        except:
+            pass
+
+        if sc.sticky.has_key("EA_GFA_FONT_SIZE"):
+            try:
+                return int(sc.sticky["EA_GFA_FONT_SIZE"])
+            except:
+                pass
+
+        try:
+            val = DATA_FILE.get_sticky("EA_GFA_FONT_SIZE", None)
+            if val is not None:
+                return int(val)
+        except:
+            pass
+
+        return 20   
 
     
     def add_hook(self):
@@ -273,12 +301,14 @@ class EA_GFA_Conduit(Rhino.Display.DisplayConduit):
         pt = Rhino.Geometry.Point2d(pt[0], pt[1] + 10)
         e.Display.Draw2dText("Accepting single surface(Z+ or Z- normal) and polysurface(open or enclosed, only check the face with Z- normal). ", color, pt, False, 10)
         pt = Rhino.Geometry.Point2d(pt[0], pt[1] + 10)
-        e.Display.Draw2dText("Target area can be set for each keyword in the right toggle button.", color_hightlight, pt, False, 10)
+        e.Display.Draw2dText("Target area and text size can be set in the right-click menu.", color_hightlight, pt, False, 10)
 
 
         pt = Rhino.Geometry.Point2d(pt[0], pt[1] + 10)
-        size = 20
-        offset = 20
+        size = getattr(self, "font_size", None)
+        if size is None:
+            size = sc.sticky.get("EA_GFA_FONT_SIZE", 20)
+        offset = size
 
         grand_total = 0
         #sub_title = "X" * 10
@@ -325,7 +355,7 @@ class EA_GFA_Conduit(Rhino.Display.DisplayConduit):
             
             if diff:  # Only process if there's a difference
                 # Pre-calculate common values
-                temp_pt = Rhino.Geometry.Point2d(pt[0]-20, pt[1])
+                temp_pt = Rhino.Geometry.Point2d(pt[0] - max(15, size), pt[1])
                 
                 if diff > 0:
                     e.Display.Draw2dText(u"\u25BC", 
@@ -353,7 +383,7 @@ class EA_GFA_Conduit(Rhino.Display.DisplayConduit):
                 text = "OOps! Missing keyworded area [{}], target: {}".format(keyword, convert_area_to_good_unit(self.target_dict[keyword]))
                 e.Display.Draw2dText(text, color, pt, False, size)
 
-        pt = Rhino.Geometry.Point2d(pt[0], pt[1] + 25)
+        pt = Rhino.Geometry.Point2d(pt[0], pt[1] + max(15, int(size * 1.25)))
         color = rs.CreateColor([87, 85, 83])
         #print "C"
         pt0 = System.Drawing.Point(pt[0], pt[1] )

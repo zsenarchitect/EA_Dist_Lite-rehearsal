@@ -1,28 +1,29 @@
 # EnneadTab Distribution Repository
 
 ## 📅 Last Updated
-2026-08-12 13:00:42
+2026-10-07 10:48:34
 
-# ⚠️ LITE VERSION ⚠️
+# LITE VERSION
 
 This is the **LITE VERSION** of the distribution repository, optimized for quick installation.
 
 ## Excluded Content
 The following content has been removed to reduce size:
-- ❌ Most executable files (.exe) - **except installer files**
-- ❌ Dynamic link libraries (.dll)
-- ❌ CAD-related files and folders
-- ❌ Engine files and folders
-- ❌ Dump scripts
-- ❌ Dependency files
+- Most executable files (.exe), **except installers, uninstallers and a few core utilities**
+- Dynamic link libraries (.dll)
+- CAD-related files and folders
+- Engine files and folders
+- Dump scripts
+- Dependency files
 
-## Included Installer Files
-The following essential installer files are still included:
-- ✅ EnneadTab_OS_Installer.exe
-- ✅ EnneadTab_For_Revit_Installer.exe
-- ✅ Emailer.exe
-- ✅ Messenger.exe
-- ✅ ProgressBar.exe
+## Included Executable Files
+- EnneadTab_OS_Installer.exe
+- EnneadTab_OS_UnInstaller.exe
+- EnneadTab_For_Revit_Installer.exe
+- EnneadTab_For_Revit_UnInstaller.exe
+- Emailer.exe
+- NotificationHost.exe
+- ProgressBar.exe
 
 For the full version with all features, please use the standard distribution.
 
@@ -32,7 +33,6 @@ This repository contains:
 - 📂 Installation
 
 ## ⚠️ Important Notes
-- This repository is **automatically generated** and not manually maintained
 - For support, please contact szhang@ennead.com directly
 
 ## 🙏 Acknowledgments
@@ -40,7 +40,7 @@ This repository contains:
 - Special thanks to Ehsan and the pyRevit team for providing the foundation for the Revit Extension
 
 ## 💭 Wisdom of the Day
-I was going to get a brain transplant, but I changed my mind
+What's the difference between a hippo and a zippo? One is really heavy, the other is a little lighter.
 
 ---
 *Have a nice day! Hope you enjoy using this product.*

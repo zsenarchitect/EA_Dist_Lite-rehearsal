@@ -187,7 +187,12 @@ def messenger(main_text,
         font_family (str, optional): Font name
         level (str, optional): info | success | warning | error
         actions (list, optional): Up to 2 action dicts with keys
-            id, label, type (dismiss|open_path|open_url|copy), payload
+            id, label, type (dismiss|open_path|open_url|copy), payload,
+            tooltip (str, optional - explicit hover text for the action
+            button; when omitted the host derives a short default from
+            type, e.g. "Open {filename}" for open_path, "Open link" for
+            open_url, "Copy to clipboard" for copy, "Dismiss this
+            notification" for dismiss)
         youtube (str, optional): YouTube URL or 11-char video id. Host fetches
             a thumbnail into the toast and adds an Open action (no iframe).
         sticky (bool, optional): When True, the card never auto-dismisses on

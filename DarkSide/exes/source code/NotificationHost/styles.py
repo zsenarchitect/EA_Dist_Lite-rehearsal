@@ -1,15 +1,17 @@
 """Visual tokens for NotificationHost toast cards.
 
 macOS/iOS notification cues: translucent glass card, large uniform radius,
-level-tinted ambient glow (no accent bar - border-left accents are a banned
-generic-AI UI tell, see repo CLAUDE.md), tight stack gap.
+thin level-tinted border on all four sides (no accent bar - border-left
+accents are a banned generic-AI UI tell, see repo CLAUDE.md) plus a subtle
+neutral elevation shadow, tight stack gap.
 """
 
 # Translucent glass card - not purple-gradient AI chrome. Window already sets
 # WA_TranslucentBackground so this rgba alpha reads as real glass, not fake blur.
+# Dark sophisticated grey (near-neutral, faint cool undertone - not blue,
+# not warm) - was a blue-charcoal rgba(28, 33, 43, 230).
 COLORS = {
-    "card_bg": "rgba(28, 33, 43, 230)",
-    "card_border": "rgba(255, 255, 255, 20)",
+    "card_bg": "rgba(39, 39, 42, 230)",
     "text": "#F2F4F8",
     "text_muted": "#A8B0C0",
     "button_bg": "#2A3344",
@@ -52,14 +54,24 @@ CARD_RADIUS = 18
 BODY_PAD_H = 18 + 8  # left body pad + gap before icon col
 CARD_GAP = 8
 SCREEN_EDGE_PAD = 20
-# Room around the card so the drop shadow/glow is not clipped.
+# Room around the card so the drop shadow is not clipped.
 SHADOW_PAD = 14
-SHADOW_BLUR = 36
+SHADOW_BLUR = 28
 SHADOW_OFFSET_Y = 3
-# Level-tinted glow alpha (0-255). Neutral shadow color no longer used.
-SHADOW_GLOW_ALPHA = 100
+# Subtle neutral elevation shadow alpha (0-255) - depth only, no level tint.
+# The level cue now lives in the card border instead (see LEVEL_BORDER_ALPHA).
+SHADOW_ALPHA = 60
+# Level-tinted, semi-opaque border alpha (0-255) - a thin border line around
+# all four sides of the card carries the per-level color cue that the old
+# ambient glow used to carry.
+LEVEL_BORDER_ALPHA = 150
 # Optional toast image/gif: full-bleed at card width, height follows aspect
 # ratio uncapped (no max-height box).
+
+# Thin bottom countdown bar (non-sticky cards only) - hints at time left
+# before auto-dismiss. Range is 0-1000 for smooth animation precision.
+COUNTDOWN_BAR_HEIGHT = 3
+COUNTDOWN_RANGE_MAX = 1000
 
 # Segoe MDL2 Assets codepoints (monochrome).
 SYM_CLOSE = "\uE711"   # Cancel / X
@@ -119,7 +131,10 @@ CARD_STYLE = """
 QFrame#ToastCard {{
     background-color: {card_bg};
     border: 1px solid {card_border};
-    border-radius: {radius}px;
+    border-top-left-radius: {radius}px;
+    border-top-right-radius: {radius}px;
+    border-bottom-left-radius: {bottom_radius}px;
+    border-bottom-right-radius: {bottom_radius}px;
 }}
 QLabel#ToastTitle {{
     color: {text};
@@ -169,26 +184,54 @@ QPushButton#IconBtnClose:hover {{
 QPushButton#IconBtnMute:hover {{
     color: {mute_hover};
 }}
+QProgressBar#CountdownBar {{
+    background: transparent;
+    border: none;
+}}
+QProgressBar#CountdownBar::chunk {{
+    background-color: {countdown_color};
+}}
 """
 
 
-def level_glow_color(level):
-    """QColor-ready (r, g, b, a) for the level-tinted ambient shadow glow."""
+def level_border_color(level):
+    """rgba(...) CSS string for the level-tinted, thin all-sides card border.
+
+    Replaces the old ambient shadow glow as the per-level color cue.
+    """
     from PyQt5.QtGui import QColor
     hex_accent = LEVEL_ACCENT.get(level, LEVEL_ACCENT[DEFAULT_LEVEL])
     color = QColor(hex_accent)
-    color.setAlpha(SHADOW_GLOW_ALPHA)
+    color.setAlpha(LEVEL_BORDER_ALPHA)
+    return "rgba({}, {}, {}, {})".format(
+        color.red(), color.green(), color.blue(), color.alpha()
+    )
+
+
+def neutral_shadow_color():
+    """QColor for the subtle, level-neutral elevation drop shadow."""
+    from PyQt5.QtGui import QColor
+    color = QColor(COLORS["shadow"])
+    color.setAlpha(SHADOW_ALPHA)
     return color
 
 
 def build_card_stylesheet(level="info", font_family=None, font_size=None,
-                           has_title=False):
+                           has_title=False, has_countdown_bar=False):
     resolved_font_size = font_size or DEFAULT_FONT_SIZE
     body_color = COLORS["text_muted"] if has_title else COLORS["text"]
+    countdown_color = LEVEL_ACCENT.get(level, LEVEL_ACCENT[DEFAULT_LEVEL])
+    # The countdown bar is a plain rectangular QProgressBar flush against the
+    # card's bottom edge - rounding the card's bottom corners while the bar
+    # stays square makes the bar visibly overflow/clip past the curve at
+    # both bottom corners. Square the bottom corners off instead whenever
+    # the bar is present so it sits flush without any mismatch to hide.
+    bottom_radius = 0 if has_countdown_bar else CARD_RADIUS
     return CARD_STYLE.format(
         card_bg=COLORS["card_bg"],
-        card_border=COLORS["card_border"],
+        card_border=level_border_color(level),
         radius=CARD_RADIUS,
+        bottom_radius=bottom_radius,
         text=COLORS["text"],
         body_color=body_color,
         button_bg=COLORS["button_bg"],
@@ -198,6 +241,7 @@ def build_card_stylesheet(level="info", font_family=None, font_size=None,
         icon_hover=COLORS["icon_hover"],
         close_hover=COLORS["close_hover"],
         mute_hover=COLORS["mute_hover"],
+        countdown_color=countdown_color,
         font_family=font_family or resolve_default_font_family(),
         font_size=resolved_font_size,
         title_font_size=resolved_font_size + 1,

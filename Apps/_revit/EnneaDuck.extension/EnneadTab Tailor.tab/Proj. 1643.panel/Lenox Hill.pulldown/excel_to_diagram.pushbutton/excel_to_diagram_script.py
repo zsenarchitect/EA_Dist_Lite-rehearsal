@@ -20,15 +20,15 @@ __title__ = "Excel2Diagram"
 from pyrevit import script #
 
 
-from EnneadTab import ERROR_HANDLE, EXCEL, FOLDER, NOTIFICATION, TIME
+from EnneadTab import ERROR_HANDLE, EXCEL, FOLDER, NOTIFICATION, TIME, SHAREPOINT
 from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_FAMILY, REVIT_VIEW, REVIT_SELECTION
-from Autodesk.Revit import DB # pyright: ignore 
+from Autodesk.Revit import DB # pyright: ignore
 # from Autodesk.Revit import UI # pyright: ignore
 # uidoc = EnneadTab.REVIT.REVIT_APPLICATION.get_uidoc()
 doc = REVIT_APPLICATION.get_doc()
 
 
-EXCEL_FILE = "J:\\1643\\2_Master File\\B-70_Programming\\01_Program & Analysis\\EA 2024-05-03 EA Program.xlsx"
+EXCEL_FILE = SHAREPOINT.get_project_file("1643/2_Master File/B-70_Programming/01_Program & Analysis/EA 2024-05-03 EA Program.xlsx")
 SHADER_FAMILY_NAME = "AreaShader"
 TITLER_FAMILY_NAME = "TitleMaker"
 WORKING_VIEW = "SK-G09_10_Program Shading"

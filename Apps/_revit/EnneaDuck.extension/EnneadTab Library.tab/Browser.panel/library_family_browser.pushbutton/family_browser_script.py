@@ -3,7 +3,7 @@
 
 
 
-__doc__ = "A simple window that can help you search the family from AppliedComputing Library.\n\nDisclaimer: EnneadTab only help you find the family, but is not participating in the creation and maintainance of the family library."
+__doc__ = "Browse and place digital assets from EnneadTab-Library directly into the active document.\n\nDisclaimer: EnneadTab only helps you find and load the asset, but is not participating in the creation and maintenance of the library content."
 __title__ = "Family\nBrowser"
 
 
@@ -16,11 +16,12 @@ from pyrevit import script #
 import os
 
 import System # pyright: ignore
-import proDUCKtion # pyright: ignore 
+import proDUCKtion # pyright: ignore
 proDUCKtion.validify()
-from EnneadTab import ENVIRONMENT, ERROR_HANDLE, DATA_FILE, NOTIFICATION
+from EnneadTab import AUTH, ENVIRONMENT, ERROR_HANDLE, NOTIFICATION
+from EnneadTab.DEPOT import LIBRARY_CATALOG
 import traceback
-from Autodesk.Revit import DB # pyright: ignore 
+from Autodesk.Revit import DB # pyright: ignore
 
 from Autodesk.Revit import UI # pyright: ignore
 uidoc = __revit__.ActiveUIDocument # pyright: ignore
@@ -28,14 +29,57 @@ doc = __revit__.ActiveUIDocument.Document # pyright: ignore
 __persistentengine__ = True
 
 
+def _find_loaded_family(target_doc, family_name):
+    """Post-LoadFamily lookup by name -- the established idiom in this repo
+    (content_transfer_script.py, cleanup_family_script.py) since IronPython's
+    out-param LoadFamily overload is fragile; a name match on the freshly
+    loaded family is simpler and already proven here."""
+    for family in DB.FilteredElementCollector(target_doc).OfClass(DB.Family):
+        if family.Name == family_name:
+            return family
+    return None
+
+
+def _activate_default_symbol(target_doc, family):
+    """Return an active FamilySymbol for `family`, or None if it has none."""
+    symbol_ids = family.GetFamilySymbolIds()
+    if not symbol_ids or symbol_ids.Count == 0:
+        return None
+    symbol = target_doc.GetElement(list(symbol_ids)[0])
+    if symbol is None:
+        return None
+    if not symbol.IsActive:
+        t = DB.Transaction(target_doc, "Activate Family Symbol")
+        t.Start()
+        symbol.Activate()
+        target_doc.Regenerate()
+        t.Commit()
+    return symbol
+
+
 @ERROR_HANDLE.try_catch_error()
 def load_family(family_path):
+    """Load `family_path` into the active document, then prompt the user to
+    place an instance (#5449: "Direct Family Load/Placement"). Placement is
+    best-effort: a family with no symbols (rare, but not impossible for an
+    arbitrary library asset) still loads, it just is not placed."""
     app = doc.Application
-    family_doc = app.OpenDocumentFile (family_path)
-    
-    family_doc.LoadFamily(doc,FamilyOption())
-    
+    family_doc = app.OpenDocumentFile(family_path)
 
+    family_doc.LoadFamily(doc, FamilyOption())
+
+    family_name = family_doc.OwnerFamily.Name
+    family = _find_loaded_family(doc, family_name)
+    if family is None:
+        NOTIFICATION.messenger(main_text="'{0}' loaded, but could not be found in the document to place an instance.".format(family_name))
+        return
+
+    symbol = _activate_default_symbol(doc, family)
+    if symbol is None:
+        NOTIFICATION.messenger(main_text="'{0}' loaded, but has no placeable type.".format(family_name))
+        return
+
+    uidoc.PromptForFamilyInstancePlacement(symbol)
 
 
 class FamilyOption(DB.IFamilyLoadOptions):
@@ -92,26 +136,41 @@ class SimpleEventHandler(IExternalEventHandler):
 
 
 
-class DataGrid_Preview_Obj(object):
+class LibraryAssetRow(object):
+    """One row = one EnneadTab-Library catalog asset. Unlike the old
+    shared-network-library metadata index (one row per family TYPE, indexed
+    locally by meta_data_exporter.pushbutton), Library's REST API already
+    returns one entry per asset with its own parameters/versions embedded --
+    no local re-indexing needed.
 
+    Holds only plain data from the JSON response (never a Revit API element --
+    see this repo's CLAUDE.md "Modeless WPF DataGrid forms" checklist: WPF's
+    selection machinery calls GetHashCode/ToString on a selected row OUTSIDE
+    the API context, and a held element throws there, uncatchably)."""
 
+    def __init__(self, asset_dict):
+        self.data = asset_dict
+        self.asset_id = asset_dict.get("id", "N/A")
+        self.family_name = asset_dict.get("name", "N/A")           # DataGrid "Asset" column
+        self.type_name = asset_dict.get("category", "N/A")         # DataGrid "Category" column
+        self.format = asset_dict.get("format", "N/A")
+        self.tags = asset_dict.get("tags", []) or []
+        self.author = asset_dict.get("author", "N/A")
+        self.current_version = asset_dict.get("currentVersion", "N/A")
 
-    def __init__(self, type_meta_data):
-     
-        self.data = type_meta_data
-        self.family_name = type_meta_data.get("family_name", "N/A")
-        self.family_path = type_meta_data.get("family_path", "N/A")
-        self.shortened_family_path = self.family_path.split("03_Library\\")[1]
-        self.type_name = type_meta_data.get("type_name", "N/A")
-        self.type_data = type_meta_data.get("type_detail", "N/A")
-        self.preview_images = [x for x in type_meta_data.get("type_detail", "N/A").get("views", "N/A").values()]
-        self.record_time = type_meta_data.get("record_time", "N/A")
-        # print self.type_data
-        
+        version_history = asset_dict.get("versionHistory", []) or []
+        latest = version_history[0] if version_history else {}
+        self.download_url = latest.get("downloadUrl")
+        self.released_at = latest.get("releasedAt", "N/A")
+
+        preview_url = asset_dict.get("previewUrl")
+        resolved_preview = LIBRARY_CATALOG.resolve_media_url(preview_url)
+        self.preview_images = [resolved_preview] if resolved_preview else []
+
     @property
     def searcher_name(self):
-        return self.family_name + "_" + self.type_name + "_" + self.shortened_family_path
-        
+        return "_".join([self.family_name, self.type_name, self.format] + list(self.tags))
+
 
 
 
@@ -137,7 +196,7 @@ class family_browser_ModelessForm(WPFWindow):
 
         self.title_text.Text = "EnneadTab Family Browser"
 
-        self.sub_text.Text = "Find the family located at the shared network library with a search bar. The result are ranked by direct name and then partial match, and then anything mentioned in the folder structure."
+        self.sub_text.Text = "Browse EnneadTab-Library with a search bar. Results are ranked by direct name match, then partial word match."
 
 
         self.Title = self.title_text.Text
@@ -147,62 +206,27 @@ class family_browser_ModelessForm(WPFWindow):
         self.set_image_source(self.preview_image, "DEFAULT PREVIEW_CANNOT FIND PREVIEW IMAGE.png")
         self.set_image_source(self.status_icon, "update_icon.png")
 
-
-        self.meta_data_folder = os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "01_Revit", "06_DB", "Family Browser")
-
-        if not ENVIRONMENT.require_shared_root("Family Browser"):
-            self.data_pool = []
-            self.data_grid.ItemsSource = self.data_pool[:]
-            self.Show()
-            return
-
-        self.data_pool = [DataGrid_Preview_Obj(x) for x in self.get_meta_datas()]
-
+        self.data_pool = self._load_catalog()
         self.data_grid.ItemsSource = self.data_pool[:]
-
-
 
         self.Show()
 
-    def get_meta_datas(self):
-        if not os.path.exists(self.meta_data_folder):
-            NOTIFICATION.messenger(main_text="Family Browser database folder not found.")
+    def _load_catalog(self):
+        """Fetch the catalog from EnneadTab-Library. Degrades to an empty pool
+        (same shape as ASSET.py's offline degradation -- a dead network never
+        raises out of this button) when Library is unreachable."""
+        token = AUTH.get_token()
+        assets, _categories = LIBRARY_CATALOG.list_assets(token=token)
+        if assets is None:
+            if not token:
+                # Lazy sign-in, same pattern as AI Render: open the browser
+                # now, non-blocking, and tell the user to retry once done.
+                AUTH.request_auth()
+                NOTIFICATION.messenger(main_text="Sign in to EnneadTab in the browser window that just opened, then reopen this dialog.")
+            else:
+                NOTIFICATION.messenger(main_text="EnneadTab-Library is unreachable right now. Check your connection or try again later.")
             return []
-        meta_data_files = [os.path.join(self.meta_data_folder, x) for x in os.listdir(self.meta_data_folder) if x.endswith(ENVIRONMENT.PLUGIN_EXTENSION)]
-        meta_data_files.sort()
-        NOTIFICATION.messenger(main_text = "Indexing {} files from the DataBase...\nthis might takes a few seconds...".format(len(meta_data_files)))
-
-        family_datas =  [DATA_FILE.get_data(x) for x in meta_data_files]
-        type_datas = []
-        for family_data in family_datas:
-
-            for family_type in  family_data.get("type_data", []):
-                temp_data = dict()
-  
-                temp_data["family_name"] = family_data.get("family_name", "N/A")
-                temp_data["family_path"] = family_data.get("family_path", "N/A")
-                temp_data["record_time"] = family_data.get("record_time", "N/A")
-                temp_data["type_name"] = family_type
-                temp_data["type_detail"] = family_data.get("type_data", None).get(family_type,None)
-                type_datas.append(temp_data)
-        
-            # temp_data = family_data.get("type_data", None)
-            # if temp_data is not None:
-            #     try:
-            #         print "\n"
-            #         DATA_FILE.pretty_print_dict(temp_data)
-            #     except:
-            #         print "!!!!!!!!!!!!!!!!!!!!!!!!!!"*100
-            #         print family_data.get("family_name", "N/A")
-            
-        #type_datas = [DATA_FILE.get_data(x) for x in meta_data_files]
-        
-        return type_datas
-
-
-  
-
-
+        return [LibraryAssetRow(x) for x in assets]
 
     @ERROR_HANDLE.try_catch_error()
     def preview_selection_changed(self, sender, e):
@@ -228,7 +252,7 @@ class family_browser_ModelessForm(WPFWindow):
                 image = System.Windows.Controls.Image()
                 bitmap = System.Windows.Media.Imaging.BitmapImage()
                 bitmap.BeginInit()
-                bitmap.UriSource = System .Uri(System.IO.Path.GetFullPath(preview_image))
+                bitmap.UriSource = System.Uri(preview_image)  # already an absolute Library URL, see LIBRARY_CATALOG.resolve_media_url
                 bitmap.EndInit()
 
                 # Set max width for image
@@ -246,8 +270,7 @@ class family_browser_ModelessForm(WPFWindow):
                 self.preview_image.Visibility = System.Windows.Visibility.Collapsed
                 
 
-            # creation_time = time.ctime(os.path.getctime(preview_image))
-            note = "Family Name = {}\nType Name = {}\nFile Path = {}\nPreview Generated: {}".format(obj.family_name,obj.type_name, obj.shortened_family_path, obj.record_time)
+            note = "Asset = {0}\nCategory = {1}\nAuthor = {2}\nVersion {3} (released {4})".format(obj.family_name, obj.type_name, obj.author, obj.current_version, obj.released_at)
             self.textblock_export_status.Text = note
         except:
             #self.update_preview_grid()
@@ -289,8 +312,8 @@ class family_browser_ModelessForm(WPFWindow):
   
 
     def get_true_preview_images(self, preview_obj):
-        preview_images = [os.path.join(self.meta_data_folder, img) for img in preview_obj.preview_images]
-        return preview_images
+        # Already-resolved absolute Library URLs (LIBRARY_CATALOG.resolve_media_url) -- no local folder join needed.
+        return preview_obj.preview_images
 
    
     
@@ -394,11 +417,20 @@ class family_browser_ModelessForm(WPFWindow):
             return
 
         obj = self.data_grid.SelectedItem
-        
+
         if not obj:
-            
             return
-        self.load_family_event_handler.kwargs = obj.family_path,
+
+        if not obj.download_url:
+            NOTIFICATION.messenger(main_text="'{0}' has no downloadable file published yet.".format(obj.family_name))
+            return
+
+        family_path = LIBRARY_CATALOG.download_asset(obj.download_url, token=AUTH.get_token())
+        if not family_path:
+            NOTIFICATION.messenger(main_text="Could not download '{0}' from EnneadTab-Library right now. Check your connection or try again later.".format(obj.family_name))
+            return
+
+        self.load_family_event_handler.kwargs = family_path,
         self.ext_event_load_family.Raise()
 
     def close_Click(self, sender, e):

@@ -263,6 +263,9 @@ class AiRenderForm(WPFWindow):
         except Exception:
             pass
 
+        # Keep #459 -- seed the prompt box with shared starter-prompt chips.
+        self._populate_suggested_prompt_chips()
+
         # Workers: one image + one video per Review #2 recommendation (A) so
         # a 3-min video doesn't block a 30-sec image.
         self._image_worker = Q.QueueWorker(
@@ -1003,6 +1006,65 @@ class AiRenderForm(WPFWindow):
                 os.startfile(self._style_ref_path)
             except Exception:
                 pass
+
+    # ------------------------------------------------------------------
+    # Suggested starter-prompt chips (Keep #459)
+    # Shared list: AI_RENDER.get_suggested_starter_prompts()
+    # ------------------------------------------------------------------
+
+    def _populate_suggested_prompt_chips(self):
+        """Build clickable chip bubbles above the prompt box from the shared
+        starter list. Click fills tbox_prompt (undoable)."""
+        panel = getattr(self, "wp_suggested_prompts", None)
+        if panel is None:
+            return
+        # Local import: WPF Controls.Button. Matches other dialog helpers in
+        # this file; duck-type Tag/Content so we never rely on typed names in
+        # selection handlers (see CLAUDE.md modeless DataGrid checklist).
+        from System.Windows.Controls import Button as SysButton  # pyright: ignore
+
+        try:
+            panel.Children.Clear()
+        except Exception:
+            pass
+
+        style = None
+        try:
+            style = self.FindResource("ChipButton")
+        except Exception:
+            try:
+                style = self.FindResource("SmallButton")
+            except Exception:
+                style = None
+
+        items = AI_RENDER.get_suggested_starter_prompts()
+        for item in items:
+            label = item.get("label") or ""
+            prompt = item.get("prompt") or label
+            if not label:
+                continue
+            btn = SysButton()
+            btn.Content = label
+            btn.Tag = prompt
+            btn.ToolTip = "Fill prompt box with: {}".format(prompt)
+            if style is not None:
+                try:
+                    btn.Style = style
+                except Exception:
+                    pass
+            btn.Click += self.suggested_prompt_chip_Click
+            panel.Children.Add(btn)
+
+    def suggested_prompt_chip_Click(self, sender, e):
+        prompt = getattr(sender, "Tag", None) or ""
+        if not prompt:
+            return
+        self._push_prompt_undo()
+        self.tbox_prompt.Text = prompt
+        try:
+            self.status_label.Text = "Starter prompt loaded -- edit or queue as-is."
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     # Prompt action buttons (spell / lengthen / shorten / reset / undo)

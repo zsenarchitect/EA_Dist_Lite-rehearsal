@@ -6,6 +6,9 @@ Configuration file for Monitor Area System
 Single source of truth for all configuration settings
 """
 
+from EnneadTab import SHAREPOINT
+import os
+
 # =============================================================================
 # PARAMETER MAPPING (Excel ↔ Revit)
 # =============================================================================
@@ -49,7 +52,7 @@ TARGET_DGSF_PARAM = "RoomDataTarget"
 # =============================================================================
 
 # Excel file settings
-EXCEL_FILENAME = r"J:\2534\2_Master File\B-70_Programming\01_Program & Analysis\EA_NYULLI Melville Program.xlsx"
+EXCEL_FILENAME = SHAREPOINT.get_project_file("2534/2_Master File/B-70_Programming/01_Program & Analysis/EA_NYULLI Melville Program.xlsx")
 EXCEL_WORKSHEET = "Hospital Program TARGET_DESIGN"
 EXCEL_HEADER_ROW = 1  # Row where headers are located (1-based, as per parse_excel_data documentation)
 
@@ -87,6 +90,39 @@ COLOR_SCHEME_NAMES = {
 # REPORT CONFIGURATION
 # =============================================================================
 
+# =============================================================================
+# NYU HQ WEBAPP API (zero-data architecture)
+# =============================================================================
+# The NYU HQ website repo holds ZERO data: Postgres is the system of record
+# and the webapp's /api/* endpoints are the only gateway. Revit syncs through
+# the API -- it READS clean targets (GET /api/targets) and PUBLISHES report +
+# geometry (POST /api/report, POST /api/geometry). No repo clone, no JSON
+# data files, no GitHub writes from Revit.
+#
+# Configure via environment variables on the machine running Revit
+# (all optional -- sensible production defaults are baked in):
+#   NYU_HQ_API_URL        webapp origin (default:
+#                         https://enneadtab.com/projects/nyu-hq, the
+#                         EnneadTab-Home proxy. Home validates the Bearer
+#                         desktop token and adds the identity and proxy
+#                         secret NYU-HQ requires. The direct host
+#                         nyu-hq.vercel.app answers 404 to requests without
+#                         Home's x-proxy-secret, see NYU-HQ middleware.js.)
+#   NYU_HQ_SERVICE_TOKEN  headless/CI override only. Interactive Revit
+#                         sessions authenticate through the user's
+#                         EnneadTab-Home sign-in instead (see home_auth.py):
+#                         the first sync opens the browser for a one-time
+#                         approval, then the token is cached DPAPI-protected.
+#   NYU_HQ_WEBAPP_URL      dashboard URL opened in the browser after a sync
+#   NYU_HQ_ACTOR           audit label for the edit log (default: revit-...)
+# The service token lives on the user's machine only -- never commit it.
+NYU_HQ_API_URL = os.environ.get(
+    "NYU_HQ_API_URL", "https://enneadtab.com/projects/nyu-hq").strip()
+NYU_HQ_SERVICE_TOKEN = os.environ.get("NYU_HQ_SERVICE_TOKEN", "").strip()
+NYU_HQ_WEBAPP_URL = os.environ.get(
+    "NYU_HQ_WEBAPP_URL", "https://enneadtab.com/projects/nyu-hq").strip()
+NYU_HQ_ACTOR = os.environ.get("NYU_HQ_ACTOR", "").strip()
+
 # Report settings
 REPORTS_DIR = "reports"
 LATEST_REPORT_FILENAME = "latest_report.html"
@@ -121,4 +157,3 @@ AREA_TOLERANCE_PERCENTAGE = 5.0
 # Alert thresholds for highlighting high differences
 COUNT_DELTA_ALERT_THRESHOLD = 10  # Alert if count difference is >= 10
 AREA_PERCENTAGE_ALERT_THRESHOLD = 50.0  # Alert if area percentage difference is >= 50%   # 5% tolerance for area fulfillment status
-

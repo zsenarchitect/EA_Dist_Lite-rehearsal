@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__doc__ = """Check the designed areas against the program requirement and open a fulfillment report.
+__doc__ = """Check the designed areas against the program requirement and publish to the NYU HQ webapp.
 
-Every area in the model is matched to its line in the program spreadsheet, so you
-can see at a glance which departments are over, under, or on target. Color schemes
-and the area parameters are refreshed from the match, and a report opens in your
-browser.
+Every area in the model is matched to its line in the program targets (fetched
+from the webapp API -- Postgres is the system of record), so you can see at a
+glance which departments are over, under, or on target. Color schemes and the
+area parameters are refreshed from the match, and the report + geometry are
+published to the webapp, which renders the dashboard in your browser.
 
 Features:
 - Areas that have no match in the program are called out
 - Color schemes are rebuilt so over and under areas read by color in plan
-- Actual design areas can be written back into the program spreadsheet
+- Report and geometry are published via the webapp API (service token auth)
 - Department level summary spreadsheets can be exported to the file exchange folder"""
 __title__ = "Monitor Area"
 
@@ -19,6 +20,7 @@ __title__ = "Monitor Area"
 import os
 import traceback
 import time
+import webbrowser
 
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
@@ -40,12 +42,15 @@ DOC = REVIT_APPLICATION.get_doc()
 
 
 # Import consolidated modules
-from excel_data import get_excel_data
+# NOTE: targets come from the NYU HQ webapp API (target_data.py -- Postgres is
+# the system of record), NOT from the hand-crafted Excel drop. Excel drops are
+# dirty inputs cleaned by AI agents via the webapp's MCP server, or fine-tuned
+# by humans in targets.html. Revit only reads the clean data via the API.
+from target_data import get_target_data
 from revit_data import get_revit_area_data_by_scheme
-from html_export import HTMLReportGenerator
+from website_data_export import WebsiteDataExporter
 from color_scheme_updater import update_all_color_schemes
 from parameter_updater import update_area_parameters
-from excel_writeback import write_design_values_to_excel
 import department_matrix
 import config
 
@@ -138,59 +143,36 @@ def monitor_area(doc):
     This function is designed to run in Revit environment
     """
     
-    # Heads-up notice: this button no longer publishes data to the NYU HQ
-    # website. It still runs the local area comparison + report below; the
-    # published dashboard now lives under enneadtab.com (migrated off the old
-    # GitHub Pages site).
-    NOTIFICATION.messenger(
-        main_text="NYU HQ Monitor Area no longer pushes data to the website. "
-                  "It still runs the local area check and report here. For the "
-                  "latest published dashboard, visit enneadtab.com/projects/nyu-hq"
-    )
+    # Get CLEAN target data from the NYU HQ webapp API (Postgres is the system
+    # of record). The hand-crafted Excel is a dirty drop only -- it is cleaned
+    # by AI agents via the webapp MCP server or fine-tuned by humans in
+    # targets.html.
+    excel_data, color_hierarchy = get_target_data()
 
-    # Get data from Excel and Revit
-    excel_data, color_hierarchy = get_excel_data()
-    
-    # Update color schemes from Excel color hierarchy
+    # Update color schemes from the target color hierarchy
     update_all_color_schemes(doc, color_hierarchy)
-    
+
     revit_data_by_scheme = get_revit_area_data_by_scheme()
 
-    # Generate consolidated HTML report with all schemes and open automatically
-    generator = HTMLReportGenerator()
-    filepaths, all_matches, all_unmatched = generator.generate_html_report(excel_data, revit_data_by_scheme, color_hierarchy)
-    
+    # Publish report + geometry to the webapp API (no HTML builder, no JSON
+    # files: the NYU HQ repo owns all presentation and holds zero data).
+    # Revit only syncs data.
+    exporter = WebsiteDataExporter()
+    sync_result, all_matches, all_unmatched = exporter.export_website_data(
+        excel_data, revit_data_by_scheme, color_hierarchy)
+
     # Update Revit area parameters with suggestions
     param_stats = update_area_parameters(doc, all_matches, all_unmatched)
-    
-    # Ask user if they want to write back to Excel
-    write_to_excel = REVIT_FORMS.dialogue(
-        title="Excel Writeback",
-        main_text="Write Revit area data back to Excel?",
-        sub_text="This will update the DESIGN column in the Excel file with actual Revit area values.\n\nFile: {}\n\nNote: Skipping writeback will process faster (just view the report).".format(config.EXCEL_FILENAME),
-        options=["Yes, write to Excel", "No, skip writeback (faster)"],
-        icon="info"
-    )
-    
-    # Write Revit area data back to original Excel file (only if user agrees)
-    if write_to_excel == "Yes, write to Excel":
-        writeback_stats = write_design_values_to_excel(
-            excel_data, 
-            all_matches, 
-            config.EXCEL_FILENAME, 
-            config.EXCEL_WORKSHEET
-        )
-    else:
-        writeback_stats = {
-            'total_updates': 0,
-            'design_column': 'N/A',
-            'skipped': True
-        }
-        print("Excel writeback skipped by user")
-    
-    # Open the consolidated report (single HTML with all schemes)
-    if filepaths:
-        generator.open_report_in_browser(filepaths[0])
+
+    # NOTE: the old "write DESIGN values back to Excel" step is retired.
+    # Excel drops are dirty inputs, not the system of record -- writing Revit
+    # actuals into them would corrupt the drop. Reality data lives in
+    # Postgres behind the webapp API; planners who need a spreadsheet can
+    # export from there.
+    print("Reality data published to the NYU HQ webapp API.")
+
+    # Open the published dashboard in the browser (the webapp owns presentation).
+    webbrowser.open(config.NYU_HQ_WEBAPP_URL)
     
     excel_export_dir = _get_matrix_export_directory()
     matrix_exports = []
@@ -260,18 +242,10 @@ def monitor_area(doc):
     if param_stats['errors']:
         param_summary += "\n  Errors: {}".format(len(param_stats['errors']))
     
-    # Add Excel writeback summary
-    if writeback_stats.get('skipped'):
-        writeback_summary = "\n\nExcel Writeback:\n  Status: Skipped by user"
-    else:
-        writeback_summary = "\n\nExcel Writeback:\n  Total cells updated: {}\n  DESIGN Column: {}".format(
-            writeback_stats['total_updates'],
-            writeback_stats.get('design_column', 'N/A')
-        )
-        
-        if writeback_stats.get('error'):
-            writeback_summary += "\n  ERROR: Excel file cannot be written because you have it open in another program. Please close it and try again."
-            # writeback_summary += "\n  Error: {}".format(writeback_stats['error'])
+    # Excel writeback retired: reality data lives in Postgres behind the webapp
+    # API; the Excel drop is a dirty input, not the system of record.
+    writeback_summary = ("\n\nWebapp Sync:\n  Published report + geometry to {}"
+                         .format(config.NYU_HQ_API_URL))
 
     if excel_export_dir and matrix_exports:
         latest_path = matrix_exports[-1]
@@ -284,15 +258,15 @@ def monitor_area(doc):
     # Create notification message
     schemes_text = ", ".join(scheme_names) if len(scheme_names) <= 3 else "{} schemes".format(len(scheme_names))
     msg = (
-        "Consolidated HTML Report Generated and Opened!\n"
-        "File: {file_name}\n"
+        "NYU HQ data published to the webapp!\n"
+        "Dashboard: {dashboard}\n"
         "Schemes: {schemes}\n"
         "Fulfilled: {fulfilled}/{total}"
         "{param_summary}"
         "{writeback_summary}"
         "{matrix_summary}"
     ).format(
-        file_name=os.path.basename(filepaths[0]) if filepaths else "N/A",
+        dashboard=config.NYU_HQ_WEBAPP_URL,
         schemes=schemes_text,
         fulfilled=total_fulfilled,
         total=total_requirements,
@@ -300,34 +274,8 @@ def monitor_area(doc):
         writeback_summary=writeback_summary,
         matrix_summary=matrix_summary
     )
-    
+
     NOTIFICATION.messenger(main_text=msg)
-    
-
-
-    if os.path.exists(r"C:\Users\szhang"):
-        try:
-            dist_reports_dir = r"C:\Users\szhang\Documents\EnneadTab Ecosystem\EA_Dist\Apps\_revit\EnneaDuck.extension\EnneadTab Tailor.tab\Proj. 2534.panel\NYU HQ.pulldown\monitor_area.pushbutton\reports"
-            if not os.path.exists(dist_reports_dir):
-                os.makedirs(dist_reports_dir)
-
-            # Copy generated HTML reports
-            import shutil
-            for filepath in filepaths:
-                if not filepath.lower().endswith('.html'):
-                    continue
-                dst_path = os.path.join(dist_reports_dir, os.path.basename(filepath))
-                shutil.copy2(filepath, dst_path)
-
-            # Copy icon asset if present in the source reports folder
-            if filepaths:
-                src_reports_dir = os.path.dirname(filepaths[0])
-                icon_name = 'icon_logo_dark_background.png'
-                src_icon = os.path.join(src_reports_dir, icon_name)
-                if os.path.exists(src_icon):
-                    shutil.copy2(src_icon, os.path.join(dist_reports_dir, icon_name))
-        except Exception:
-            print ("Failed to copy reports to dist folder due to error: {}".format(traceback.format_exc()))
 
 
     # Open NYU_HQ executable

@@ -96,7 +96,7 @@ def sanitize_revit_name(name, replacement_char="_"):
     
     Based on Revit error messages and naming rules:
     - Material names: "{, }, [, ], |, ;, less-than sign, greater-than sign, ?, `, ~"
-    - View names: "\ : { } [ ] | ; < > ? ` ~"
+    - View names: "\\ : { } [ ] | ; < > ? ` ~"
     
     Args:
         name (str): Original name to sanitize

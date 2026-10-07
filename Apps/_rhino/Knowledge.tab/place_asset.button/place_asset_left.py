@@ -6,16 +6,25 @@ import sys
 import Rhino # pyright: ignore
 import rhinoscriptsyntax as rs
 
-from EnneadTab import FOLDER, ENVIRONMENT
-from EnneadTab import LOG, ERROR_HANDLE
+from EnneadTab import AUTH, LOG, ERROR_HANDLE, NOTIFICATION
+from EnneadTab.DEPOT import ASSET, LIBRARY_CATALOG
 import asset_UI as ui
 
-def insert_ref_block(block_name, is_ref_block_method):
+# senzhang-todo #5773 decided uploads/tagging happen on Library's own website
+# only -- Rhino stays a pure read consumer of GET /api/v1/assets, same
+# contract #5449's Revit family browser already depends on. "rhino_block" is
+# Library's own AssetFormat value (EnneadTab-Library/lib/types.ts) -- not the
+# literal file extension.
+RHINO_BLOCK_ASSET_FORMAT = "rhino_block"
+
+
+def insert_ref_block(asset_row, is_ref_block_method):
+    block_name = asset_row.block_name
     if rs.IsBlock(block_name):
         rs.InsertBlock(block_name, (0,0,0))
         return
 
-    external_block_filepath = get_external_filepath(block_name)
+    external_block_filepath = _download_asset_file(asset_row)
     if not external_block_filepath:
         return
 
@@ -43,64 +52,63 @@ def insert_ref_block(block_name, is_ref_block_method):
     obj = Rhino.RhinoDoc.ActiveDoc.Objects.AddInstanceObject(indexOfAddedBlock,Rhino.Geometry.Transform.Identity)
 
     if not is_ref_block_method:
-        sys.path.append(os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "03_Rhino", "12_EnneadTab for Rhino", "Source Codes", "Blocks"))
+        # NOTE: this is the block-packaging TOOL SCRIPT (a Depot asset key
+        # unrelated to the EnneadTab-Library catalog cutover above) -- keep
+        # resolving it through ASSET, not LIBRARY_CATALOG.
+        blocks_folder = ASSET.get_asset_folder('rhino/scripts/blocks')
+        if not blocks_folder:
+            return
+        sys.path.append(blocks_folder)
         import block_layer_packaging
         block_layer_packaging.pack_block_layers(blocks = [obj], flatten_layer = True)
 
 
 
         import imp
-        MAKE_BLOCK_UNIQUE = imp.load_source('make block unique', 
-                                            os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "03_Rhino", "12_EnneadTab for Rhino", "Source Codes", "Blocks", "make block unique.py"))
+        MAKE_BLOCK_UNIQUE = imp.load_source('make block unique',
+                                            os.path.join(blocks_folder, "make block unique.py"))
 
         MAKE_BLOCK_UNIQUE.make_block_unique(add_name_tag = False, original_blocks = [obj], treat_nesting = True)
         rs.DeleteBlock(block_name)
         rs.RenameBlock( "{}_new".format(block_name), block_name )
 
 
-
-def get_external_filepath(block_name):
-    if not ENVIRONMENT.require_shared_root("Place Asset"):
+def _download_asset_file(asset_row):
+    if not asset_row.download_url:
+        NOTIFICATION.messenger(main_text = "'{0}' has no downloadable file published yet.".format(asset_row.name))
         return None
 
-    folder = os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "00_Asset Library")
-    if folder in block_name:
-        return block_name
-
-
-    files = os.listdir(folder)
-    for file_name in files:
-        if block_name in  file_name:
-            return "{}\{}".format(folder, file_name)
+    local_path = LIBRARY_CATALOG.download_asset(asset_row.download_url, token = AUTH.get_token())
+    if not local_path:
+        NOTIFICATION.messenger(main_text = "Could not download '{0}' from EnneadTab-Library right now. Check your connection or try again later.".format(asset_row.name))
+        return None
+    return local_path
 
 
 
 @LOG.log(__file__, __title__)
 @ERROR_HANDLE.try_catch_error()
 def place_asset():
-    if not ENVIRONMENT.require_shared_root("Place Asset"):
+    token = AUTH.get_token()
+    assets, _categories = LIBRARY_CATALOG.list_assets(asset_format = RHINO_BLOCK_ASSET_FORMAT, token = token)
+    if assets is None:
+        if not token:
+            # Lazy sign-in, same pattern as AI Render: open the browser now,
+            # non-blocking, and tell the user to retry once it completes.
+            AUTH.request_auth()
+            NOTIFICATION.messenger(main_text = "Sign in to EnneadTab in the browser window that just opened, then click this button again.")
+        else:
+            NOTIFICATION.messenger(main_text = "EnneadTab-Library is unreachable right now. Check your connection or try again later.")
+        return
+    if not assets:
+        NOTIFICATION.messenger(main_text = "No Rhino block assets are published on EnneadTab-Library yet.")
         return
 
-    folder = os.path.join(ENVIRONMENT.L_DRIVE_HOST_FOLDER, "00_Asset Library")
-    files = os.listdir(folder)
+    selected_rows, is_ref_block_method = ui.ShowImageSelectionDialog(assets)
 
-    def is_good_file(name):
-        if name.endswith(".3dm"):
-            return True
-        return False
-
-    files = filter(is_good_file, files)
-
-
-    block_names =  [("{}\{}".format(folder, file), file) for file in files]
-
-    block_name, is_ref_block_method = ui.ShowImageSelectionDialog(block_names)
-
-    if block_name is None or is_ref_block_method is None or block_name == []:
+    if not selected_rows or is_ref_block_method is None:
         return
-    block_name = block_name[0]
-    print("########", is_ref_block_method)
-    insert_ref_block(block_name, is_ref_block_method)
+    insert_ref_block(selected_rows[0], is_ref_block_method)
 
 
 

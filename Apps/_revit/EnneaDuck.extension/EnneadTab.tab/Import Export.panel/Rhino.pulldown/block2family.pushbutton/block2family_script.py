@@ -89,7 +89,12 @@ def block2family(always_standing=False):
 
 
 def process_file(data_file, use_UV_projection):
-    load_family(data_file)
+    # load_family() has many early-return failure paths (missing template,
+    # missing data, bad unit, etc.) -- only proceed if it actually succeeded,
+    # otherwise update_instances() looks up a family/type that was never
+    # loaded and crashes on a None it gets back.
+    if not load_family(data_file):
+        return
     update_instances(data_file, use_UV_projection)
 
 
@@ -226,8 +231,9 @@ def load_family(file):
                       option)
 
     REVIT_FAMILY.load_family(family_doc, doc)
+    return True
 
-    
+
 def DWG_convert(doc, geo_file):
 
     exisiting_cads = DB.FilteredElementCollector(doc).OfClass(DB.ImportInstance).ToElements()
@@ -351,18 +357,25 @@ def update_instances(file, use_UV_projection):
     t.Start()
     block_name = get_block_name_from_data_file(file)
     exisitng_instances = REVIT_FAMILY.get_family_instances_by_family_name_and_type_name(family_name=block_name, type_name=block_name, doc=doc) or []
-    exisitng_instances_map = {x.LookupParameter("Rhino_Id").AsString(): x for x in exisitng_instances}
+    exisitng_instances_map = {}
+    for x in exisitng_instances:
+        rhino_id_param = x.LookupParameter("Rhino_Id")
+        if rhino_id_param is None:
+            continue
+        exisitng_instances_map[rhino_id_param.AsString()] = x
     
     data = DATA_FILE.get_data(file)
     if not data:
         NOTIFICATION.messenger("Failed to load data from file: {}".format(file))
+        t.RollBack()
         return
-        
+
     unit = data.get("unit")
     if not unit:
         NOTIFICATION.messenger("No unit information found in data file: {}".format(file))
+        t.RollBack()
         return
-        
+
     if unit == "ft":
         factor = 1
     elif unit == "in":
@@ -375,10 +388,17 @@ def update_instances(file, use_UV_projection):
     geo_data = data.get("geo_data")
     if not geo_data:
         NOTIFICATION.messenger("No geometry data found in file: {}".format(file))
+        t.RollBack()
         return
 
     type = REVIT_FAMILY.get_family_type_by_name(family_name=block_name, type_name=block_name, doc=doc)
-    type.LookupParameter("Description").Set("EnneadTab Block Convert")
+    if type is None:
+        NOTIFICATION.messenger("Could not find family type '{}' -- the family may have failed to load.".format(block_name))
+        t.RollBack()
+        return
+    description_param = type.LookupParameter("Description")
+    if description_param is not None:
+        description_param.Set("EnneadTab Block Convert")
 
 
 

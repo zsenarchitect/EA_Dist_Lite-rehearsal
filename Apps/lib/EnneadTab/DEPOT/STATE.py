@@ -124,6 +124,18 @@ def _inm(rev):
     return '"' + str(rev) + '"'
 
 
+def _error_code(result):
+    """Extract the server's {"error": "<code>"} (see ROUTES.ERR_*) from a
+    rejected response body, e.g. ROUTES.ERR_UNAUTHORIZED. None when the body
+    doesn't parse or there is none (as for a transport failure) -- callers
+    thread this into _alarm.announce_depot_unreachable so an expired sign-in
+    doesn't get reported as a depot outage (#5013)."""
+    doc = _parse(result.body)
+    if isinstance(doc, dict):
+        return doc.get("error")
+    return None
+
+
 # --- read -------------------------------------------------------------------
 
 def read_state(key, default=None, token=None):
@@ -201,8 +213,11 @@ def write_state(key, data, token=None):
         _alarm.announce_depot_unreachable("state write:{0}".format(key))
         return False
     # Server rejected the write (auth / 5xx): loud, but do NOT outbox-loop a
-    # request the server actively refused.
-    _alarm.announce_depot_unreachable("state write failed:{0}".format(key))
+    # request the server actively refused. Thread the error code through so an
+    # expired token (401) gets "please sign in again" instead of the generic
+    # "could not reach the shared depot" text (#5013).
+    _alarm.announce_depot_unreachable(
+        "state write failed:{0}".format(key), error_code=_error_code(result))
     return False
 
 
@@ -212,12 +227,15 @@ def update_state(key, mutator, default=None, token=None):
     more (no second GET). Returns True on success, False (queued) when offline."""
     if token is None:
         token = _get_token()
-    doc = _fetch_doc(key, token)
+    doc, fetch_error_code = _fetch_doc(key, token)
     if doc is None:
-        # Offline with no cache: apply to default, queue, alarm.
+        # Offline with no cache: apply to default, queue, alarm. fetch_error_code
+        # is set instead of None when the GET was actually rejected (e.g. an
+        # expired token) rather than genuinely offline (#5013).
         new_data = mutator(default)
         _queue_outbox(key, new_data)
-        _alarm.announce_depot_unreachable("state update:{0}".format(key))
+        _alarm.announce_depot_unreachable(
+            "state update:{0}".format(key), error_code=fetch_error_code)
         return False
     new_data = mutator(doc.get("data"))
     body = json.dumps({"rev": doc.get("rev"), "data": new_data})
@@ -237,23 +255,29 @@ def update_state(key, mutator, default=None, token=None):
         _queue_outbox(key, new_data)
         _alarm.announce_depot_unreachable("state update:{0}".format(key))
         return False
-    _alarm.announce_depot_unreachable("state update failed:{0}".format(key))
+    _alarm.announce_depot_unreachable(
+        "state update failed:{0}".format(key), error_code=_error_code(result))
     return False
 
 
 def _fetch_doc(key, token):
     """Get the current {rev, data} for a key: server truth if reachable, else the
-    cached doc, else None."""
+    cached doc, else None. Returns (doc, error_code): error_code is the
+    server's rejection code (e.g. ROUTES.ERR_UNAUTHORIZED) when doc is None
+    because the GET was rejected rather than genuinely offline, else None."""
     result = _transport.get(ROUTES.state_url(key), token=token)
     if result.ok():
         doc = _parse(result.body)
         if doc is not None:
             out = {"rev": doc.get("rev"), "data": doc.get("data")}
             _write_cached_doc(key, out)
-            return out
+            return out, None
     if result.status == 404:
-        return {"rev": None, "data": None}   # exists to be created
-    return _read_cached_doc(key)
+        return {"rev": None, "data": None}, None   # exists to be created
+    cached = _read_cached_doc(key)
+    if cached is not None:
+        return cached, None
+    return None, _error_code(result)
 
 
 def _cache_new_rev(key, resp_body, data_written):

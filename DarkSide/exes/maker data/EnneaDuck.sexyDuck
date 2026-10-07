@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\EnneaDuck\\EnneaDuck.py"
+   "value": "DarkSide\\exes\\source code\\EnneaDuck\\EnneaDuck.py"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "icon_file",
-   "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\EnneaDuck\\images\\icon.ico"
+   "value": "DarkSide\\exes\\source code\\EnneaDuck\\images\\icon.ico"
   },
   {
    "optionDest": "clean_build",
@@ -55,19 +55,19 @@
   },
     {
     "optionDest": "datas",
-    "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\EnneaDuck\\audio;audio\\"
+    "value": "DarkSide\\exes\\source code\\EnneaDuck\\audio;audio\\"
    },
   {
     "optionDest": "datas",
-    "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\EnneaDuck\\images;images\\"
+    "value": "DarkSide\\exes\\source code\\EnneaDuck\\images;images\\"
    },
    {
     "optionDest": "datas",
-    "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\_Exe_Util.py;."
+    "value": "DarkSide\\exes\\source code\\_Exe_Util.py;."
    },
    {
     "optionDest": "datas",
-    "value": "C:\\Users\\szhang\\github\\ennead-llp\\EnneadTab-OS\\DarkSide\\exes\\source code\\_GUI_Base_Util.py;."
+    "value": "DarkSide\\exes\\source code\\_GUI_Base_Util.py;."
    },
    {
     "optionDest": "hidden-import",

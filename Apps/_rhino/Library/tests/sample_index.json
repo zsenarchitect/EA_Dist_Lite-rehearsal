@@ -1,0 +1,62 @@
+{
+  "lastIndexedAt": "2026-09-29T14:00:00+00:00",
+  "scanRoots": ["C:\\GH\\Library"],
+  "entries": [
+    {
+      "id": "library-9f2ac101/facade/panelizer.gh",
+      "title": "Panelizer",
+      "description": "Divides a facade surface into panels.",
+      "tags": ["facade", "panel"],
+      "category": "Facade",
+      "sourcePath": "C:\\GH\\Library\\facade\\panelizer.gh",
+      "scanRoot": "C:\\GH\\Library",
+      "fileHash": "aaa111",
+      "pluginsRequired": [],
+      "pluginsKnown": false,
+      "conventionOk": true,
+      "conventionNotes": null,
+      "parameters": [
+        {"name": "Surface", "type": "geometry", "defaultValue": null, "group": "Inputs"},
+        {"name": "PanelCount", "type": "integer", "defaultValue": 12, "group": "Inputs"}
+      ],
+      "indexedAt": "2026-09-29T14:00:00+00:00",
+      "curated": true
+    },
+    {
+      "id": "library-9f2ac101/facade/louver_shading.gh",
+      "title": "Louver Shading",
+      "description": "Generates louver shading for glazing.",
+      "tags": ["facade", "shading"],
+      "category": "Facade",
+      "sourcePath": "C:\\GH\\Library\\facade\\louver_shading.gh",
+      "scanRoot": "C:\\GH\\Library",
+      "fileHash": "bbb222",
+      "pluginsRequired": ["Ladybug"],
+      "pluginsKnown": true,
+      "conventionOk": false,
+      "conventionNotes": "Outputs group is missing.",
+      "parameters": [],
+      "indexedAt": "2026-09-29T13:00:00+00:00",
+      "curated": false
+    },
+    {
+      "id": "library-9f2ac101/structure/beam_sizer.gh",
+      "title": "Beam Sizer",
+      "description": "Sizes steel beams from span and load.",
+      "tags": ["structure"],
+      "category": "Structure",
+      "sourcePath": "C:\\GH\\Library\\structure\\beam_sizer.gh",
+      "scanRoot": "C:\\GH\\Library",
+      "fileHash": "ccc333",
+      "pluginsRequired": [],
+      "pluginsKnown": false,
+      "conventionOk": true,
+      "conventionNotes": null,
+      "parameters": [
+        {"name": "Span", "type": "number", "defaultValue": 6.0, "group": "Inputs"}
+      ],
+      "indexedAt": "2026-09-29T12:00:00+00:00",
+      "curated": false
+    }
+  ]
+}

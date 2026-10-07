@@ -77,11 +77,28 @@ MIN_SESSION_SECONDS = 5 * 60
 KEY_RECOMMENDATION = "EA_SYNC_CARD_RECOMMENDATION"
 KEY_LAST_SHOWN = "EA_SYNC_CARD_LAST_SHOWN"
 
+# Independent of KEY_LAST_SHOWN: caps how often the soft "Get Arcade" install
+# CTA may appear -- shared by the session-card action (wait START) AND the
+# post-wait toast (wait END). One stamp covers both surfaces so a wait that
+# already offered Get Arcade on the card does not toast again, and card+toast
+# together stay on a single 7-day cadence rather than weekly spam twice.
+# Play arcade (when installed) is not gated by this.
+KEY_ARCADE_INSTALL_CTA_LAST_SHOWN = "EA_ARCADE_INSTALL_CTA_LAST_SHOWN"
+ARCADE_INSTALL_CTA_COOLDOWN_SECONDS = 7 * 24 * 60 * 60
+
 # One card per this window. Someone syncing every two minutes gets the card
 # occasionally, not every time.
 MIN_SECONDS_BETWEEN_CARDS = 45 * 60
 
 BANK_URL = "https://enneadtab.com/bank"
+ACTION_ID_ARCADE_PLAY = "sync_card_arcade"
+ACTION_ID_ARCADE_GET = "sync_card_arcade_get"
+ACTION_ID_ARCADE_TOAST_GET = "arcade_after_wait_get"
+
+# Punchline toast after a long wait -- short stay, not sticky. Distinct from
+# CARD_STAY_SECONDS (pinned to the arcade threshold for the mid-wait card).
+ARCADE_TOAST_STAY_SECONDS = 12
+ARCADE_TOAST_MAIN_TEXT = "You just waited that out.\nNext time, play through it."
 
 
 def is_enabled():
@@ -208,11 +225,23 @@ def _coin_line(balance, earned):
     return "Balance: {} quacks.".format(balance)
 
 
+def _arcade_install_cta_due():
+    """True when the soft Get Arcade CTA may appear (7-day cooldown elapsed)."""
+    last = SESSION_STATS.store_get(KEY_ARCADE_INSTALL_CTA_LAST_SHOWN)
+    if last is None:
+        return True
+    try:
+        return (time.time() - float(last)) >= ARCADE_INSTALL_CTA_COOLDOWN_SECONDS
+    except Exception:
+        return True
+
+
 def _actions(balance):
     """At most two -- the renderer's hard cap.
 
-    Arcade first when it is installed and wanted: on a long sync it is the more
-    useful of the two, and the watcher is about to offer it anyway.
+    Arcade CTA first (Play when installed, soft Get when not and due), then
+    Bank. Opt-out and install-CTA cooldown can leave the first slot empty so
+    Bank still fills it when eligible.
     """
     actions = []
     try:
@@ -220,10 +249,17 @@ def _actions(balance):
             exe = ARCADE.get_installed_arcade_exe()
             if exe:
                 actions.append({
-                    "id": "sync_card_arcade",
+                    "id": ACTION_ID_ARCADE_PLAY,
                     "label": "Play arcade",
                     "type": "open_path",
                     "payload": exe,
+                })
+            elif _arcade_install_cta_due():
+                actions.append({
+                    "id": ACTION_ID_ARCADE_GET,
+                    "label": "Get Arcade",
+                    "type": "open_url",
+                    "payload": ARCADE.ARCADE_LANDING_URL,
                 })
     except Exception:
         pass
@@ -238,6 +274,16 @@ def _actions(balance):
             "payload": BANK_URL,
         })
     return actions
+
+
+def _record_arcade_install_cta_shown(actions):
+    """Stamp the install-CTA cooldown only when Get Arcade was on the shown card."""
+    if not actions:
+        return
+    for action in actions:
+        if isinstance(action, dict) and action.get("id") == ACTION_ID_ARCADE_GET:
+            SESSION_STATS.store_set(KEY_ARCADE_INSTALL_CTA_LAST_SHOWN, time.time())
+            return
 
 
 # --------------------------------------------------------------- recommendation
@@ -374,6 +420,7 @@ def show_session_card(doc_title=None, doc=None):
         return False
 
     SESSION_STATS.store_set(KEY_LAST_SHOWN, time.time())
+    _record_arcade_install_cta_shown(card.get("actions"))
 
     kwargs = {
         "main_text": render_text(card),
@@ -400,6 +447,56 @@ def on_sync_finished(doc=None, doc_title=None):
     cleared = SESSION_STATS.get_warnings_cleared(doc)
     if cleared:
         LEADER_BOARD.report_warnings_cleared(cleared, doc_title)
+    return True
+
+
+@ERROR_HANDLE.try_catch_error(is_pass=True)
+def offer_arcade_after_wait(wait_seconds):
+    """Post-wait install toast after a long sync/open, when Arcade is missing.
+
+    Call AFTER ARCADE.end_wait_watch() with the age it returned. Complements the
+    session-card Get Arcade CTA (OS #254) which can appear at wait START: this
+    is the punchline at wait END. Shares KEY_ARCADE_INSTALL_CTA_LAST_SHOWN so
+    a wait that already offered Get Arcade on the card skips the toast, and so
+    card + toast together are not twice-weekly spam.
+
+    Gates (all must pass):
+      * wait_seconds >= ARCADE.WAIT_THRESHOLD_SECONDS (flag lived long enough;
+        short waits / never-armed waits return None or a small age)
+      * not ARCADE.is_hate_arcade() / radio_bt_arcade_never
+      * Arcade not installed
+      * install-CTA 7-day cooldown elapsed
+
+    Never opens a browser from the watcher -- this is NotificationHost only,
+    post-wait, via open_url to ARCADE.ARCADE_LANDING_URL.
+    """
+    if wait_seconds is None:
+        return False
+    try:
+        age = float(wait_seconds)
+    except Exception:
+        return False
+    if age < ARCADE.WAIT_THRESHOLD_SECONDS:
+        return False
+    if ARCADE.is_hate_arcade():
+        return False
+    if ARCADE.get_installed_arcade_exe():
+        return False
+    if not _arcade_install_cta_due():
+        return False
+
+    SESSION_STATS.store_set(KEY_ARCADE_INSTALL_CTA_LAST_SHOWN, time.time())
+    NOTIFICATION.messenger(
+        main_text=ARCADE_TOAST_MAIN_TEXT,
+        level="info",
+        animation_stay_duration=ARCADE_TOAST_STAY_SECONDS,
+        actions=[{
+            "id": ACTION_ID_ARCADE_TOAST_GET,
+            "label": "Get Arcade",
+            "type": "open_url",
+            "payload": ARCADE.ARCADE_LANDING_URL,
+        }],
+    )
     return True
 
 

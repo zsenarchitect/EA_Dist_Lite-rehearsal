@@ -21,6 +21,14 @@ import scriptcontext as sc # pyright: ignore
 from EnneadTab import ERROR_HANDLE, EXCEL, NOTIFICATION
 from EnneadTab.RHINO import RHINO_PROJ_DATA
 
+def _format_target_area(val):
+    """Safely format a target area as a 2-decimal float string across Python runtimes."""
+    try:
+        return "{:.2f}".format(float(val))
+    except (ValueError, TypeError):
+        return str(val)
+
+
 class GFAExcelImporter:
     """Handles importing GFA target data from Excel files"""
     
@@ -394,7 +402,7 @@ class GFAExcelImporter:
         
         print("Current GFA targets:")
         for key, value in existing_targets.items():
-            print("  - {}: {:.2f}".format(key, value))
+            print("  - {}: {}".format(key, _format_target_area(value)))
         
         # Track changes
         updated_items = []
@@ -417,17 +425,17 @@ class GFAExcelImporter:
         if updated_items:
             print("Updated existing targets:")
             for keyword, old_value, new_value in updated_items:
-                print("  - {}: {:.2f} -> {:.2f}".format(keyword, old_value, new_value))
+                print("  - {}: {} -> {}".format(keyword, _format_target_area(old_value), _format_target_area(new_value)))
         
         if new_items:
             print("Added new targets:")
             for keyword, area in new_items:
-                print("  - {}: {:.2f}".format(keyword, area))
+                print("  - {}: {}".format(keyword, _format_target_area(area)))
         
         if unchanged_items:
             print("Unchanged targets:")
             for keyword in unchanged_items:
-                print("  - {}: {:.2f}".format(keyword, existing_targets[keyword]))
+                print("  - {}: {}".format(keyword, _format_target_area(existing_targets[keyword])))
         
         # Save updated targets
         data[RHINO_PROJ_DATA.DocKeys.GFA_TARGET_DICT] = existing_targets
@@ -476,7 +484,7 @@ def test_excel_import():
         print("Test completed successfully!")
         print("Final GFA targets:")
         for keyword, area in result.items():
-            print("  - {}: {:.2f}".format(keyword, area))
+            print("  - {}: {}".format(keyword, _format_target_area(area)))
     else:
         print("Test failed - no data imported")
 

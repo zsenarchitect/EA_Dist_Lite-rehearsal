@@ -11,6 +11,9 @@ Layout (built across staged commits):
     _cache       cache index, atomic replace, sha256, LRU prune      [Commit 2]
     ASSET        manifest + get_asset_path / get_asset_folder        [Commit 2]
     STATE        read_state / write_state / update_state + outbox     [Commit 3]
+    LIBRARY_CATALOG  EnneadTab-Library catalog reads (list_assets)     [#5447]
+        -- a separate service from the depot (Library owns catalog metadata,
+        depot delivers asset bytes); lives here only to reuse _transport.
 
 Design rules (do not violate):
   * Fully-qualified imports inside this subpackage -- always
@@ -33,11 +36,14 @@ package yet, and the repo must still import cleanly.
 from EnneadTab.DEPOT import ROUTES  # noqa: F401
 from EnneadTab.DEPOT import ASSET  # noqa: F401
 from EnneadTab.DEPOT import STATE  # noqa: F401
+from EnneadTab.DEPOT import LIBRARY_CATALOG  # noqa: F401
 from EnneadTab.DEPOT.ASSET import get_asset_path, get_asset_folder, get_manifest  # noqa: F401
 from EnneadTab.DEPOT.STATE import read_state, write_state, update_state, list_state, flush_outbox  # noqa: F401
+from EnneadTab.DEPOT.LIBRARY_CATALOG import list_assets  # noqa: F401
 
 __all__ = [
-    "ROUTES", "ASSET", "STATE",
+    "ROUTES", "ASSET", "STATE", "LIBRARY_CATALOG",
     "get_asset_path", "get_asset_folder", "get_manifest",
     "read_state", "write_state", "update_state", "list_state", "flush_outbox",
+    "list_assets",
 ]

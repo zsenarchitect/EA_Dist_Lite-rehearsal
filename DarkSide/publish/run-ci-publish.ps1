@@ -181,15 +181,98 @@ try {
     Write-Host "  HEAD $(git rev-parse --short HEAD) clean"
     Write-Host ""
 
+    # Capture the RESOLVED commit ONCE, right after the reset that is meant to land
+    # on it, and export it for ________publish.py to read. A publish run can take up
+    # to 90 minutes (timeout-minutes in publish-production.yml); if the stamp writer
+    # instead re-derives "the commit we published" via a live `git rev-parse HEAD` at
+    # write time, any later git operation on this same clone during that window
+    # (however unlikely) would silently drift the stamp away from the SHA this run
+    # actually dispatched on. Exporting it now removes that window (senzhang-todo #4417).
+    $resolvedSha = (git rev-parse HEAD | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($resolvedSha)) {
+        Fail "Could not resolve HEAD after reset to capture ENNEADTAB_PUBLISH_SHA"
+    }
+    $env:ENNEADTAB_PUBLISH_SHA = $resolvedSha
+
+    # Sync sibling dist repos: if a clean dist repo is behind origin/main, fast-forward it
+    # so publish builds on top of any remote commits rather than failing on STALE_CLONE.
+    # Relax $ErrorActionPreference around native git commands on PS 5.1 to prevent NativeCommandError on stderr.
+    Write-Host "Sync sibling dist repos:" -ForegroundColor Cyan
+    $parentDir = Split-Path -Parent $clone
+    $prevSyncEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        Get-ChildItem -LiteralPath $parentDir -Directory | Where-Object { $_.Name -like 'EA_Dist*' } | ForEach-Object {
+            $distPath = $_.FullName
+            Write-Host "  Checking $distPath ..."
+            Push-Location $distPath
+            try {
+                $isGit = (git rev-parse --is-inside-work-tree 2>&1 | Out-String).Trim()
+                if ($LASTEXITCODE -eq 0 -and $isGit -eq "true") {
+                    $status = (git status --porcelain 2>&1 | Out-String).Trim()
+                    if (-not $status) {
+                        git -c gc.auto=0 fetch origin main 2>&1 | Out-Null
+                        if ($LASTEXITCODE -eq 0) {
+                            $diffCount = (git rev-list --left-right --count origin/main...HEAD 2>&1 | Out-String).Trim()
+                            if ($LASTEXITCODE -eq 0 -and $diffCount -match '^\s*(\d+)\s+(\d+)\s*$') {
+                                $behind = [int]$matches[1]
+                                $ahead = [int]$matches[2]
+                                if ($behind -gt 0 -and $ahead -eq 0) {
+                                    Write-Host "    Fast-forwarding $behind commit(s) from origin/main..." -ForegroundColor Yellow
+                                    git merge --ff-only origin/main 2>&1 | Out-Null
+                                    if ($LASTEXITCODE -ne 0) {
+                                        Write-Host "    Warning: git merge --ff-only failed (exit $LASTEXITCODE)" -ForegroundColor Yellow
+                                    } else {
+                                        Write-Host "    Successfully fast-forwarded to $(git rev-parse --short HEAD)" -ForegroundColor Green
+                                    }
+                                } else {
+                                    Write-Host "    Already up to date (behind=$behind, ahead=$ahead)"
+                                }
+                            }
+                        }
+                    } else {
+                        Write-Host "    Skipping sync: working tree is dirty" -ForegroundColor Yellow
+                    }
+                }
+            } finally {
+                Pop-Location
+            }
+        }
+    } finally {
+        $ErrorActionPreference = $prevSyncEAP
+    }
+    Write-Host ""
+
+
     if ($Production) {
         # Runs against the RESET clone, so it reads the siblings this publish
         # will actually force-push -- not whatever the caller believed. The
         # rehearsal path deliberately does not run this: there, WRONG_REMOTE
         # inside --report is the equivalent assertion against the override map.
+        # Capture stderr here too. The #4661 fix landed on the --report call below and
+        # left this one bare, so the PRODUCTION-only assertion -- the one gating a
+        # force-push to the fleet -- was still able to fail with nothing but an exit
+        # code. Same EAP dance and the same reason: on Windows PowerShell 5.1,
+        # $ErrorActionPreference = 'Stop' turns native stderr captured via 2>&1 into a
+        # terminating NativeCommandError, so the script would die here and never reach
+        # the Fail below. Do not "simplify" to a bare 2>&1 or a file redirect without
+        # re-testing on 5.1 specifically.
         Write-Host "publish_guard --assert-production:" -ForegroundColor Yellow
-        & $python $guardPy --assert-production
-        if ($LASTEXITCODE -ne 0) {
-            Fail "publish_guard --assert-production exited $LASTEXITCODE. -Production was passed but this tree does not provably target the production distribution."
+        $prevAssertEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $assertLines = & $python $guardPy --assert-production 2>&1
+            $assertExit = $LASTEXITCODE
+        } finally {
+            $ErrorActionPreference = $prevAssertEAP
+        }
+        $assertLines | ForEach-Object { Write-Host $_ }
+        if ($assertExit -ne 0) {
+            $assertText = ($assertLines | Out-String).Trim()
+            if ([string]::IsNullOrWhiteSpace($assertText)) {
+                $assertText = "(the guard produced NO output on stdout or stderr -- see senzhang-todo #4661)"
+            }
+            Fail "publish_guard --assert-production exited $assertExit. -Production was passed but this tree does not provably target the production distribution.`n--- publish_guard output ---`n$assertText"
         }
         Write-Host ""
     }

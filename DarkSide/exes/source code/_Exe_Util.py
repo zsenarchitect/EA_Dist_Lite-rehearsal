@@ -95,9 +95,45 @@ def is_avd():
 
      
 def find_main_repo():
-    for root, dirs, files in os.walk(os.environ['USERPROFILE']):
-        if 'EnneadTab-OS' in dirs:
-            return os.path.join(root, 'EnneadTab-OS')
+    # WHY (#5974): the previous implementation os.walk'd the ENTIRE
+    # %USERPROFILE% with NO pruning, so it descended into AppData (multi-GB)
+    # and every other subtree before it happened to reach github\. That
+    # stalled the Rhino installer for tens of seconds. This file is the
+    # standalone EXE twin and cannot import the EnneadTab library, so the
+    # fix stays stdlib-only. Contract is UNCHANGED: return the path to an
+    # EnneadTab-OS checkout under the user profile if one exists, otherwise
+    # the EA_Dist fallback.
+    repo_name = 'EnneadTab-OS'
+    user_profile = os.environ['USERPROFILE']
+
+    # 1) Fast path: check the usual checkout locations directly. This alone
+    #    covers every real machine and avoids any walk.
+    fast_candidates = [
+        os.path.join(user_profile, 'github', repo_name),
+        os.path.join(user_profile, 'Documents', repo_name),
+        os.path.join(user_profile, 'source', repo_name),
+        os.path.join(user_profile, repo_name),
+    ]
+    for candidate in fast_candidates:
+        if os.path.isdir(candidate):
+            return candidate
+
+    # 2) Pruned-walk fallback: same 'first dir named EnneadTab-OS wins'
+    #    (top-down) semantics as before, but prune heavy/irrelevant subtrees
+    #    in-place so the walk stays cheap. AppData, the legacy profile
+    #    junctions (which also raise PermissionError), build caches, and any
+    #    hidden dir are deliberately made unreachable by this walk.
+    skip_dirs = set([
+        'AppData', 'Application Data', 'Local Settings',
+        '.git', 'node_modules', '__pycache__', '.venv',
+    ])
+    for root, dirs, files in os.walk(user_profile):
+        if repo_name in dirs:
+            return os.path.join(root, repo_name)
+        dirs[:] = [d for d in dirs
+                   if d not in skip_dirs and not d.startswith('.')]
+
+    # 3) Same fallback as before.
     return os.path.join(ECO_SYS_FOLDER, 'EA_Dist')
 
 def try_catch_error(func):

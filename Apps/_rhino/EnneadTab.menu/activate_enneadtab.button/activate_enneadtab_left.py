@@ -23,19 +23,27 @@ except:
 
 def add_search_path():
     """Register EnneadTab lib path. Priority:
-    1. Git repo (EnneadTab-OS) - for developers with the repo cloned
-    2. EA_Dist (EnneadTab Ecosystem) - for all other users
+    1. If this script is running from inside a git repo, use that repo's Apps/lib (active working copy)
+    2. Git repo (EnneadTab-OS) developer checkouts under ~/github or ~/github/ennead-llp
+    3. EA_Dist (EnneadTab Ecosystem) - for all other users
     """
     home = os.environ.get("USERPROFILE", os.environ.get("HOME", ""))
-    git_lib = os.path.join(home, "github", "ennead-llp", "EnneadTab-OS", "Apps", "lib")
-
     _app_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    dist_lib = os.path.join(_app_folder, "lib")
+    this_lib = os.path.join(_app_folder, "lib")
+    _repo_root = os.path.dirname(_app_folder)
 
-    if os.path.isdir(git_lib):
-        lib_path = git_lib
+    if os.path.isdir(os.path.join(_repo_root, ".git")) and os.path.isdir(this_lib) and "EA_Dist" not in _repo_root:
+        lib_path = this_lib
     else:
-        lib_path = dist_lib
+        candidate_paths = [
+            os.path.join(home, "github", "EnneadTab-OS", "Apps", "lib"),
+            os.path.join(home, "github", "ennead-llp", "EnneadTab-OS", "Apps", "lib"),
+        ]
+        lib_path = this_lib
+        for candidate in candidate_paths:
+            if os.path.isdir(candidate):
+                lib_path = candidate
+                break
 
     for p in list(sys.path):
         if "EnneadTab" in p and "lib" in p and p != lib_path:
