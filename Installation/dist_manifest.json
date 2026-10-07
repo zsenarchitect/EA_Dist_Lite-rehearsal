@@ -722,11 +722,11 @@
         "Apps/lib/EnneadTab/tests/test_color_scheme_orphans.py": "b989bc14dd3762fa9b1e8d07c720e43466554e63827f51573afb00136fa519c1",
         "Apps/lib/EnneadTab/tests/test_documentation_sanitize.py": "782d2dd40e77cab7912031f0dae0ac6b66d0c2fee8ee3d567d71b917a880a9a9"
     },
-    "published_at": "2026-10-07T13:27:36",
-    "source_commit": "2265ae95d71d94a8f05cea6566bce274f4e9fa4b",
+    "published_at": "2026-10-07T13:32:21",
+    "source_commit": "7c3aa8b362ccbd318d7815ae7df592eef4a0d207",
     "trees": [
         "Apps/lib/EnneadTab",
         "Apps/_revit/EnneaDuck.extension"
     ],
-    "version": "2026.10.07.1327"
+    "version": "2026.10.07.1332"
 }

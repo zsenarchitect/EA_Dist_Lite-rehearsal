@@ -54,10 +54,12 @@ WALKER_SRC = (
     "lf = open(sys.argv[1], 'rb')\n"
     "paths = lf.read().split('\\n')\n"
     "lf.close()\n"
+    "n = 0\n"
     "for p in paths:\n"
     "    p = p.strip()\n"
     "    if not p:\n"
     "        continue\n"
+    "    n = n + 1\n"
     "    try:\n"
     "        f = open(p, 'rb')\n"
     "        src = f.read()\n"
@@ -75,6 +77,7 @@ WALKER_SRC = (
     "        sys.stdout.write('SYNTAXERR\\t' + p + '\\t' + str(e) + '\\n')\n"
     "    except Exception, e:\n"
     "        sys.stdout.write('UNREADABLE\\t' + p + '\\t' + str(e) + '\\n')\n"
+    "sys.stdout.write('DONE\\t' + str(n) + '\\n')\n"
 )
 
 
@@ -247,12 +250,17 @@ def run_gate(repo_root, ipy_exe, checker=None, timeout=GATE_TIMEOUT_SECONDS):
             except OSError:
                 pass
 
-    if result.returncode != 0 and not (result.stdout or "").strip():
-        # The walker reports per-file problems on stdout and exits 0. A non-zero exit
-        # with nothing on stdout means the walker itself died, so nothing was checked.
-        return ("IronPython compile gate SKIPPED: the walker exited {} without a "
-                "report. stderr: {}".format(result.returncode,
-                                            (result.stderr or "").strip()[:300]))
+    # Only a run that reached its end and counted every file is a check. The walker
+    # writes `DONE\t<n>` last; a crash part-way (MemoryError, .NET fault, kill) can
+    # still leave earlier SYNTAXERR lines on stdout, and classifying that partial report
+    # would print a pass while every file after the crash shipped unchecked.
+    done = [line for line in (result.stdout or "").splitlines() if line.startswith("DONE\t")]
+    walked = done[-1].split("\t", 1)[1].strip() if done else ""
+    if result.returncode != 0 or walked != str(len(to_check)):
+        return ("IronPython compile gate SKIPPED: the walker did not finish (exit {}, "
+                "walked {} of {} file(s)). Shipping trees were NOT fully compile-checked. "
+                "stderr: {}".format(result.returncode, walked or "?", len(to_check),
+                                    (result.stderr or "").strip()[:300]))
 
     found = classify_output(result.stdout, hard_paths, allowed_paths)
 
