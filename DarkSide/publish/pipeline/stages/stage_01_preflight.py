@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 from ..stage_base import PublishStage, PublishStageError
+from ..syntax_gate import run_gate as run_ironpython_compile_gate
 
 
 def clear_stale_git_locks(repo_folder):
@@ -76,13 +77,18 @@ class PreflightStage(PublishStage):
         if ipy_exe:
             print("IronPython 2.7 syntax oracle located at: {}".format(ipy_exe))
         else:
-            print("Notice: IronPython 2.7 syntax oracle not found; Py2 syntax check will be skipped.")
+            print("Notice: IronPython 2.7 syntax oracle not found; the compile gate will be skipped.")
 
         # Confirm all executables exist against maker data
         self._confirm_all_exes_exist(context)
 
         # Confirm all button icons exist against knowledge database
         self._confirm_all_button_icons_exist(context)
+
+        # Last, because it is the slow one: compile every shipping IronPython file with
+        # the real interpreter (TODO-7728). Raises on a broken _revit/_rhino file; a
+        # skip (no interpreter, timeout) comes back as a reason -> stage is DEGRADED.
+        return run_ironpython_compile_gate(context.os_repo_folder, ipy_exe)
 
     def _confirm_all_button_icons_exist(self, context):
         """Verify all button icon files referenced in knowledge database exist.
