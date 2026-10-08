@@ -559,13 +559,13 @@ def setup_area_tracking_parameters(doc, proj_data):
     
     # Check if any area elements exist
     existing_areas = list(DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Areas).WhereElementIsNotElementType().ToElements())
-    temp_area_created = False
-    
+    temp_element_ids = []
+
     try:
         # If no areas exist, create a temporary one for parameter setup
         if not existing_areas:
-            temp_area_created = _create_temporary_area_for_setup(doc)
-            if not temp_area_created:
+            temp_element_ids = _create_temporary_area_for_setup(doc)
+            if not temp_element_ids:
                 NOTIFICATION.messenger("Failed to create temporary area element. Please create at least one area manually and try again.")
                 return False
         
@@ -578,78 +578,86 @@ def setup_area_tracking_parameters(doc, proj_data):
         return True
         
     finally:
-        # Clean up temporary area if we created one
-        if temp_area_created:
-            _cleanup_temporary_area(doc)
+        # Clean up the temporary area (and its boundary lines) if we created one
+        if temp_element_ids:
+            _cleanup_temporary_area(doc, temp_element_ids)
+
+
+def _find_area_plan_view(doc):
+    """Return the first non-template area plan view that has a scheme and level, or None."""
+    for view in DB.FilteredElementCollector(doc).OfClass(DB.ViewPlan).ToElements():
+        try:
+            if view.IsTemplate or view.ViewType != DB.ViewType.AreaPlan:
+                continue
+            if view.AreaScheme is None or view.GenLevel is None:
+                continue
+            return view
+        except Exception:
+            continue
+    return None
 
 
 def _create_temporary_area_for_setup(doc):
-    """Create a temporary area element for parameter setup"""
+    """Create a temporary 1x1 ft area element for parameter setup.
+
+    The Revit API has no Area.Create; areas are placed with the documented
+    doc.Create.NewArea(ViewPlan, UV) inside an area plan view, enclosed by
+    boundary lines from doc.Create.NewAreaBoundaryLine(SketchPlane, Curve, ViewPlan).
+
+    Returns:
+        list: ElementIds of every element created (area, boundary lines,
+            sketch plane) so the caller can delete exactly those. Empty list
+            on failure.
+    """
+    created_ids = []
     try:
-        # Get the first level to place the area
-        levels = list(DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements())
-        if not levels:
-            print("  ERROR: No levels found in project")
-            return False
-        
-        # Get the first area scheme
-        area_schemes = list(DB.FilteredElementCollector(doc).OfClass(DB.AreaScheme).ToElements())
-        if not area_schemes:
-            print("  ERROR: No area schemes found in project")
-            return False
-        
-        # Create a simple rectangle for the temporary area
-        level = levels[0]
-        area_scheme = area_schemes[0]
-        
-        # Create a simple rectangle curve loop (1x1 foot)
-        start_point = DB.XYZ(0, 0, level.Elevation)
-        end_point = DB.XYZ(1, 1, level.Elevation)
-        
-        # Create curve loop
-        curve_loop = DB.CurveLoop()
-        curve_loop.Append(DB.Line.CreateBound(start_point, DB.XYZ(end_point.X, start_point.Y, start_point.Z)))
-        curve_loop.Append(DB.Line.CreateBound(DB.XYZ(end_point.X, start_point.Y, start_point.Z), end_point))
-        curve_loop.Append(DB.Line.CreateBound(end_point, DB.XYZ(start_point.X, end_point.Y, start_point.Z)))
-        curve_loop.Append(DB.Line.CreateBound(DB.XYZ(start_point.X, end_point.Y, start_point.Z), start_point))
-        
-        # Create the area
-        area = DB.Area.Create(doc, area_scheme.Id, level.Id, curve_loop)
-        
-        if area:
-            return True
-        else:
+        area_view = _find_area_plan_view(doc)
+        if area_view is None:
+            print("  ERROR: No area plan view found in project")
+            return []
+
+        level = area_view.GenLevel
+        elevation = level.Elevation
+
+        # Sketch plane at the area plan's level so the boundary curves lie on it
+        plane = DB.Plane.CreateByNormalAndOrigin(DB.XYZ.BasisZ, DB.XYZ(0, 0, elevation))
+        sketch_plane = DB.SketchPlane.Create(doc, plane)
+        created_ids.append(sketch_plane.Id)
+
+        # Simple 1x1 foot rectangle at the origin
+        p0 = DB.XYZ(0, 0, elevation)
+        p1 = DB.XYZ(1, 0, elevation)
+        p2 = DB.XYZ(1, 1, elevation)
+        p3 = DB.XYZ(0, 1, elevation)
+        for start, end in ((p0, p1), (p1, p2), (p2, p3), (p3, p0)):
+            boundary = doc.Create.NewAreaBoundaryLine(sketch_plane, DB.Line.CreateBound(start, end), area_view)
+            if boundary is not None:
+                created_ids.append(boundary.Id)
+
+        # Place the area inside the rectangle
+        area = doc.Create.NewArea(area_view, DB.UV(0.5, 0.5))
+        if area is None:
             print("  ERROR: Failed to create temporary area")
-            return False
-            
+            _cleanup_temporary_area(doc, created_ids)
+            return []
+        # Delete the area before its boundary lines and sketch plane
+        created_ids.insert(0, area.Id)
+        return created_ids
+
     except Exception as e:
         print("  ERROR: Exception creating temporary area: {}".format(str(e)))
-        return False
+        _cleanup_temporary_area(doc, created_ids)
+        return []
 
 
-def _cleanup_temporary_area(doc):
-    """Remove the temporary area element created for setup"""
-    try:
-        # Find and delete the temporary area (1x1 foot area at origin)
-        areas = list(DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Areas).WhereElementIsNotElementType().ToElements())
-        
-        for area in areas:
-            # Check if this is our temporary area (1x1 foot at origin)
-            try:
-                area_curve_loop = area.AreaCurveLoop
-                if area_curve_loop and len(area_curve_loop) == 4:
-                    # Check if it's approximately 1x1 foot
-                    area_value = area.Area
-                    if 0.9 < area_value < 1.1:  # Allow small tolerance
-                        doc.Delete(area.Id)
-                        return
-            except:
-                continue
-                
-        print("  WARNING: Could not find temporary area to clean up")
-        
-    except Exception as e:
-        print("  WARNING: Error cleaning up temporary area: {}".format(str(e)))
+def _cleanup_temporary_area(doc, element_ids):
+    """Delete exactly the elements created by _create_temporary_area_for_setup."""
+    for element_id in element_ids:
+        try:
+            if doc.GetElement(element_id) is not None:
+                doc.Delete(element_id)
+        except Exception as e:
+            print("  WARNING: Error cleaning up temporary area element {}: {}".format(element_id, str(e)))
 
 
 def update_project_levels_in_project_data(doc, proj_data):

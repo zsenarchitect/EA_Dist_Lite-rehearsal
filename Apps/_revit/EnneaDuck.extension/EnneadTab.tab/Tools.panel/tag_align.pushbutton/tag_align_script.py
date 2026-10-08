@@ -30,7 +30,7 @@ from pyrevit import HOST_APP
 import proDUCKtion # pyright: ignore 
 proDUCKtion.validify()
 
-from EnneadTab.REVIT import REVIT_APPLICATION
+from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_TAG
 from EnneadTab import IMAGE, ERROR_HANDLE, LOG
 import traceback
 from Autodesk.Revit import DB # pyright: ignore 
@@ -49,7 +49,7 @@ def test_elbow_straight(tag):
     #get archor position and elbow location, if thwo are same then it is straight line.
     if not tag.HasLeader:
         return False
-    if tag.HasElbow:
+    if REVIT_TAG.has_leader_elbow(tag):
         return False
     else:
         return True
@@ -76,8 +76,8 @@ def process_tag(ref_tag, bad_tag, is_V):
 
 
     try:
-        temp_location = move_to_target_in_view(bad_tag.LeaderElbow,ref_tag.LeaderElbow)
-        bad_tag.LeaderElbow = temp_location
+        temp_location = move_to_target_in_view(REVIT_TAG.get_leader_elbow(bad_tag), REVIT_TAG.get_leader_elbow(ref_tag))
+        REVIT_TAG.set_leader_elbow(bad_tag, temp_location)
     except:
         if test_elbow_straight(bad_tag):
             pass

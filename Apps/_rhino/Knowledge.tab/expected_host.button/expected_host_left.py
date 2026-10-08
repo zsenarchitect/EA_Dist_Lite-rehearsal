@@ -1,5 +1,5 @@
 __title__ = "Expected Host"
-__doc__ = """Record which host document this Rhino model expects Grasshopper definitions to run against.
+__doc__ = """Record the host document this Rhino model expects Grasshopper definitions against.
 
 Definitions that drive the active Rhino document, a linked file (worksession attachment or model link), or an external host (Rhino.Inside.Revit) are not interchangeable. This tool stores the expectation in the document's user text (key ET_ExpectedHost) so the GH library explorer can hide definitions that don't match the current session.
 

@@ -59,7 +59,7 @@ def group_objects_by_key():
         groups.setdefault(value, []).append(guid)
 
     key_label = user_text_key if user_text_key else kind
-    lines = ["Branch map — one branch per {0}:".format(key_label), ""]
+    lines = ["Branch map \xe2\x80\x94 one branch per {0}:".format(key_label), ""]
     for value in sorted(groups):
         lines.append("  {0}: {1} object(s)".format(value, len(groups[value])))
     report = "\n".join(lines)

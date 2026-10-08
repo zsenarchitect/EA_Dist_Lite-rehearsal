@@ -14,6 +14,8 @@ from EnneadTab import NOTIFICATION, FOLDER
 
 ARVR_URL_BASE = "https://enneadtab.com/arvr"
 SUBDIR_STAGING = "ARVR_Exports"
+# The only non-model type the room upload-token route accepts (see put_blob_file).
+OCTET_STREAM = "application/octet-stream"
 
 # Content types for files staged/uploaded to ARVR rooms.
 _CONTENT_TYPES = {
@@ -186,7 +188,7 @@ def _http_put_bytes(url, body_bytes, headers, timeout_ms):
     except Exception as e:
         return False, None, str(e)
 
-def put_blob_file(filepath, room_id, blob_pathname, timeout_ms=60000):
+def put_blob_file(filepath, room_id, blob_pathname, timeout_ms=60000, content_type=None):
     """PUT a file's bytes directly to Vercel Blob storage (no room registration).
 
     Steps 1-2 of the two-step direct-to-Blob protocol: request a short-lived
@@ -202,6 +204,10 @@ def put_blob_file(filepath, room_id, blob_pathname, timeout_ms=60000):
         blob_pathname (str): Destination pathname in the blob store, e.g.
             "rooms/AB12CD/drawings/A101/A101.glb".
         timeout_ms (int): Network timeout in milliseconds.
+        content_type (str, optional): Override the content type sent to Blob. The room
+            upload-token route only allows model types and application/octet-stream, so
+            non-model files (sheet PNGs, JSON) must pass "application/octet-stream";
+            the web app serves them with a type derived from the file extension.
 
     Returns:
         tuple: (success, blob_url, error_message)
@@ -224,7 +230,7 @@ def put_blob_file(filepath, room_id, blob_pathname, timeout_ms=60000):
         return False, None, "File is empty (0 bytes): " + str(filepath)
 
     filename = os.path.basename(filepath)
-    content_type = content_type_for(filename)
+    content_type = content_type or content_type_for(filename)
 
     # Step 1: request a short-lived client token. Request shape matches
     # exactly what @vercel/blob/client's upload() sends to a handleUpload()
@@ -360,6 +366,77 @@ def upload_model_file(filepath, room_id=None, timeout_ms=60000):
         return False, room_id, None, err
 
     return True, room_id, web_url, None
+
+
+def upload_composition(model_path, sheet_png_path, plan_ext, paper, origin_mm,
+                       north_yaw_deg, scale_den, room_id=None, set_name=None, timeout_ms=90000):
+    """Upload a model plus its composed site-plan sheet as a one-sheet drawing set.
+
+    The sheet PNG (from ARVR_COMPOSE.render_sheet_png) and the model go to the
+    drawing-set paths the server validates. The model is also staged as the
+    room's main model so the desktop hub preview and plain AR view keep working.
+
+    Returns:
+        tuple: (success, room_id, drawings_url, error_message)
+    """
+    from EnneadTab import ARVR_COMPOSE as compose
+    if not model_path or not model_path.lower().endswith(".glb"):
+        return False, None, None, "Composed sheets need a .glb model (the drawing-set viewer reads GLB only)."
+    if not os.path.exists(model_path):
+        return False, None, None, "File does not exist: " + str(model_path)
+    if not sheet_png_path or not os.path.exists(sheet_png_path):
+        return False, None, None, "Composed sheet image is missing."
+    room_id = (room_id or generate_room_id()).upper().strip()
+    model_size = os.path.getsize(model_path)
+    try:
+        manifest = compose.build_manifest(set_name, model_size, plan_ext, paper, origin_mm,
+                                          north_yaw_deg, scale_den, created_at_ms=int(time.time() * 1000))
+    except ValueError as e:
+        return False, room_id, None, str(e)
+    plan_path, sheet_model_path = compose.sheet_blob_paths(room_id, plan_ext)
+    manifest["sheets"][0]["planBlobPath"] = plan_path
+    manifest["sheets"][0]["modelBlobPath"] = sheet_model_path
+
+    ok, _, err = put_blob_file(sheet_png_path, room_id, plan_path, timeout_ms,
+                               content_type=OCTET_STREAM)
+    if not ok:
+        return False, room_id, None, err
+    ok, _, err = put_blob_file(model_path, room_id, sheet_model_path, timeout_ms)
+    if not ok:
+        return False, room_id, None, err
+    filename = os.path.basename(model_path)
+    ok, main_url, err = put_blob_file(model_path, room_id, "rooms/{}/{}".format(room_id, filename), timeout_ms)
+    if not ok:
+        return False, room_id, None, err
+    ok, _, err = register_room(room_id, main_url, filename, content_type_for(filename), model_size,
+                               extra={"drawingSet": manifest}, timeout_ms=timeout_ms)
+    if not ok:
+        return False, room_id, None, err
+    return True, room_id, "{}/view/{}/drawings".format(ARVR_URL_BASE, room_id), None
+
+
+def upload_sequence(room_id, manifest, timeout_ms=60000):
+    """Upload an exploded-axon / construction-sequence manifest to an existing room.
+
+    The file goes to rooms/<id>/sequence/sequence.json (a subfolder, so the
+    room's model lookup never mistakes it for the model) as octet-stream, the
+    only non-model type the upload-token route accepts.
+
+    Returns:
+        tuple: (success, error_message)
+    """
+    if not room_id:
+        return False, "No room yet: send the model to a room first."
+    room_id = room_id.upper().strip()
+    path = os.path.join(get_staging_directory(), "arvr_sequence.json")
+    try:
+        with open(path, "w") as f:
+            json.dump(manifest, f)
+    except Exception as e:
+        return False, "Could not write the sequence file: " + str(e)
+    ok, _, err = put_blob_file(path, room_id, "rooms/{}/sequence/sequence.json".format(room_id),
+                               timeout_ms, content_type=OCTET_STREAM)
+    return ok, err
 
 
 def _url_quote(text):

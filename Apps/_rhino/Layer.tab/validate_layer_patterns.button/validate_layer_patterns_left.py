@@ -1,7 +1,7 @@
 __title__ = "ValidateLayerPatterns"
-__doc__ = """Validate Elefront-style layer patterns (with :: full paths and * wildcards) against the document's layer table.
+__doc__ = """Validate Elefront-style layer patterns against the document's layer table.
 
-Reports per-pattern match counts and, for patterns that match nothing, suggests the closest real layer names — catching renamed layers before a definition fails silently.
+Reports per-pattern match counts and, for patterns that match nothing, suggests the closest real layer names -- catching renamed layers before a definition fails silently.
 """
 __is_popular__ = False
 

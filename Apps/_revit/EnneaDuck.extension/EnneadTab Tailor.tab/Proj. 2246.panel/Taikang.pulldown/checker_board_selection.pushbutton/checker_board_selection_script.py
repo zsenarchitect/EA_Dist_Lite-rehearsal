@@ -56,8 +56,11 @@ def checker_board_selection():
             # print (output.linkify(v_grid_id))
 
             
-            u_order = u_grids.index(u_grid_id.IntegerValue) + 1 if u_grid_id.IntegerValue != -1 else 0
-            v_order = v_grids.index(v_grid_id.IntegerValue) + 1 if v_grid_id.IntegerValue != -1 else 0
+            # StrongBox.Value is the ElementId; ElementId.IntegerValue is gone in Revit 2026
+            u_grid_int = REVIT_APPLICATION.get_element_id_value(u_grid_id.Value)
+            v_grid_int = REVIT_APPLICATION.get_element_id_value(v_grid_id.Value)
+            u_order = u_grids.index(u_grid_int) + 1 if u_grid_int != -1 else 0
+            v_order = v_grids.index(v_grid_int) + 1 if v_grid_int != -1 else 0
             
             is_selecting = (v_order - u_order)%2
             if is_alt_mode:

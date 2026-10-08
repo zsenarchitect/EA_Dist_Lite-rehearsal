@@ -2575,7 +2575,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\arvr_overlay.pushbutton\\arvr_overlay_script.py": {
         "alias": "AR/VR Overlay",
-        "doc": "Open EnneadTab-ARVR: Mobile Camera AR Overlay for 3D Models.\n\nBeam an already-exported 3D model onto your smartphone camera in augmented reality:\n- Auto-detect a staged .glb matching the active 3D view, or browse to pick an\n  existing .glb / .gltf / .usdz you exported some other way\n- Staged safely in local temporary dump directory\n- Upload directly into cloud room session\n- Scan QR code to launch mobile camera AR overlay with 1:1 scale\n- Zero app installs needed on phone or headset\n\nNote: this tool does not export the Revit 3D view itself (Revit has no native\nglTF/GLB exporter). Export your model to .glb/.gltf/.usdz first, then use this\ntool to stage & beam it.\n\nOpens https://enneadtab.com/arvr\n",
+        "doc": "Open EnneadTab-ARVR: Mobile Camera AR Overlay for 3D Models.\n\nBeam an already-exported 3D model onto your smartphone camera in augmented reality:\n- Auto-detect a staged .glb matching the active 3D view, or browse to pick an\n  existing .glb / .gltf / .usdz you exported some other way\n- Staged safely in local temporary dump directory\n- Upload directly into cloud room session\n- Scan QR code to launch mobile camera AR overlay with 1:1 scale\n- Zero app installs needed on phone or headset\n- Compose a .glb with a site-plan image on one printable sheet and upload both together\n\nNote: this tool does not export the Revit 3D view itself (Revit has no native\nglTF/GLB exporter). Export your model to .glb/.gltf/.usdz first, then use this\ntool to stage & beam it.\n\nOpens https://enneadtab.com/arvr\n",
         "icon": "EnneadTab.tab\\Import Export.panel\\arvr_overlay.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\arvr_overlay.pushbutton\\arvr_overlay_script.py",
@@ -2593,7 +2593,7 @@
     },
     "EnneadTab.tab\\Import Export.panel\\drawing_set_export.pushbutton\\drawing_set_export_script.py": {
         "alias": "Drawing Set Export",
-        "doc": "Export a per-sheet drawing set for phone AR: sheet plan images + section-boxed 3D models (.glb), beamed to an ARVR room.",
+        "doc": "Export a per-sheet drawing set for phone AR.\n\nFor each selected sheet with a placed floor plan, exports a 300-DPI plan image\n(PNG) and a section-boxed 3D model of the sheet's level converted to .glb, then\nuploads both to an ARVR room and writes drawings/manifest.json next to the files.\nTracked under ticket 7005 (sheet-anchored 3D for AR/VR).",
         "icon": "EnneadTab.tab\\Import Export.panel\\drawing_set_export.pushbutton\\icon.png",
         "is_popular": false,
         "script": "EnneadTab.tab\\Import Export.panel\\drawing_set_export.pushbutton\\drawing_set_export_script.py",

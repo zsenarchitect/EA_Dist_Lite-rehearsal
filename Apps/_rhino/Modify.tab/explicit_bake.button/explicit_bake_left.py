@@ -12,10 +12,10 @@ import rhinoscriptsyntax as rs
 from EnneadTab import LOG, ERROR_HANDLE
 
 MODES = [
-    "Push — replace existing set by name (destructive)",
-    "Bake — duplicate with new names (additive)",
-    "Pull — report only, no model changes",
-    "Purge — delete named set (destructive)",
+    "Push \xe2\x80\x94 replace existing set by name (destructive)",
+    "Bake \xe2\x80\x94 duplicate with new names (additive)",
+    "Pull \xe2\x80\x94 report only, no model changes",
+    "Purge \xe2\x80\x94 delete named set (destructive)",
 ]
 
 
@@ -34,7 +34,7 @@ def explicit_bake():
     choice = rs.ListBox(MODES, "Pick the model-write action mode.", __title__)
     if choice is None:
         return
-    mode = choice.split(" — ")[0]
+    mode = choice.split(" \xe2\x80\x94 ")[0]
 
     base_name = rs.GetString("Unique base name for this bake set")
     if not base_name:

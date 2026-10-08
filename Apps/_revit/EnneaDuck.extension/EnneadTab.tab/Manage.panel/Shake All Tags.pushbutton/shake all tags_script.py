@@ -18,7 +18,7 @@ import proDUCKtion # pyright: ignore
 proDUCKtion.validify()
 
 from EnneadTab import ERROR_HANDLE, LOG
-from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_SELECTION
+from EnneadTab.REVIT import REVIT_APPLICATION, REVIT_SELECTION, REVIT_TAG
 from Autodesk.Revit import DB # pyright: ignore 
 
 try:
@@ -179,10 +179,10 @@ def shake_single_tag(tag, view_element, doc):
                     pass
             
             # Move leader end if tag has a leader
-            if has_leader and hasattr(tag, 'LeaderEnd'):
+            if has_leader:
                 try:
-                    current_leader_end = tag.LeaderEnd
-                    tag.LeaderEnd = current_leader_end + up_direction
+                    current_leader_end = REVIT_TAG.get_leader_end(tag)
+                    REVIT_TAG.set_leader_end(tag, current_leader_end + up_direction)
                 except:
                     pass
             
@@ -202,10 +202,10 @@ def shake_single_tag(tag, view_element, doc):
                     pass
             
             # Move leader end back if tag has a leader
-            if has_leader and hasattr(tag, 'LeaderEnd'):
+            if has_leader:
                 try:
-                    current_leader_end = tag.LeaderEnd
-                    tag.LeaderEnd = current_leader_end - up_direction
+                    current_leader_end = REVIT_TAG.get_leader_end(tag)
+                    REVIT_TAG.set_leader_end(tag, current_leader_end - up_direction)
                 except:
                     pass
             

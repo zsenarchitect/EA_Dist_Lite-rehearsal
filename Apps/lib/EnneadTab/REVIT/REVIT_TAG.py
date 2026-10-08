@@ -49,6 +49,55 @@ def get_tagged_elements(tag, doc):
         return None
 
 
+# Leader helpers. IndependentTag.LeaderEnd / LeaderElbow / HasElbow are only in
+# RevitAPI.xml 2022; from 2024 on only the per-reference methods exist
+# (GetLeaderEnd/SetLeaderEnd/GetLeaderElbow/SetLeaderElbow/HasLeaderElbow taking
+# a Reference, all documented 2022-2026). Prefer the old property when it
+# exists so 2022 behaviour is unchanged; otherwise use the first tagged reference.
+def _get_leader_reference(tag):
+    refs = tag.GetTaggedReferences()
+    if refs is None or refs.Count == 0:
+        raise ValueError("Tag {} has no tagged reference".format(tag.Id))
+    return refs[0]
+
+
+def get_leader_end(tag):
+    """Leader end point of a single-reference IndependentTag (version-safe)."""
+    if hasattr(tag, "LeaderEnd"):
+        return tag.LeaderEnd
+    return tag.GetLeaderEnd(_get_leader_reference(tag))
+
+
+def set_leader_end(tag, point):
+    """Set the leader end point of a single-reference IndependentTag (version-safe)."""
+    if hasattr(tag, "LeaderEnd"):
+        tag.LeaderEnd = point
+        return
+    tag.SetLeaderEnd(_get_leader_reference(tag), point)
+
+
+def has_leader_elbow(tag):
+    """True if the tag's leader has an elbow (version-safe)."""
+    if hasattr(tag, "HasElbow"):
+        return tag.HasElbow
+    return tag.HasLeaderElbow(_get_leader_reference(tag))
+
+
+def get_leader_elbow(tag):
+    """Leader elbow point of a single-reference IndependentTag (version-safe)."""
+    if hasattr(tag, "LeaderElbow"):
+        return tag.LeaderElbow
+    return tag.GetLeaderElbow(_get_leader_reference(tag))
+
+
+def set_leader_elbow(tag, point):
+    """Set the leader elbow point of a single-reference IndependentTag (version-safe)."""
+    if hasattr(tag, "LeaderElbow"):
+        tag.LeaderElbow = point
+        return
+    tag.SetLeaderElbow(_get_leader_reference(tag), point)
+
+
 def purge_tags(bad_host_family_name_or_names, tag_category, doc = DOC):
     """get all the tags from project, if its host's name is in the list, delete it.
     Note that: if tag is tagging multiple elements and anyone of them is in the list, the shared tag will be deleted.

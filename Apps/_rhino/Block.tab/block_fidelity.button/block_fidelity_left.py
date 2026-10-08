@@ -1,5 +1,5 @@
 __title__ = "Block Fidelity"
-__doc__ = """Classify every block definition in this document as embedded, linked, or proxy (linked but its source file is missing), and stamp the result into document user text.
+__doc__ = """Classify blocks as embedded, linked, or proxy and stamp them into document user text.
 
 Why this matters: Grasshopper definitions behave very differently against block-heavy models depending on whether their components round-trip blocks (names, materials, user strings, GUIDs preserved) or silently explode instances to raw geometry. This tool gives you the block side of that picture: which definitions are safe to edit here, and which are proxies pointing at missing files.
 

@@ -31,7 +31,11 @@ def change_para_key_group():
             break
 
     para_defintion = para.Definition
-    print (para_defintion.ParameterGroup)
+    # Definition.ParameterGroup is gone from Revit 2025; GetGroupTypeId() exists 2022+
+    if hasattr(para_defintion, "GetGroupTypeId"):
+        print (para_defintion.GetGroupTypeId().TypeId)
+    else:
+        print (para_defintion.ParameterGroup)
         
 
 

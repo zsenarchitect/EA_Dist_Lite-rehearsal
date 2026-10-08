@@ -1,5 +1,5 @@
 __title__ = "Model Contract"
-__doc__ = """Edit the living model-contract description for a model context key, and propagate it to every Grasshopper catalog sidecar referencing that context.
+__doc__ = """Edit a model-context contract and propagate it to matching Grasshopper sidecars.
 
 A model contract describes what a definition expects from the model (for example which layers and user-text keys it reads). Catalog entries carry a modelContextKey; this tool edits the shared description once and writes it into every *.gh.ennead.json / *.ghx.ennead.json sidecar in your library folder whose modelContextKey matches, and stores it in this document's user text too.
 

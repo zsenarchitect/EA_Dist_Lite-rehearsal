@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 __title__ = "LibraryPackageRestore"
-__doc__ = """Show the Yak install commands for a catalog entry's missing plugins (ports EnneadTab-For-Grasshopper PR #74).
+__doc__ = """Show the Yak install commands for a catalog entry's missing plugins.
 
-Reads the entry's required plugin packages ("DisplayName|secret" wire format,
+Ports EnneadTab-For-Grasshopper PR #74. Reads the entry's required plugin packages ("DisplayName|secret" wire format,
 same as the Grasshopper plugin), compares them against the plugins installed
 on this machine, and emits the `yak install <name>` commands needed to restore
 the missing ones.

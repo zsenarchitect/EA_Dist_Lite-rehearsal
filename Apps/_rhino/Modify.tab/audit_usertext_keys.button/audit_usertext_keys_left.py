@@ -1,5 +1,5 @@
 __title__ = "AuditUsertextKeys"
-__doc__ = """Audit user-text keys on the selected objects (or the whole document) and report per-key object counts.
+__doc__ = """Audit user-text keys and report per-key object counts across the document.
 
 Shows how many objects carry each key plus the number of distinct values, so missing, misspelled, or inconsistently filled keys surface before baking.
 """

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 __title__ = "LibraryPortability"
-__doc__ = """Audit a catalog definition for portability problems (ports EnneadTab-For-Grasshopper PR #72).
+__doc__ = """Audit a catalog definition for portability problems.
 
-Checks one library entry for the things that break when a definition moves to
+Ports EnneadTab-For-Grasshopper PR #72. Checks one library entry for the things
+that break when a definition moves to
 another machine: absolute paths hiding in the sidecar or in indexed parameter
 values, plugin assemblies the entry needs but this machine does not have
 installed ("Name|secret" wire format, cross-checked against the Grasshopper

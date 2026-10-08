@@ -1,23 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Drawing Set Export: per-sheet plan images + section-boxed 3D models beamed to phone AR.
-
-For every selected sheet that has a placed floor plan, this tool exports:
-  1. A 300-DPI plan image of the sheet (PNG) -- the AR phone's sheet picker.
-  2. A section-boxed 3D model of the sheet's level, converted FBX -> .glb
-     (native FBX export + bundled FBX2glTF converter) -- the model the phone
-     places on the paper sheet in AR.
-
-Then it uploads everything to an ARVR room (direct-to-Vercel-Blob), writes a
-drawings/manifest.json next to the files, and registers the room so the phone
-can open the set. The room's primary model is the first sheet's GLB, so
-today's viewer keeps working unchanged.
-
-TODO-7005 of epic TODO-6999 (sheet-anchored 3D for AR/VR).
-"""
-
 __title__ = "Drawing Set\nExport"
-__doc__ = ("Export a per-sheet drawing set for phone AR: sheet plan images "
-           "+ section-boxed 3D models (.glb), beamed to an ARVR room.")
+__doc__ = """Export a per-sheet drawing set for phone AR.
+
+For each selected sheet with a placed floor plan, exports a 300-DPI plan image
+(PNG) and a section-boxed 3D model of the sheet's level converted to .glb, then
+uploads both to an ARVR room and writes drawings/manifest.json next to the files.
+Tracked under ticket 7005 (sheet-anchored 3D for AR/VR)."""
 
 import os
 import re

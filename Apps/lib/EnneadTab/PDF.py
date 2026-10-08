@@ -256,7 +256,7 @@ class PDFGenerator:
             is_popular = False
 
             
-            alias_info = doc_data.get('alias', "No alias")
+            alias_info = doc_data.get('alias') or "No alias"
             if isinstance(alias_info, list):
                 alias_info = " / ".join(alias_info)
             alias = Paragraph(alias_info, self.command_style)

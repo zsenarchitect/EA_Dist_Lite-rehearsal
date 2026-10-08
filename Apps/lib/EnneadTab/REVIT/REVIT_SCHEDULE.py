@@ -206,28 +206,44 @@ def format_numeric_fields(schedule_view, field_names, rounding_value=10):
             # Get the field's spec type
             spec_type = field.GetSpecTypeId()
             
-            # Format if field has a spec type (numeric or area)
-            if spec_type:
+            # Format only measurable (numeric / area) fields. A ForgeTypeId
+            # object is always truthy, so test Empty() + IsMeasurableSpec.
+            # UnitUtils.GetUnitType / GetValidDisplayUnits, UnitType and
+            # DisplayUnitType are the pre-2021 units API and are absent from
+            # RevitAPI.xml 2022-2026; use the ForgeTypeId equivalents.
+            if spec_type is not None and not spec_type.Empty() and DB.UnitUtils.IsMeasurableSpec(spec_type):
                 format_options = DB.FormatOptions()
                 format_options.UseDefault = False
+
+                # Set the unit first: valid Accuracy values depend on the unit.
+                if spec_type == DB.SpecTypeId.Area:
+                    # For area fields, use square feet
+                    format_options.SetUnitTypeId(DB.UnitTypeId.SquareFeet)
+                else:
+                    # For other numeric fields, keep the project's unit for
+                    # this spec (so only rounding changes); fall back to the
+                    # first valid unit if the project unit cannot be read.
+                    valid_units = list(DB.UnitUtils.GetValidUnits(spec_type))
+                    unit_id = None
+                    try:
+                        project_unit = schedule_view.Document.GetUnits().GetFormatOptions(spec_type).GetUnitTypeId()
+                        if project_unit in valid_units:
+                            unit_id = project_unit
+                    except Exception:
+                        unit_id = None
+                    if unit_id is None and valid_units:
+                        unit_id = valid_units[0]
+                    if unit_id is not None:
+                        format_options.SetUnitTypeId(unit_id)
+
                 format_options.Accuracy = rounding_value
                 format_options.UseDigitGrouping = True
                 format_options.RoundingMethod = DB.RoundingMethod.Nearest
-                
-                # Get valid display units for this field type
-                unit_type = DB.UnitUtils.GetUnitType(spec_type)
-                valid_units = DB.UnitUtils.GetValidDisplayUnits(unit_type)
-                
-                # For area fields, use square feet
-                if unit_type == DB.UnitType.UT_Area:
-                    format_options.DisplayUnits = DB.DisplayUnitType.DUT_SQUARE_FEET
-                elif valid_units:
-                    # For other numeric fields, use the first valid display unit
-                    format_options.DisplayUnits = valid_units[0]
-                
+
                 field.SetFormatOptions(format_options)
-                
+
         except Exception as e:
+            ERROR_HANDLE.print_note("Cannot set number format for field [{}]: {}".format(field_name, str(e)))
             continue
 
 def shade_cells_by_field(schedule_view, color_dict):

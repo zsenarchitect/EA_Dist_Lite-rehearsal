@@ -208,7 +208,7 @@ def library_palette():
     picked = RHINO_FORMS.select_from_list(
         options,
         title="EnneadTab Library Palette",
-        message="Type to filter · Enter opens in Grasshopper · Esc dismisses\n"
+        message="Type to filter \xc2\xb7 Enter opens in Grasshopper \xc2\xb7 Esc dismisses\n"
                 "Favorites show their shelf keys [1]..[9],[0]; recents show [recent].",
         button_names=["Open"],
         multi_select=False)

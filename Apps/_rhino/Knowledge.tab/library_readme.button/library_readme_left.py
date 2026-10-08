@@ -3,7 +3,7 @@ __title__ = "LibraryReadme"
 __doc__ = """Show a library definition's version-agnostic README.md docs.
 
 Pick a catalog entry to read the <definition>.gh.README.md sidecar sitting next
-to the definition file — usage notes, input explanations, and known
+to the definition file -- usage notes, input explanations, and known
 limitations, exactly as the Grasshopper library explorer renders them
 (EnneadTab-For-Grasshopper PR #30). The docs live outside the .gh file, so
 updating the definition never wipes them; files over 256 KiB are not loaded.

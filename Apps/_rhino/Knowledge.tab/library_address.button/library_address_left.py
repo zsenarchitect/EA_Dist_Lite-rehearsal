@@ -3,10 +3,10 @@ __title__ = "LibraryAddress"
 __doc__ = """Show a library entry's address stamp and check it for updates.
 
 Pick a catalog entry to see its library address (entry id plus catalog
-version — the revision entry the Grasshopper importer stamps onto documents)
+version -- the revision entry the Grasshopper importer stamps onto documents)
 and run update recognition: the catalog's recorded file hash is compared
 against the file on disk, flagging local changes with an asterisk, and an
-optional "version you have" answer produces the "v3 available — you have v2*"
+optional "version you have" answer produces the "v3 available -- you have v2*"
 report. Ports the address stamp from the Grasshopper library explorer
 (EnneadTab-For-Grasshopper PR #46).
 
@@ -176,7 +176,7 @@ def _raw_entry(index, entry_id):
 # --- Library address stamp / update recognition (ports GH PR #46) -----------
 # LibraryAddressStamp: the (entry id, version) revision entry identifying
 # where a definition came from. LibraryVersions: best-effort ordering of
-# human version strings. LibraryAddressUpdate: the "v3 available — you have
+# human version strings. LibraryAddressUpdate: the "v3 available -- you have
 # v2*" report, with "*" marking local changes.
 
 _CONTENT_HASH_MAX_BYTES = 32 * 1024 * 1024
@@ -325,16 +325,16 @@ def _format_address(entry, raw_index):
     # Update recognition: compare the catalog version against the version
     # the user currently has (the stamp a GH import would carry).
     have_version = rs.GetString(
-        "Library address check — version you currently have "
+        "Library address check \xe2\x80\x94 version you currently have "
         "(Enter to skip the update comparison)")
     if have_version is None:
         return None
     have_version = _utext(have_version).strip()
     lines.append(u"Update recognition:")
     if not have_version:
-        lines.append(u"  (skipped — no stamped version given)")
+        lines.append(u"  (skipped \u2014 no stamped version given)")
     elif not version:
-        lines.append(u"  (no catalog version to compare — entry is unversioned)")
+        lines.append(u"  (no catalog version to compare \u2014 entry is unversioned)")
     else:
         catalog_entry = {"id": entry_id, "_raw_version": version}
         update = _describe_update(entry_id, have_version, catalog_entry, local_changes)

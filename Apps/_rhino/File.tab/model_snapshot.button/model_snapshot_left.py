@@ -1,5 +1,5 @@
 __title__ = "Model Snapshot"
-__doc__ = """Versioned snapshots of model geometry, with Speckle-style branch/commit vocabulary, kept local.
+__doc__ = """Snapshot model geometry into local versioned stores with branch/commit vocabulary.
 
 Snapshot mode: capture the objects on chosen layers into a versioned store - a .3dm export plus a JSON manifest recording a fingerprint per object - on a named branch, with a commit message.
 Diff mode: pick any past commit and compare it against the current document; added, removed, and modified objects are listed.

@@ -85,9 +85,11 @@ def vertical_random(selection,type_map):
         # print (output.linkify(u_grid_id))
         # print (output.linkify(v_grid_id))
 
-        if v_grid_id.IntegerValue not in v_map:
-            v_map[v_grid_id.IntegerValue] = random.sample(type_map.values(), 1)[0]
-        panel.Symbol = v_map.get(v_grid_id.IntegerValue,None)
+        # StrongBox.Value is the ElementId; ElementId.IntegerValue is gone in Revit 2026
+        v_grid_int = REVIT_APPLICATION.get_element_id_value(v_grid_id.Value)
+        if v_grid_int not in v_map:
+            v_map[v_grid_int] = random.sample(type_map.values(), 1)[0]
+        panel.Symbol = v_map.get(v_grid_int,None)
         
     t.Commit()
     # print (v_map)
@@ -123,8 +125,11 @@ def diagonal_random(selection, type_map):
         # print (output.linkify(v_grid_id))
 
         
-        u_order = wall_dict[panel.Host.Id]["u_order"].index(u_grid_id.IntegerValue) + 1 if u_grid_id.IntegerValue != -1 else 0
-        v_order = wall_dict[panel.Host.Id]["v_order"].index(v_grid_id.IntegerValue) + 1 if v_grid_id.IntegerValue != -1 else 0
+        # StrongBox.Value is the ElementId; ElementId.IntegerValue is gone in Revit 2026
+        u_grid_int = REVIT_APPLICATION.get_element_id_value(u_grid_id.Value)
+        v_grid_int = REVIT_APPLICATION.get_element_id_value(v_grid_id.Value)
+        u_order = wall_dict[panel.Host.Id]["u_order"].index(u_grid_int) + 1 if u_grid_int != -1 else 0
+        v_order = wall_dict[panel.Host.Id]["v_order"].index(v_grid_int) + 1 if v_grid_int != -1 else 0
         
         u_order = u_order % len(type_map)
         v_order = v_order % len(type_map)

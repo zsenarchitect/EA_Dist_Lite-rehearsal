@@ -418,7 +418,7 @@ def save_active_path(path_data):
 
 
 # ---------------------------------------------------------------------------
-# Rhino viewport I/O (gated — unit tests never enter these)
+# Rhino viewport I/O (gated -- unit tests never enter these)
 # ---------------------------------------------------------------------------
 
 def _require_rhino():
@@ -472,7 +472,7 @@ def lock_named_view_for_keyframe(keyframe):
         return
     try:
         apply_camera(keyframe)
-        # AddNamedView(name, view) — first arg is the named-view name.
+        # AddNamedView(name, view) -- first arg is the named-view name.
         existing = rs_mod.NamedViews() or []
         if name in existing:
             try:
@@ -510,7 +510,7 @@ def capture_still_to_file(file_path, width, height):
 
     bitmap = capture.CaptureToBitmap(view)
     if bitmap is None:
-        # Fallback used by batch_export_rhino_view — mutates less predictably
+        # Fallback used by batch_export_rhino_view -- mutates less predictably
         # but works when ViewCapture is unavailable.
         cmd = '!_-ViewCaptureToFile _Width {} _Height {} "{}" -enter -enter'.format(
             int(width), int(height), file_path)
@@ -842,7 +842,7 @@ def stage_render_final(width=None, height=None, fps=None, duration_sec=None):
         for pose in poses:
             _work(pose)
 
-    # Image set — evenly spaced copies for decks / reviews
+    # Image set -- evenly spaced copies for decks / reviews
     monitor.set_stage("image_set", "Building image set")
     indices = pick_image_set_indices(len(frame_paths), image_set_count)
     image_set = []

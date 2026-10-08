@@ -991,7 +991,12 @@ class TemplateDataCollector:
         
         # Check parameter type first (more reliable)
         try:
+            # Definition.ParameterType is gone from Revit 2024; GetDataType() exists 2022+
             if (hasattr(param, 'Definition') and param.Definition and 
+                hasattr(param.Definition, 'GetDataType')):
+                if param.Definition.GetDataType() == DB.SpecTypeId.Boolean.YesNo:
+                    return "Yes" if int_value == 1 else "No"
+            elif (hasattr(param, 'Definition') and param.Definition and 
                 hasattr(param.Definition, 'ParameterType')):
                 
                 if param.Definition.ParameterType == DB.ParameterType.YesNo:

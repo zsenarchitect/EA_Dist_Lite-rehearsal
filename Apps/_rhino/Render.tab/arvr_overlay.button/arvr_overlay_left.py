@@ -9,6 +9,8 @@ Beam your 3D models onto your smartphone camera in augmented reality:
 - Direct upload to cloud room session
 - Shows the phone-ready QR code and link right here, no browser hop needed
 - Pick existing local .GLB / .GLTF / .USDZ file to beam
+- Add an explode / build sequence from Rhino layers (ordered bottom to top)
+- Compose the model with a site plan (Rhino picture surface or image file) on one printable sheet
 - Launch Web Hub (https://enneadtab.com/arvr)
 """
 
@@ -84,6 +86,8 @@ class ARVRExportDialog(object):
         layout.AddSeparateRow()
 
         # Selection Status
+        self.last_room_id = None  # room of the latest successful upload, target of the sequence button
+        self.browsed_glb = None  # a .glb picked with Browse; the composer prefers it over the Rhino selection
         self.sel_objs = rs.SelectedObjects() if 'rs' in globals() else []
         sel_count = len(self.sel_objs) if self.sel_objs else 0
 
@@ -149,6 +153,24 @@ class ARVRExportDialog(object):
         self.btn_browse.Height = 32
         self.btn_browse.Click += self.on_browse_click
         layout.AddRow(self.btn_browse)
+
+        self.btn_compose = Eto.Forms.Button()
+        self.btn_compose.Text = "COMPOSE MODEL + SITE PLAN ON ONE SHEET..."
+        self.btn_compose.Font = Eto.Drawing.Font("Arial", 9)
+        self.btn_compose.BackgroundColor = self.col_panel
+        self.btn_compose.TextColor = self.col_green
+        self.btn_compose.Height = 32
+        self.btn_compose.Click += self.on_compose_click
+        layout.AddRow(self.btn_compose)
+
+        self.btn_sequence = Eto.Forms.Button()
+        self.btn_sequence.Text = "ADD EXPLODE / BUILD SEQUENCE FROM LAYERS..."
+        self.btn_sequence.Font = Eto.Drawing.Font("Arial", 9)
+        self.btn_sequence.BackgroundColor = self.col_panel
+        self.btn_sequence.TextColor = self.col_green
+        self.btn_sequence.Height = 32
+        self.btn_sequence.Click += self.on_sequence_click
+        layout.AddRow(self.btn_sequence)
 
         self.btn_web = Eto.Forms.Button()
         self.btn_web.Text = "OPEN AR/VR WEB HUB (BROWSER)"
@@ -327,6 +349,8 @@ class ARVRExportDialog(object):
             self.dialog.Visible = True
 
         self.sel_objs = objs if objs else []
+        if self.sel_objs:
+            self.browsed_glb = None  # a fresh selection replaces a previously browsed model
         self._refresh_selection_status()
 
     def _set_image(self, image_view, file_path):
@@ -379,6 +403,7 @@ class ARVRExportDialog(object):
             self.status_lbl.TextColor = self.col_magenta
             return
 
+        self.last_room_id = room_id
         self.status_lbl.Text = ">> Beamed to Room {} - scan the BIG QR on your phone".format(room_id)
         self.status_lbl.TextColor = self.col_green
 
@@ -400,50 +425,76 @@ class ARVRExportDialog(object):
         except Exception as e:
             pass
 
+    def _export_selection_glb(self, exclude_ids=None):
+        """Export the selected (or all) objects to a staged .glb. Returns the path, or None.
+
+        exclude_ids: object ids to leave out, e.g. the picture surface used as the
+        site plan, which must not end up inside the exported model.
+        """
+        skip = set(str(i) for i in (exclude_ids or []))
+        objs = rs.SelectedObjects()
+        if not objs:
+            rs.Command("-_SelAll ")
+            objs = rs.SelectedObjects()
+        objs = [o for o in (objs or []) if str(o) not in skip]
+        if not objs:
+            NOTIFICATION.messenger("No objects found to export. Please select objects in Rhino first, or use Pick Objects above.")
+            return None
+
+        # Prepare export target path in staging folder
+        doc_name = rs.DocumentName()
+        if doc_name:
+            clean_name = os.path.splitext(doc_name)[0]
+        else:
+            clean_name = "Rhino_Model"
+
+        staging_dir = ARVR.get_staging_directory()
+        out_path = os.path.join(staging_dir, clean_name + ".glb")
+
+        # Delete any leftover file from a previous run first. Without this, a
+        # failed export here would silently re-upload a stale .glb from an
+        # earlier successful export instead of reporting failure.
+        if os.path.exists(out_path):
+            try:
+                os.remove(out_path)
+            except Exception:
+                pass
+
+        # Use RhinoDoc.ExportSelected directly (same proven pattern as
+        # File.tab/external_trimmer.button) instead of scripting -_Export
+        # with blind _Enter presses -- that macro approach has no way to
+        # know how many dialogs a given selection will trigger.
+        # Select exactly the intended objects: SelectObjects only adds, so anything
+        # excluded (the site-plan picture) must be cleared first.
+        rs.UnselectAllObjects()
+        rs.SelectObjects(objs)
+        # Force the glTF exporter to write empty parent nodes named after the
+        # layers, so the build/explode manifest (matched against each mesh's
+        # ancestor node names) actually lines up. FileGltfWriteOptions.ExportLayers
+        # exists only in Rhino >= 8.3; if the type, the property, or the options
+        # overload is missing (older Rhino) the inner fallback exports the selection
+        # the plain way, so this never breaks an older install.
+        try:
+            try:
+                gltf_options = Rhino.FileIO.FileGltfWriteOptions()
+                gltf_options.ExportLayers = True
+                exported = sc.doc.Export(out_path, gltf_options.ToDictionary())
+            except Exception:
+                exported = sc.doc.ExportSelected(out_path)
+        except Exception as export_err:
+            exported = False
+            NOTIFICATION.messenger("Export raised an error: {}".format(export_err))
+
+        if not exported or not os.path.exists(out_path) or os.path.getsize(out_path) == 0:
+            NOTIFICATION.messenger("Could not export geometry to .GLB. Please check Rhino export formats or use Browse.")
+            return None
+        return out_path
+
     def on_export_click(self, sender, e):
         try:
-            objs = rs.SelectedObjects()
-            if not objs:
-                rs.Command("-_SelAll ")
-                objs = rs.SelectedObjects()
-                if not objs:
-                    NOTIFICATION.messenger("No objects found to export. Please select objects in Rhino first, or use Pick Objects above.")
-                    return
-
-            # Prepare export target path in staging folder
-            doc_name = rs.DocumentName()
-            if doc_name:
-                clean_name = os.path.splitext(doc_name)[0]
-            else:
-                clean_name = "Rhino_Model"
-
-            staging_dir = ARVR.get_staging_directory()
-            out_path = os.path.join(staging_dir, clean_name + ".glb")
-
-            # Delete any leftover file from a previous run first. Without this, a
-            # failed export here would silently re-upload a stale .glb from an
-            # earlier successful export instead of reporting failure.
-            if os.path.exists(out_path):
-                try:
-                    os.remove(out_path)
-                except Exception:
-                    pass
-
-            # Use RhinoDoc.ExportSelected directly (same proven pattern as
-            # File.tab/external_trimmer.button) instead of scripting -_Export
-            # with blind _Enter presses -- that macro approach has no way to
-            # know how many dialogs a given selection will trigger.
-            rs.SelectObjects(objs)
-            try:
-                exported = sc.doc.ExportSelected(out_path)
-            except Exception as export_err:
-                exported = False
-                NOTIFICATION.messenger("Export raised an error: {}".format(export_err))
-
-            if not exported or not os.path.exists(out_path) or os.path.getsize(out_path) == 0:
-                NOTIFICATION.messenger("Could not export geometry to .GLB. Please check Rhino export formats or use Browse.")
+            out_path = self._export_selection_glb()
+            if not out_path:
                 return
-
             room_input = self.room_tb.Text.strip() if self.room_tb.Text else None
             ok, room_id, url, err = ARVR.stage_and_upload(out_path, room_id=room_input, auto_open_browser=False)
             self._handle_upload_result(ok, room_id, url, err)
@@ -452,12 +503,97 @@ class ARVRExportDialog(object):
         except:
             NOTIFICATION.messenger("Unexpected error during export.")
 
+    def _model_for_compose(self, exclude_ids=None):
+        """The model the composer uploads: a .glb picked with Browse if there is one, else the Rhino selection."""
+        if self.browsed_glb and os.path.exists(self.browsed_glb):
+            return self.browsed_glb
+        return self._export_selection_glb(exclude_ids)
+
+    def on_compose_click(self, sender, e):
+        try:
+            from EnneadTab.RHINO import RHINO_ARVR_COMPOSER
+            room_input = self.room_tb.Text.strip() if self.room_tb.Text else None
+            RHINO_ARVR_COMPOSER.ComposerDialog(
+                self._model_for_compose, self._handle_compose_result, lambda: room_input).show()
+        except Exception as ex:
+            NOTIFICATION.messenger("Composer error: {}".format(ex))
+
+    def on_sequence_click(self, sender, e):
+        """Pick layers; they become the build/explode steps, ordered bottom to top by height."""
+        try:
+            from EnneadTab import ARVR_SEQUENCE
+            room = self.last_room_id or (self.room_tb.Text.strip().upper() if self.room_tb.Text else None)
+            if not room:
+                NOTIFICATION.messenger("Send the model to a room first, then add its sequence.")
+                return
+            layers = [n for n in rs.LayerNames() if rs.ObjectsByLayer(n)]
+            if not layers:
+                NOTIFICATION.messenger("No layers with objects found.")
+                return
+            self.dialog.Visible = False
+            try:
+                picked = rs.MultiListBox(
+                    layers, "Pick the layers in your sequence. They are ordered bottom to top automatically.",
+                    "EnneadTab-ARVR sequence")
+            finally:
+                self.dialog.Visible = True
+            if not picked:
+                return
+            measured = []
+            for name in picked:
+                box = rs.BoundingBox(rs.ObjectsByLayer(name))
+                if box:
+                    measured.append((name, (box[0].Z + box[4].Z) / 2.0))
+            manifest = ARVR_SEQUENCE.build_manifest(ARVR_SEQUENCE.order_by_elevation(measured))
+            ok, err = ARVR.upload_sequence(room, manifest)
+            if ok:
+                self.status_lbl.Text = ">> Sequence of {} layers added to Room {}: EXPLODE and BUILD appear in the camera viewers".format(
+                    len(measured), room)
+                self.status_lbl.TextColor = self.col_green
+            else:
+                self.status_lbl.Text = ">> Sequence upload failed: {}".format(err)
+                self.status_lbl.TextColor = self.col_magenta
+        except Exception as ex:
+            NOTIFICATION.messenger("Sequence error: {}".format(ex))
+
+    def _clear_share_results(self):
+        """Blank the links and QR codes so a failed upload never shows the previous room's."""
+        self.mobile_link_tb.Text = ""
+        self.room_link_tb.Text = ""
+        self.qr_mobile_view.Image = None
+        self.qr_room_view.Image = None
+
+    def _handle_compose_result(self, ok, room_id, drawings_url, err):
+        """The phone link for a composition is the sheet (drawings) viewer, not the plain AR view."""
+        if not ok:
+            self._clear_share_results()
+            self.status_lbl.Text = ">> Upload failed: {}".format(err or "unknown error")
+            self.status_lbl.TextColor = self.col_magenta
+            return
+        self.last_room_id = room_id
+        self.status_lbl.Text = ">> Composed sheet in Room {}: print it at 100%, then scan the QR".format(room_id)
+        self.status_lbl.TextColor = self.col_green
+        self.mobile_link_tb.Text = drawings_url
+        self.room_link_tb.Text = "{}?room={}".format(ARVR.ARVR_URL_BASE, room_id)
+        self.qr_mobile_view.Image = None  # clear both first: a failed download must not leave an old room's QR
+        self.qr_room_view.Image = None
+        try:
+            qr = ARVR.download_qr_code(drawings_url, size=240)
+            if qr:
+                self._set_image(self.qr_mobile_view, qr)
+            room_qr = ARVR.download_qr_code(self.room_link_tb.Text, size=80)
+            if room_qr:
+                self._set_image(self.qr_room_view, room_qr)
+        except Exception:
+            pass
+
     def on_browse_click(self, sender, e):
         try:
             filter_str = "3D Models (*.glb;*.gltf;*.usdz)|*.glb;*.gltf;*.usdz|All Files (*.*)|*.*"
             filepath = rs.OpenFileName("Select 3D Model to Beam to AR/VR", filter_str)
             if not filepath or not os.path.exists(filepath):
                 return
+            self.browsed_glb = filepath if filepath.lower().endswith(".glb") else None
 
             room_input = self.room_tb.Text.strip() if self.room_tb.Text else None
             ok, room_id, url, err = ARVR.stage_and_upload(filepath, room_id=room_input, auto_open_browser=False)

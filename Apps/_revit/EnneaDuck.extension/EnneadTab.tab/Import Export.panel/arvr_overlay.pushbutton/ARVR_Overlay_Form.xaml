@@ -108,6 +108,59 @@
                         Margin="0,0,0,10"
                         Click="on_browse_model_clicked" />
 
+                <Button x:Name="btn_sequence"
+                        Content="ADD EXPLODE / BUILD SEQUENCE (LEVELS OR PHASES)"
+                        Height="34"
+                        Background="#1E293B"
+                        Foreground="#FFE600"
+                        BorderThickness="1"
+                        BorderBrush="#334155"
+                        Margin="0,0,0,10"
+                        Click="on_sequence_clicked" />
+
+                <Border x:Name="compose_card" Background="#121829" BorderBrush="#334155" BorderThickness="1"
+                        Padding="10" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="COMPOSE MODEL + SITE PLAN ON ONE SHEET" Foreground="#00FF66"
+                                   FontWeight="Bold" Margin="0,0,0,6" />
+                        <TextBlock x:Name="plan_status_text" Foreground="#FFE600" TextWrapping="Wrap"
+                                   Text="&gt;&gt; No site plan chosen" Margin="0,0,0,6" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <Button x:Name="btn_pick_plan" Content="CHOOSE PLAN IMAGE" Height="28" Width="150"
+                                    Background="#1E293B" Foreground="#00F0FF" BorderBrush="#334155"
+                                    Margin="0,0,6,0" Click="on_pick_plan_clicked" />
+                            <Button x:Name="btn_clear_plan" Content="CLEAR" Height="28" Width="70"
+                                    Background="#1E293B" Foreground="#8A99AD" BorderBrush="#334155"
+                                    Click="on_clear_plan_clicked" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Paper" Foreground="#8A99AD" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox x:Name="paper_combo" Width="90" SelectionChanged="on_compose_changed">
+                                <ComboBoxItem Content="A4" IsSelected="True" />
+                                <ComboBoxItem Content="LETTER" />
+                                <ComboBoxItem Content="A3" />
+                                <ComboBoxItem Content="TABLOID" />
+                            </ComboBox>
+                            <TextBlock Text="Scale 1:" Foreground="#8A99AD" VerticalAlignment="Center" Margin="12,0,6,0" />
+                            <TextBox x:Name="scale_textbox" Width="70" Text="500" TextChanged="on_compose_changed" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Rotate" Foreground="#8A99AD" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <Slider x:Name="yaw_slider" Minimum="-180" Maximum="180" Value="0" Width="220"
+                                    ValueChanged="on_yaw_changed" />
+                            <TextBlock x:Name="yaw_text" Text="0 deg" Foreground="#8A99AD" Margin="6,0,0,0" />
+                        </StackPanel>
+                        <TextBlock Text="Click the sheet to place the model origin" Foreground="#FFE600" Margin="0,0,0,4" />
+                        <Grid x:Name="sheet_grid" Width="240" HorizontalAlignment="Left">
+                            <Image x:Name="sheet_image" Stretch="Fill" MouseLeftButtonDown="on_sheet_clicked" />
+                            <Canvas x:Name="origin_canvas" IsHitTestVisible="False" />
+                        </Grid>
+                        <Button x:Name="btn_upload_compose" Content="UPLOAD MODEL + SITE PLAN TOGETHER" Height="34"
+                                Background="#FF007F" Foreground="White" FontWeight="Bold" Margin="0,8,0,0"
+                                Click="on_upload_compose_clicked" />
+                    </StackPanel>
+                </Border>
+
                 <Button x:Name="btn_open_web"
                         Content="OPEN AR/VR WEB HUB (BROWSER)"
                         Height="34"

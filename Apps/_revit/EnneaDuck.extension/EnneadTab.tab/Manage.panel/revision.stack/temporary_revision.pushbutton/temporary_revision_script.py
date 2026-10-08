@@ -63,8 +63,14 @@ class TemporaryRevisionManager(object):
 
     # ---------- Helpers ----------
     def _get_document_guid(self):
+        # WorksharingUtils.GetModelGUID is not part of the Revit API (absent
+        # from RevitAPI.xml 2022-2026), so workshared models crashed here.
+        # Reuse REVIT_SYNC.get_model_guid (cloud GetCloudModelPath().GetModelGUID(),
+        # then WorksharingCentralGUID, then a hash of the central path).
+        # Lazy import: REVIT_SYNC pulls in heavy UI modules.
         if hasattr(self.doc, 'IsWorkshared') and self.doc.IsWorkshared:
-            return str(DB.WorksharingUtils.GetModelGUID(self.doc))
+            from EnneadTab.REVIT import REVIT_SYNC
+            return REVIT_SYNC.get_model_guid(self.doc)
         return "DOC:" + self.doc.Title
 
     def _read_storage(self):

@@ -1,7 +1,7 @@
 __title__ = "CheckWorksessionFiles"
 __doc__ = """Check an expected list of model files against the disk and the active worksession.
 
-Reports which expected files are missing on disk, which are not attached to the worksession, and which attached models were not expected — then offers to attach the missing ones.
+Reports which expected files are missing on disk, which are not attached to the worksession, and which attached models were not expected -- then offers to attach the missing ones.
 """
 __is_popular__ = False
 

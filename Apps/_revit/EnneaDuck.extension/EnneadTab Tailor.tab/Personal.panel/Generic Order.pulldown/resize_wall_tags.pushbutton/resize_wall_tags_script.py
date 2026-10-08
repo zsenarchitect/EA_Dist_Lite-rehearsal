@@ -14,6 +14,7 @@ import proDUCKtion # pyright: ignore
 proDUCKtion.validify()
 import clr
 from Autodesk.Revit import DB # pyright: ignore 
+from EnneadTab.REVIT import REVIT_TAG
 # from Autodesk.Revit import UI # pyright: ignore
 doc = __revit__.ActiveUIDocument.Document # pyright: ignore
 
@@ -37,7 +38,7 @@ def process_tag(tag, max_length):
 
     original_condition = tag.LeaderEndCondition
     tag.LeaderEndCondition = DB.LeaderEndCondition.Free
-    end = tag.LeaderEnd
+    end = REVIT_TAG.get_leader_end(tag)
     tag.LeaderEndCondition = original_condition
     end = project_pt_in_view(end, view)
 
@@ -53,10 +54,11 @@ def process_tag(tag, max_length):
         return
 
 
-    if tag.HasElbow :
+    has_elbow = REVIT_TAG.has_leader_elbow(tag)
+    if has_elbow :
         vec = head - end
         original_length = vec.GetLength()
-        elbow = tag.LeaderElbow
+        elbow = REVIT_TAG.get_leader_elbow(tag)
         elbow = project_pt_in_view(elbow, view)
         vec = elbow - end
         vec = vec.Normalize () * (max_length * (vec.GetLength () / original_length))
@@ -67,8 +69,8 @@ def process_tag(tag, max_length):
     vec = vec.Normalize () * max_length
     tag.TagHeadPosition  = end + vec
 
-    if tag.HasElbow :
-        tag.LeaderElbow  = new_elbow_location
+    if has_elbow :
+        REVIT_TAG.set_leader_elbow(tag, new_elbow_location)
 
 def process_view(view, max_length):
     independent_tags = DB.FilteredElementCollector(doc, view.Id).OfClass(DB.IndependentTag).WhereElementIsNotElementType().ToElements()

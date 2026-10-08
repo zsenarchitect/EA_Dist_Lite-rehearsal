@@ -542,15 +542,6 @@
         "tab_icon": "Fun.tab\\icon.png",
         "is_popular": false
     },
-    "Fun.tab\\ennead_city.button\\ennead_city_right.py": {
-        "script": "Fun.tab\\ennead_city.button\\ennead_city_right.py",
-        "icon": "Fun.tab\\ennead_city.button\\icon.png",
-        "alias": "EnneadCity",
-        "doc": "EnneadCity GUI Interface",
-        "tab": "Fun.tab",
-        "tab_icon": "Fun.tab\\icon.png",
-        "is_popular": false
-    },
     "Fun.tab\\pet_duck.button\\pet_duck_left.py": {
         "script": "Fun.tab\\pet_duck.button\\pet_duck_left.py",
         "icon": "Fun.tab\\pet_duck.button\\icon.png",

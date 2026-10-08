@@ -254,7 +254,7 @@ def _format_contract(entry, raw_index):
     raw = _raw_entry(raw_index, entry.get("id")) if raw_index else None
     contract = _ci_get(raw, "derivedContract") if raw else None
     if not isinstance(contract, dict):
-        lines.append(u"  (no derived contract in the index for this entry — Refresh the "
+        lines.append(u"  (no derived contract in the index for this entry \u2014 Refresh the "
                      u"Grasshopper library with contract derivation to add one)")
         return u"\n".join(lines)
     inputs = [p for p in (_ci_get(contract, "inputs") or []) if isinstance(p, dict)]

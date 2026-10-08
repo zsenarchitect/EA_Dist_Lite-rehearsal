@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __title__ = "FlyThrough"
-__doc__ = """Precise fly-through content pipeline (senzhang-todo #452).
+__doc__ = """Precise fly-through content pipeline (tracked under ticket #452).
 
 Locks a camera path in the LIVE Rhino 3D viewport (operator-controlled, not
 AI-guessed), exports keyframe stills for debug/approval, then renders a final
@@ -64,7 +64,7 @@ def _read_settings_prompt():
         fps = int(res[2])
         duration = float(res[3])
     except Exception:
-        NOTIFICATION.messenger("Invalid settings — keep numbers only.")
+        NOTIFICATION.messenger("Invalid settings \xe2\x80\x94 keep numbers only.")
         return None
     DATA_FILE.set_sticky(STICKY_WIDTH, width)
     DATA_FILE.set_sticky(STICKY_HEIGHT, height)
@@ -98,7 +98,7 @@ def _import_named_views():
 def fly_through():
     choice = rs.ListBox(
         ACTIONS,
-        message="Fly-through pipeline — lock path in the live viewport, stills first, then final.",
+        message="Fly-through pipeline \xe2\x80\x94 lock path in the live viewport, stills first, then final.",
         title="EnneadTab FlyThrough")
     if not choice:
         return

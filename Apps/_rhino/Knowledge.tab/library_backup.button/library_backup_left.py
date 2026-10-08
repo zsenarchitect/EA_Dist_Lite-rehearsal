@@ -78,7 +78,7 @@ def _scan_roots(index, settings):
 
 
 def _iter_sidecars(scan_root):
-    # Tolerant recursive sidecar enumeration; mirrors GH EnumerateSidecars —
+    # Tolerant recursive sidecar enumeration; mirrors GH EnumerateSidecars --
     # one unreadable folder must not fail the whole snapshot.
     stack = [scan_root]
     while stack:
@@ -223,10 +223,10 @@ def library_backup():
         hint = "Create the first backup now."
     elif age < interval:
         last_line = "Newest backup is {0} min old.".format(age)
-        hint = "That is within the {0}-min interval — a fresh backup is optional.".format(interval)
+        hint = "That is within the {0}-min interval \xe2\x80\x94 a fresh backup is optional.".format(interval)
     else:
         last_line = "Newest backup is {0} min old.".format(age)
-        hint = "That is older than the {0}-min interval — a backup is recommended.".format(interval)
+        hint = "That is older than the {0}-min interval \xe2\x80\x94 a backup is recommended.".format(interval)
 
     action = RHINO_FORMS.select_from_list(
         ["Back up now", "Change backup interval..."],

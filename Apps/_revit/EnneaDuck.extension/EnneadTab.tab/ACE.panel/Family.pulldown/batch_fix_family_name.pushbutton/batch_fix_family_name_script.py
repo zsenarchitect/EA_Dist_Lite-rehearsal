@@ -754,7 +754,7 @@ class BatchFormatFamilyNameWindow(WPFWindow):
                 fam = None
             if fam and fam.FamilyCategory \
                     and fam.FamilyCategory.CategoryType == DB.CategoryType.Model:
-                result[fam.Id.IntegerValue] = fam
+                result[family_int_id(fam)] = fam
         return list(result.values())
 
     def build_rows(self, families):

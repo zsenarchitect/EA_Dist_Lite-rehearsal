@@ -171,7 +171,7 @@ def _append_bar_section(lines, heading, counts):
         for name, count in counts:
             width = max(1, int(round(float(count) / top * _MAX_BAR_WIDTH)))
             lines.append(u"  {0} {1} {2}".format(
-                name.ljust(label_width), u"█" * width, count))
+                name.ljust(label_width), u"\u2588" * width, count))
     lines.append("")
 
 
@@ -237,7 +237,7 @@ def library_insights():
     lines = []
     lines.append("EnneadTab Library Insights")
     lines.append("==========================")
-    lines.append(u"Entries: {0} · Total opens: {1}".format(len(entries), total_opens))
+    lines.append(u"Entries: {0} \u00b7 Total opens: {1}".format(len(entries), total_opens))
     lines.append("")
     _append_bar_section(lines, "Definitions per category", category_counts[:15])
     _append_bar_section(lines, "Top tags", tag_counts[:15])

@@ -205,16 +205,20 @@ def disjoin_columns_from_walls(doc):
                     failure_pairs += 1
                     print("        Failed to disjoin column {0} and wall {1}: {2}".format(column.Id, joined_element.Id, exc))
                 try:
-                    if hasattr(DB.SolidSolidCutUtils, "AreElementsCut") and DB.SolidSolidCutUtils.AreElementsCut(doc, column, joined_element):
+                    # SolidSolidCutUtils.AreElementsCut is not part of the Revit API
+                    # (absent from RevitAPI.xml 2022-2026), so the old hasattr guard
+                    # always skipped this branch. The documented call is
+                    # CutExistsBetweenElements(first, second, out firstCutsSecond);
+                    # IronPython returns (exists, first_cuts_second) for the out param.
+                    cut_exists, column_cuts_wall = DB.SolidSolidCutUtils.CutExistsBetweenElements(column, joined_element)
+                    if cut_exists:
                         DB.SolidSolidCutUtils.RemoveCutBetweenSolids(doc, column, joined_element)
                         solid_cut_pairs += 1
                         solid_cuts_this_column += 1
-                        print("        Removed solid-solid cut between column {0} and wall {1}.".format(column.Id, joined_element.Id))
-                    elif hasattr(DB.SolidSolidCutUtils, "AreElementsCut") and DB.SolidSolidCutUtils.AreElementsCut(doc, joined_element, column):
-                        DB.SolidSolidCutUtils.RemoveCutBetweenSolids(doc, joined_element, column)
-                        solid_cut_pairs += 1
-                        solid_cuts_this_column += 1
-                        print("        Removed solid-solid cut between wall {0} and column {1}.".format(joined_element.Id, column.Id))
+                        if column_cuts_wall:
+                            print("        Removed solid-solid cut between column {0} and wall {1}.".format(column.Id, joined_element.Id))
+                        else:
+                            print("        Removed solid-solid cut between wall {0} and column {1}.".format(joined_element.Id, column.Id))
                 except Exception as exc:
                     solid_cut_failures += 1
                     print("        Failed to remove solid-solid cut between column {0} and wall {1}: {2}".format(column.Id, joined_element.Id, exc))

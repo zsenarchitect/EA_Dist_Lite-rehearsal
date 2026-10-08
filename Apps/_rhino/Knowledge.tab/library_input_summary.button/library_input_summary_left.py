@@ -4,9 +4,9 @@ __doc__ = """Summarize a library definition's inputs, grouped by control type.
 
 Pick a catalog entry to see its Inputs-group parameters grouped as sliders,
 toggles, value lists, panels, referenced geometry, or other, with counts and
-member names — the "drive 3 sliders" view from the Grasshopper library
+member names -- the "drive 3 sliders" view from the Grasshopper library
 explorer (EnneadTab-For-Grasshopper PR #42). The picker list itself shows the
-compact summary (e.g. "2 sliders · 1 toggle") next to each entry.
+compact summary (e.g. "2 sliders / 1 toggle") next to each entry.
 
 Reads the shared Grasshopper definition catalog through
 Apps/_rhino/Library/catalog.py; inputs come from the catalog index."""
@@ -234,7 +234,7 @@ def _format_input_summary(entry):
              u""]
     if not groups:
         lines.append(u"Input summary (grouped by control type):")
-        lines.append(u"  (none — this entry has no Inputs-group parameters)")
+        lines.append(u"  (none \u2014 this entry has no Inputs-group parameters)")
         return u"\n".join(lines)
     lines.append(u"Input summary (grouped by control type):")
     for kind, members in groups:
